@@ -1,0 +1,54 @@
+package com.lyra.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.List;
+
+/**
+ * Representa un libro dentro de la plataforma
+ * Contiene información bibliográfica y mantiene relaciones con reseñas,
+ * frases favoritas, préstamos y asociaciones con usuarios
+ */
+
+
+@Entity
+@Table(name = "Libro")
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+public class Libro {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id_libro;
+
+    private String titulo_libro;
+    private String autor;
+    private String genero;
+    private Integer anio_publicacion;
+
+    @Column(columnDefinition = "TEXT")
+    private String sinopsis;
+
+    private String portada;
+
+    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<Reseña> reseñas;
+
+    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<FrasesFavoritas> frases;
+
+    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<LibroUsuario> usuariosLibro;
+
+    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<PrestamoUsuarioLibro> prestamos;
+}

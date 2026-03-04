@@ -1,0 +1,25 @@
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Maven
+target/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+
+# Spring Boot
+*.jar
+*.war
+*.zip
+
+# Archivo local con credenciales (NO se sube)
+src/main/resources/application-local.properties
