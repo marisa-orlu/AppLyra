@@ -38,7 +38,7 @@ public class Libro {
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Reseña> reseñas;
+    private List<Resena> resenas;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     @ToString.Exclude

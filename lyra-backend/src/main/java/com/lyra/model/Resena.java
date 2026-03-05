@@ -20,7 +20,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 
-public class Reseña {
+public class Resena {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
