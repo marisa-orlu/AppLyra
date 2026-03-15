@@ -20,11 +20,11 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 
-public class Reseña {
+public class Resena {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_reseña;
+    private Long id_resena;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")

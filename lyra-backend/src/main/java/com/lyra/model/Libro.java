@@ -26,9 +26,14 @@ public class Libro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_libro;
 
+    @Column(name = "titulo_libro")
     private String titulo_libro;
+    @Column(name = "autor")
     private String autor;
+
     private String genero;
+
+    @Column(name = "anio_publicacion")
     private Integer anio_publicacion;
 
     @Column(columnDefinition = "TEXT")
@@ -38,7 +43,7 @@ public class Libro {
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Reseña> reseñas;
+    private List<Resena> resenas;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     @ToString.Exclude
@@ -46,7 +51,7 @@ public class Libro {
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<LibroUsuario> usuariosLibro;
+    private List<LibroUsuario> usuarios_libro;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     @ToString.Exclude
