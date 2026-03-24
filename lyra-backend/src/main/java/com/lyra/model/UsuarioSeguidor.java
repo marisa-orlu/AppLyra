@@ -20,6 +20,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(UsuarioSeguidorId.class)
+@Builder
+
 public class UsuarioSeguidor {
 
     @Id
