@@ -59,12 +59,12 @@ public class UsuarioSeguidorService {
     }
 
     // Obtener seguidores de un usuario (quién lo sigue)
-    public List<UsuarioSeguidor> obtenerSeguidores(Long idUsuario) {
+    public List<UsuarioSeguidor> obtenerSeguidores(Long id_usuario) {
 
-        usuarioRepository.findById(idUsuario)
+        usuarioRepository.findById(id_usuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        return usuarioSeguidorRepository.findByIdUsuario(idUsuario);
+        return usuarioSeguidorRepository.findByIdUsuario(id_usuario);
     }
 
     // Obtener seguidos por un usuario (a quién sigue)

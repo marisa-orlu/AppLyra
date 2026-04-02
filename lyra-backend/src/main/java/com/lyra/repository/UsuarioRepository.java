@@ -24,3 +24,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     // 5. Opcional: Buscar por fragmento de nombre (para buscadores)
     List<Usuario> findByNombreContainingIgnoreCase(String nombre);
 }
+
+
