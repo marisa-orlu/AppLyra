@@ -3,6 +3,7 @@ package com.lyra.controller;
 
 import com.lyra.DTOs.LibroUsuarioDTOs.*;
 import com.lyra.services.LibroUsuarioService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/biblioteca")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class LibroUsuarioController {
 
     private final LibroUsuarioService libroUsuarioService;

@@ -3,6 +3,7 @@ package com.lyra.controller;
 
 import com.lyra.DTOs.FrasesFavoritasDTOs.*;
 import com.lyra.services.FrasesFavoritasService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/frases")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class FrasesFavoritasController {
 
     private final FrasesFavoritasService frasesService;

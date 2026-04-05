@@ -36,7 +36,12 @@ public class LibroUsuario {
     private Libro libro;
 
     private String estado;
+
+    @Column(name = "fecha_agregacion")
     private Date fecha_agregacion;
-    private Boolean isPrestamo;
+
+    @Column(name = "is_prestamo")
+    private Boolean is_prestamo;
+
     private Integer puntuacion;
 }

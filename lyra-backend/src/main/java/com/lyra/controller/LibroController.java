@@ -4,6 +4,7 @@ import com.lyra.DTOs.LibroDTOs.*;
 import com.lyra.DTOs.LibroDTOs.LibroCrearDTO;
 import com.lyra.model.Libro;
 import com.lyra.services.LibroService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.query.Page;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/libros")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class LibroController {
 
     private final LibroService libroService;

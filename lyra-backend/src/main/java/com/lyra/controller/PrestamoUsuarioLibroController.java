@@ -2,6 +2,7 @@ package com.lyra.controller;
 
 import com.lyra.DTOs.PrestamoUsuarioLibroDTOs.*;
 import com.lyra.services.PrestamoUsuarioLibroService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/prestamos")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class PrestamoUsuarioLibroController {
 
     private final PrestamoUsuarioLibroService prestamoService;

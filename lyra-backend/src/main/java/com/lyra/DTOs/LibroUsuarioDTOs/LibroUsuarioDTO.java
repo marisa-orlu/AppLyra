@@ -21,7 +21,7 @@ public record LibroUsuarioDTO(
                 lu.getLibro().getId_libro(),
                 lu.getEstado(),
                 lu.getPuntuacion(),
-                lu.getIsPrestamo(),
+                lu.getIs_prestamo(),
                 lu.getFecha_agregacion()
         );
     }

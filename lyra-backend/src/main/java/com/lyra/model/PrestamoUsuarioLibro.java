@@ -34,8 +34,12 @@ public class PrestamoUsuarioLibro {
     @JoinColumn(name = "id_libro")
     private Libro libro;
 
+    @Column(name = "fecha_inicio")
     private Date fecha_inicio;
+
+    @Column(name = "fecha_fin")
     private Date fecha_fin;
+
     private String estado;
 }
 
