@@ -11,4 +11,6 @@ public interface FrasesFavoritasRepository extends JpaRepository<FrasesFavoritas
     List<FrasesFavoritas> findByUsuario(Usuario usuario);
 
     List<FrasesFavoritas> findByLibro(Libro libro);
+
+
 }

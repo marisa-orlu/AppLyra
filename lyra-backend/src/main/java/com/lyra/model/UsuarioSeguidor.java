@@ -2,6 +2,8 @@ package com.lyra.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -25,9 +27,11 @@ import java.util.Date;
 public class UsuarioSeguidor {
 
     @Id
+    @Column(name = "id_usuario")
     private Long id_usuario;
 
     @Id
+    @Column(name = "id_seguidor")
     private Long id_seguidor;
 
     private Date fecha;

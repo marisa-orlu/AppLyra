@@ -11,7 +11,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "FrasesFavoritas")
+@Table(name = "frasesfavoritas")
 @Getter
 @Setter
 @ToString
