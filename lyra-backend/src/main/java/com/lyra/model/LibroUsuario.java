@@ -13,7 +13,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "LibroUsuario")
+@Table(name = "librousuario")
 @Getter
 @Setter
 @ToString

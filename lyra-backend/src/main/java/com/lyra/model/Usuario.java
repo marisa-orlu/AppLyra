@@ -14,7 +14,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "Usuario")
+@Table(name = "usuario")
 @Getter
 @Setter
 @ToString

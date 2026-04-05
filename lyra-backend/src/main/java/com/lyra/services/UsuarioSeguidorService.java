@@ -1,5 +1,6 @@
 package com.lyra.services;
 
+import com.lyra.exception.OperacionNoPermitidaException;
 import com.lyra.model.Usuario;
 import com.lyra.model.UsuarioSeguidor;
 import com.lyra.model.UsuarioSeguidorId;
@@ -22,7 +23,7 @@ public class UsuarioSeguidorService {
     public UsuarioSeguidor seguirUsuario(Long idUsuario, Long idSeguidor) {
 
         if (idUsuario.equals(idSeguidor)) {
-            throw new RuntimeException("Un usuario no puede seguirse a sí mismo");
+            throw new OperacionNoPermitidaException("Un usuario no puede seguirse a sí mismo");
         }
 
         // Validar usuarios
