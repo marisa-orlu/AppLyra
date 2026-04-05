@@ -12,7 +12,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "Reseña")
+@Table(name = "resena")
 @Getter
 @Setter
 @ToString

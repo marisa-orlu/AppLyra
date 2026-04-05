@@ -15,7 +15,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "UsuarioSeguidor")
+@Table(name = "usuarioseguidor")
 @Getter
 @Setter
 @ToString

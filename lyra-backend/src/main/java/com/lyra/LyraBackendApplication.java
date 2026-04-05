@@ -1,9 +1,15 @@
 package com.lyra;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@OpenAPIDefinition(info =
+@Info(description = "API para la gestión de una biblioteca personal con funcionalidades sociales",
+		title = "Lyra API",
+		version = "1.0"))
 public class LyraBackendApplication {
 
 	public static void main(String[] args) {

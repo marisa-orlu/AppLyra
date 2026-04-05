@@ -2,6 +2,7 @@ package com.lyra.services;
 
 import com.lyra.DTOs.UsuarioDTOs.UsuarioActualizarDTO;
 import com.lyra.DTOs.UsuarioDTOs.UsuarioRegistroDTO;
+import com.lyra.exception.EmailYaRegistradoException;
 import com.lyra.model.Rol;
 import com.lyra.model.Usuario;
 import com.lyra.repository.UsuarioRepository;
@@ -20,7 +21,7 @@ public class UsuarioService {
     // Crear usuario (registro)
     public Usuario crearUsuario(UsuarioRegistroDTO dto) {
         if (usuarioRepository.existsByEmail(dto.email())) {
-            throw new RuntimeException("El email ya está registrado");
+            throw new EmailYaRegistradoException("El email ya está registrado");
         }
         if (usuarioRepository.existsByNombre(dto.nombre())) {
             throw new RuntimeException("El nombre de usuario ya está en uso");
