@@ -1,7 +1,9 @@
 package com.lyra.services;
 
+import com.lyra.DTOs.LibroDTOs.LibroDTO;
 import com.lyra.model.Libro;
 import com.lyra.repository.LibroRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +16,24 @@ public class LibroService {
     private final LibroRepository libroRepository;
 
     // Crear libro
-    public Libro crearLibro(Libro libro) {
+    public Libro crearLibro(LibroDTO dto) {
+
+        Libro libro = Libro.builder()
+                .titulo_libro(dto.titulo())
+                .autor(dto.autor())
+                .genero(dto.genero())
+                .anio_publicacion(dto.anio_publicacion())
+                .sinopsis(dto.sinopsis())
+                .portada(dto.portada())
+                .build();
+
         return libroRepository.save(libro);
     }
 
     // Obtener libro por ID
     public Libro obtenerPorId(Long id) {
         return libroRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("No existe un libro con id: " + id));
     }
 
     // Obtener todos los libros
@@ -43,6 +55,8 @@ public class LibroService {
         return libroRepository.save(libro);
     }
 
+
+
     // Eliminar libro
     public void eliminarLibro(Long id) {
         Libro libro = obtenerPorId(id);
@@ -62,7 +76,7 @@ public class LibroService {
         return libroRepository.findByGeneroIgnoreCase(genero);
     }
 
-    public List<Libro> buscarPorAnio(Integer anio) {
-        return libroRepository.findByAnioPublicacion(anio);
+    public List<Libro> buscarPorAnio(Integer anio_publicacion) {
+        return libroRepository.findByAnio(anio_publicacion);
     }
 }

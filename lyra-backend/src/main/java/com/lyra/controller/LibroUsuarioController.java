@@ -1,0 +1,56 @@
+package com.lyra.controller;
+
+
+import com.lyra.DTOs.LibroUsuarioDTOs.*;
+import com.lyra.services.LibroUsuarioService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/biblioteca")
+@RequiredArgsConstructor
+public class LibroUsuarioController {
+
+    private final LibroUsuarioService libroUsuarioService;
+
+    @PostMapping
+    public LibroUsuarioDTO agregar(@RequestBody LibroUsuarioCrearDTO dto) {
+        return LibroUsuarioDTO.of(
+                libroUsuarioService.agregarLibro(dto.idUsuario(), dto.idLibro(), dto.estado())
+        );
+    }
+
+    @PutMapping("/{id}/estado")
+    public LibroUsuarioDTO cambiarEstado(@PathVariable Long id, @RequestParam String estado) {
+        return LibroUsuarioDTO.of(libroUsuarioService.cambiarEstado(id, estado));
+    }
+
+    @PutMapping("/{id}/puntuacion")
+    public LibroUsuarioDTO puntuar(@PathVariable Long id, @RequestParam Integer puntuacion) {
+        return LibroUsuarioDTO.of(libroUsuarioService.puntuarLibro(id, puntuacion));
+    }
+
+    @PutMapping("/{id}/prestamo")
+    public LibroUsuarioDTO marcarPrestamo(@PathVariable Long id, @RequestParam boolean prestamo) {
+        return LibroUsuarioDTO.of(libroUsuarioService.marcarComoPrestamo(id, prestamo));
+    }
+
+    @GetMapping("/usuario/{idUsuario}")
+    public List<LibroUsuarioDTO> obtenerBiblioteca(@PathVariable Long idUsuario) {
+        return libroUsuarioService.obtenerBiblioteca(idUsuario)
+                .stream()
+                .map(LibroUsuarioDTO::of)
+                .toList();
+    }
+
+    @GetMapping("/usuario/{idUsuario}/top")
+    public List<LibroUsuarioDTO> topPuntuados(@PathVariable Long idUsuario) {
+        return libroUsuarioService.topPuntuados(idUsuario)
+                .stream()
+                .map(LibroUsuarioDTO::of)
+                .toList();
+    }
+}
+
