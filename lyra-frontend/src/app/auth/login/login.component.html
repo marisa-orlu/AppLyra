@@ -1,0 +1,31 @@
+<section class="login-page">
+  <div class="login-card">
+    <h1>Login</h1>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()" novalidate>
+      <input
+        class="login-input"
+        type="email"
+        formControlName="email"
+        placeholder="Usuario *"
+        autocomplete="username"
+      />
+
+      <input
+        class="login-input"
+        type="password"
+        formControlName="password"
+        placeholder="Contraseña *"
+        autocomplete="current-password"
+      />
+
+      <button class="btn-primary" type="submit" [disabled]="loginForm.invalid || isSubmitting">
+        Inicio sesión
+      </button>
+
+      <button class="btn-secondary" type="button" (click)="goToRegister()">
+        Registro usuario
+      </button>
+    </form>
+  </div>
+</section>
