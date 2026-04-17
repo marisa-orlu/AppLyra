@@ -50,22 +50,51 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.email(), dto.contrasena())
-        );
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO dto) {
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(dto.email(), dto.contrasena())
+            );
 
-        Usuario usuario = (Usuario) auth.getPrincipal();
-        String token = jwtService.generateToken(usuario);
+            Object principal = auth.getPrincipal();
+            String email;
+            String rol;
+            Usuario usuarioToken;
 
-        return ResponseEntity.ok(new LoginResponseDTO(
-                usuario.getId(),
-                usuario.getNombre(),
-                usuario.getEmail(),
-                usuario.getRol().name(),
-                token
-        ));
+            if (principal instanceof Usuario u) {
+                email = u.getEmail();
+                rol = u.getRol().name();
+                usuarioToken = u;
+            } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+                email = userDetails.getUsername(); // si username \= email
+                rol = userDetails.getAuthorities().stream().findFirst()
+                        .map(a -> a.getAuthority())
+                        .orElse("ROLE_USER");
+
+                // Carga tu entidad para poder firmar con generateToken\(Usuario\)
+                usuarioToken = usuarioService.obtenerPorEmail(email);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(java.util.Map.of("error", "No se pudo autenticar el usuario"));
+            }
+
+            String token = jwtService.generateToken(usuarioToken);
+
+            return ResponseEntity.ok(java.util.Map.of(
+                    "email", email,
+                    "rol", rol,
+                    "token", token ));
+        } catch (org.springframework.security.authentication.BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("error", "Credenciales inválidas"));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(java.util.Map.of("error", "Error interno en login"));
+        }
     }
+
+
+
 
     @GetMapping("/buscar")
     public ResponseEntity<List<UsuarioDTO>> buscarPorNombre(@RequestParam String nombre) {

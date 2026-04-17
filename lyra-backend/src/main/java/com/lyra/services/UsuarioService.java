@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -39,6 +40,10 @@ public class UsuarioService {
                 .build();
 
         return usuarioRepository.save(usuario);
+    }
+    public Usuario obtenerPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("No existe usuario con email: " + email));
     }
 
     // Obtener usuario por ID
