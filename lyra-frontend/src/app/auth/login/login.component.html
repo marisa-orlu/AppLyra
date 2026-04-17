@@ -1,0 +1,37 @@
+<section class="login-page">
+  <div class="login-card">
+    <h1>Login</h1>
+
+    <form (submit)="onSubmit($event)" method="post" novalidate>
+      <input
+        class="login-input"
+        type="email"
+        name="email"
+        [value]="email"
+        (input)="email = ($any($event.target)).value"
+        placeholder="Email *"
+        autocomplete="email"
+      />
+
+      <input
+        class="login-input"
+        type="password"
+        name="contrasena"
+        [value]="contrasena"
+        (input)="contrasena = ($any($event.target)).value"
+        placeholder="Contraseña *"
+        autocomplete="current-password"
+      />
+
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button class="btn-primary" type="submit">
+        Iniciar sesión
+      </button>
+
+      <button class="btn-secondary" type="button" (click)="registrarUsuario()">
+        Registro usuario
+      </button>
+    </form>
+  </div>
+</section>

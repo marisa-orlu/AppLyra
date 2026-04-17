@@ -40,7 +40,7 @@ public class LibroUsuarioService {
                 .libro(libro)
                 .estado(estado)
                 .fecha_agregacion(new Date())
-                .isPrestamo(false)
+                .is_prestamo(false)
                 .puntuacion(null)
                 .build();
 
@@ -70,7 +70,7 @@ public class LibroUsuarioService {
         LibroUsuario lu = libroUsuarioRepository.findById(idLibroUsuario)
                 .orElseThrow(() -> new RuntimeException("Registro no encontrado"));
 
-        lu.setIsPrestamo(prestamo);
+        lu.setIs_prestamo(prestamo);
         return libroUsuarioRepository.save(lu);
     }
 

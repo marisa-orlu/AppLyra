@@ -3,12 +3,15 @@ package com.lyra.services;
 import com.lyra.DTOs.UsuarioDTOs.UsuarioActualizarDTO;
 import com.lyra.DTOs.UsuarioDTOs.UsuarioRegistroDTO;
 import com.lyra.exception.EmailYaRegistradoException;
+import com.lyra.exception.OperacionNoPermitidaException;
 import com.lyra.model.Rol;
 import com.lyra.model.Usuario;
 import com.lyra.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Crear usuario (registro)
     public Usuario crearUsuario(UsuarioRegistroDTO dto) {
@@ -30,11 +34,16 @@ public class UsuarioService {
         Usuario usuario = Usuario.builder()
                 .nombre(dto.nombre())
                 .email(dto.email())
-                .contrasena(dto.contrasena())  // TODO: cifrar
+                .contrasena(passwordEncoder.encode(dto.contrasena())) //Cifrar contraseña
                 .fechaRegistro(LocalDate.now())
+                .rol(Rol.USER)
                 .build();
 
         return usuarioRepository.save(usuario);
+    }
+    public Usuario obtenerPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("No existe usuario con email: " + email));
     }
 
     // Obtener usuario por ID
@@ -67,8 +76,8 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Email no registrado"));
 
-        if (!usuario.getContrasena().equals(contrasena)) {
-            throw new RuntimeException("Contraseña incorrecta");
+        if (!passwordEncoder.matches(contrasena, usuario.getContrasena())) { //  comparar cifrado
+            throw new OperacionNoPermitidaException("Contraseña incorrecta");
         }
 
         return usuario;

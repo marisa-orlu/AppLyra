@@ -2,6 +2,7 @@ package com.lyra.controller;
 
 import com.lyra.DTOs.UsuarioSeguidorDTOs.*;
 import com.lyra.services.UsuarioSeguidorService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/seguidores")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class UsuarioSeguidorController {
 
     private final UsuarioSeguidorService seguidorService;
