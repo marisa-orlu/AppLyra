@@ -1,53 +1,66 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { LoginRequest } from '../../interfaces/login-request';
 
 @Component({
   selector: 'app-login',
   standalone: false,
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-
-  loginForm: FormGroup;
-  isSubmitting = false;
+  email: string = '';
+  contrasena: string = '';
+  errorMessage: string = '';
 
   constructor(
-    private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
-    });
-  }
+  ) { }
 
-  login() {
-    if (this.loginForm.invalid || this.isSubmitting) return;
+  onSubmit(event?: Event) {
+    event?.preventDefault();
 
-    this.isSubmitting = true;
+    if (!this.email || !this.contrasena) {
+      this.errorMessage = 'Ambos campos son obligatorios';
+      return;
+    }
 
-    const data = this.loginForm.value;
+    const loginRequest: LoginRequest = { email: this.email, contrasena: this.contrasena };
+    this.authService.login(loginRequest).subscribe({
+      next: (res) => {
+        if (res.token) {
+          this.authService.saveToken(res.token);
+        }
 
-    this.authService.login(data).subscribe({
-      next: (response) => {
-        this.authService.saveToken(response.token);
-        this.router.navigate(['/biblioteca']);
+        if (res.role) {
+          localStorage.setItem('rol', res.role);
+        }
+
+        console.log('Login correcto', {
+          email: this.email,
+          rol: res.role
+        });
+
+        switch (res.role) {
+          case 'ROLE_ADMIN':
+            this.router.navigate(['/dashboard']);
+            break;
+          case 'ROLE_USER':
+          default:
+            this.router.navigate(['/home-usuario']);
+            break;
+        }
       },
       error: () => {
-        this.isSubmitting = false;
-        alert('Credenciales incorrectas');
-      },
-      complete: () => {
-        this.isSubmitting = false;
+        this.errorMessage = 'Usuario o contraseña incorrectos';
       }
     });
   }
 
-  goToRegister() {
-    this.router.navigate(['/register']);
+
+  registrarUsuario() {
+    this.router.navigate(['/registro-usuario']);
   }
 }

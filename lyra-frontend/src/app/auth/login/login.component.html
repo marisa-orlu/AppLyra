@@ -2,28 +2,34 @@
   <div class="login-card">
     <h1>Login</h1>
 
-    <form [formGroup]="loginForm" (ngSubmit)="login()" novalidate>
+    <form (submit)="onSubmit($event)" method="post" novalidate>
       <input
         class="login-input"
         type="email"
-        formControlName="email"
-        placeholder="Usuario *"
-        autocomplete="username"
+        name="email"
+        [value]="email"
+        (input)="email = ($any($event.target)).value"
+        placeholder="Email *"
+        autocomplete="email"
       />
 
       <input
         class="login-input"
         type="password"
-        formControlName="password"
+        name="contrasena"
+        [value]="contrasena"
+        (input)="contrasena = ($any($event.target)).value"
         placeholder="Contraseña *"
         autocomplete="current-password"
       />
 
-      <button class="btn-primary" type="submit" [disabled]="loginForm.invalid || isSubmitting">
-        Inicio sesión
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button class="btn-primary" type="submit">
+        Iniciar sesión
       </button>
 
-      <button class="btn-secondary" type="button" (click)="goToRegister()">
+      <button class="btn-secondary" type="button" (click)="registrarUsuario()">
         Registro usuario
       </button>
     </form>

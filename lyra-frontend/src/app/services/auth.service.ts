@@ -10,12 +10,17 @@ import { LoginResponse } from '../interfaces/login-response';
 export class AuthService {
 
   private tokenKey = 'token';
-  private apiUrl = 'http://localhost:8080/usuarios'; // tu backend
+  private apiUrl = 'http://localhost:8080/usuarios';
 
   constructor(private http: HttpClient) {}
 
   login(data: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, data);
+    const payload: LoginRequest = {
+      email: data.email.trim(),
+      contrasena: data.contrasena
+    };
+
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, payload);
   }
 
   saveToken(token: string) {
