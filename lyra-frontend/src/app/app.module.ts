@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { BibliotecaComponent } from './components/biblioteca/biblioteca.component';
 import { ListadoLibrosComponent } from './components/Libros/listado-libros/listado-libros.component';
 import { GestionLibrosComponent } from './components/Libros/gestion-libros/gestion-libros.component';
+import { DetalleLibroComponent } from './components/Libros/detalle-libro/detalle-libro.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
 
@@ -17,6 +18,7 @@ import { EnProcesoComponent } from './components/en-proceso/en-proceso.component
     BibliotecaComponent,
     ListadoLibrosComponent,
     GestionLibrosComponent,
+    DetalleLibroComponent,
     MenuComponent,
     EnProcesoComponent
   ],

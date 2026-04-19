@@ -29,7 +29,13 @@
 				<p><strong>Categoria:</strong> {{ libro.genero || 'Sin genero' }}</p>
 
 				<div class="acciones-card">
-					<button type="button" class="btn-accion btn-ver" aria-label="Ver libro">Ver</button>
+					<a
+						[routerLink]="['/libros', libro.id]"
+						class="btn-accion btn-ver"
+						aria-label="Ver libro"
+					>
+						Ver
+					</a>
 					<button type="button" class="btn-accion btn-borrar" aria-label="Eliminar libro">X</button>
 				</div>
 			</div>
