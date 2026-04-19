@@ -1,0 +1,18 @@
+<aside class="menu-lateral">
+  <div class="menu-logo">
+    <img src="assets/logo/logo-app-lyra.png" alt="Logo App Lyra" class="logo-img" />
+  </div>
+
+  <nav class="menu-nav" aria-label="Navegacion principal">
+    <a routerLink="/libros" routerLinkActive="activo" class="menu-item">Libros</a>
+    <button type="button" class="menu-item deshabilitado" disabled>Usuarios</button>
+    <button type="button" class="menu-item deshabilitado" disabled>Explorar</button>
+    <button type="button" class="menu-item deshabilitado" disabled>Amigos</button>
+    <a routerLink="/biblioteca" routerLinkActive="activo" class="menu-item">Mi biblioteca</a>
+    <button type="button" class="menu-item deshabilitado" disabled>Cuenta</button>
+  </nav>
+
+  <button type="button" class="btn-cerrar" (click)="cerrarSesion()">
+    Cerrar sesion
+  </button>
+</aside>

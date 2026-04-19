@@ -8,13 +8,15 @@ import { HttpClientModule } from '@angular/common/http';
 import { BibliotecaComponent } from './components/biblioteca/biblioteca.component';
 import { ListadoLibrosComponent } from './components/Libros/listado-libros/listado-libros.component';
 import { GestionLibrosComponent } from './components/Libros/gestion-libros/gestion-libros.component';
+import { MenuComponent } from './components/menu/menu.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BibliotecaComponent,
     ListadoLibrosComponent,
-    GestionLibrosComponent
+    GestionLibrosComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,

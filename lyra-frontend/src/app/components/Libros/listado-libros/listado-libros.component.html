@@ -1,1 +1,40 @@
-<p>listado-libros works!</p>
+<section class="panel-libros">
+	<header class="cabecera-libros">
+		<h2>Libros</h2>
+	</header>
+
+	<div class="acciones">
+		<button type="button" class="icono-filtro" aria-label="Filtrar libros">&#x1F5D0;</button>
+		<button type="button" class="btn-anadir">
+			Anadir libro
+			<span class="mas">+</span>
+		</button>
+	</div>
+
+	<p *ngIf="cargando" class="estado">Cargando libros...</p>
+	<p *ngIf="error" class="estado estado-error">{{ error }}</p>
+
+	<div class="grid-libros" *ngIf="!cargando && !error">
+		<article class="card-libro" *ngFor="let libro of libros; trackBy: trackByLibro">
+			<img
+				[src]="libro.portada || portadaDefault"
+				[alt]="libro.titulo"
+				class="portada"
+				(error)="onPortadaError($event)"
+			/>
+
+			<div class="contenido-card">
+				<h3 class="titulo">{{ libro.titulo }}</h3>
+				<p><strong>Autor:</strong> {{ libro.autor }}</p>
+				<p><strong>Categoria:</strong> {{ libro.genero || 'Sin genero' }}</p>
+
+				<div class="acciones-card">
+					<button type="button" class="btn-accion btn-ver" aria-label="Ver libro">Ver</button>
+					<button type="button" class="btn-accion btn-borrar" aria-label="Eliminar libro">X</button>
+				</div>
+			</div>
+		</article>
+
+		<p class="estado" *ngIf="libros.length === 0">No hay libros disponibles.</p>
+	</div>
+</section>
