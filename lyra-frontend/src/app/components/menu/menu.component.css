@@ -1,0 +1,90 @@
+.menu-lateral {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem 1.1rem 1.2rem;
+  color: #fff;
+  background: linear-gradient(180deg, #c8b3d7 0%, #e3b6ce 45%, #e8bed5 100%);
+}
+
+.menu-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logo-img {
+  width: min(260px, 100%);
+  height: auto;
+  object-fit: contain;
+}
+
+.menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 2.7rem;
+  padding: 2.1rem 1rem;
+}
+
+.menu-item {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 1.05rem;
+  text-align: left;
+  text-decoration: none;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item.activo {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.menu-item.deshabilitado {
+  opacity: 0.78;
+  cursor: not-allowed;
+}
+
+.btn-cerrar {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(183, 162, 208, 0.55);
+  color: #fff;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-cerrar:hover {
+  background: rgba(168, 147, 197, 0.8);
+}
+
+@media (max-width: 900px) {
+  .menu-lateral {
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  .logo-img {
+    width: min(200px, 100%);
+  }
+
+  .menu-nav {
+    border-radius: 1rem;
+    padding: 0.8rem;
+    gap: 0.35rem;
+  }
+
+  .menu-item {
+    font-size: 0.95rem;
+    padding: 0.45rem;
+  }
+}

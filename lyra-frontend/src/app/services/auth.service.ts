@@ -16,7 +16,7 @@ export class AuthService {
 
   login(data: LoginRequest): Observable<LoginResponse> {
     const payload: LoginRequest = {
-      email: data.email.trim(),
+      email: data.email.trim().toLowerCase(),
       contrasena: data.contrasena
     };
 

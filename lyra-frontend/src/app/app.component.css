@@ -1,0 +1,23 @@
+.app-shell {
+	min-height: 100vh;
+}
+
+.app-shell.con-menu {
+	display: grid;
+	grid-template-columns: 250px 1fr;
+}
+
+.app-main {
+	min-height: 100vh;
+	background: #f1f1f4;
+}
+
+@media (max-width: 900px) {
+	.app-shell.con-menu {
+		grid-template-columns: 1fr;
+	}
+
+	.app-main {
+		min-height: auto;
+	}
+}

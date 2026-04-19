@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { LoginRequest } from '../../interfaces/login-request';
 
@@ -30,20 +31,26 @@ export class LoginComponent {
     const loginRequest: LoginRequest = { email: this.email, contrasena: this.contrasena };
     this.authService.login(loginRequest).subscribe({
       next: (res) => {
-        if (res.token) {
-          this.authService.saveToken(res.token);
+        const token = res.token ?? res.jwt ?? res.accessToken;
+        const role = res.role ?? res.rol;
+
+        if (!token) {
+          this.errorMessage = 'Login correcto, pero no se recibió token de autenticación.';
+          return;
         }
 
-        if (res.role) {
-          localStorage.setItem('rol', res.role);
+        this.authService.saveToken(token);
+
+        if (role) {
+          localStorage.setItem('rol', role);
         }
 
         console.log('Login correcto', {
           email: this.email,
-          rol: res.role
+          rol: role
         });
 
-        switch (res.role) {
+        switch (role) {
           case 'ROLE_ADMIN':
             this.router.navigate(['/dashboard']);
             break;
@@ -53,8 +60,14 @@ export class LoginComponent {
             break;
         }
       },
-      error: () => {
-        this.errorMessage = 'Usuario o contraseña incorrectos';
+      error: (err: HttpErrorResponse) => {
+        if (err.status === 401) {
+          const backendMessage = err.error?.message || err.error?.error;
+          this.errorMessage = backendMessage || 'Usuario o contraseña incorrectos';
+          return;
+        }
+
+        this.errorMessage = 'No se pudo iniciar sesión. Inténtalo de nuevo.';
       }
     });
   }

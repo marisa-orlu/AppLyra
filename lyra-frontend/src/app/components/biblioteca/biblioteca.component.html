@@ -1,1 +1,23 @@
-<p>biblioteca works!</p>
+<section class="home-panel">
+	<header class="home-header">
+		<h1>{{ tituloPanel }}</h1>
+	</header>
+
+	<div class="home-grid">
+		<ng-container *ngFor="let acceso of accesos">
+			<a
+				*ngIf="acceso.ruta; else tarjetaBloqueada"
+				[routerLink]="acceso.ruta"
+				class="home-card"
+			>
+				{{ acceso.titulo }}
+			</a>
+
+			<ng-template #tarjetaBloqueada>
+				<button type="button" class="home-card bloqueada" disabled>
+					{{ acceso.titulo }}
+				</button>
+			</ng-template>
+		</ng-container>
+	</div>
+</section>

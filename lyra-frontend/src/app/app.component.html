@@ -1,3 +1,7 @@
-<app-login>
+<div class="app-shell" [class.con-menu]="mostrarMenu">
+	<app-menu *ngIf="mostrarMenu"></app-menu>
 
-</app-login>
+	<main class="app-main">
+		<router-outlet></router-outlet>
+	</main>
+</div>

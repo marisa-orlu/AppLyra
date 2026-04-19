@@ -3,5 +3,8 @@ export interface LoginResponse {
   nombre: string;
   email: string;
   token?: string;
+  jwt?: string;
+  accessToken?: string;
   role?: string;
+  rol?: string;
 }
