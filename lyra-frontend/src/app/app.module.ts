@@ -9,6 +9,7 @@ import { BibliotecaComponent } from './components/biblioteca/biblioteca.componen
 import { ListadoLibrosComponent } from './components/Libros/listado-libros/listado-libros.component';
 import { GestionLibrosComponent } from './components/Libros/gestion-libros/gestion-libros.component';
 import { MenuComponent } from './components/menu/menu.component';
+import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { MenuComponent } from './components/menu/menu.component';
     BibliotecaComponent,
     ListadoLibrosComponent,
     GestionLibrosComponent,
-    MenuComponent
+    MenuComponent,
+    EnProcesoComponent
   ],
   imports: [
     BrowserModule,

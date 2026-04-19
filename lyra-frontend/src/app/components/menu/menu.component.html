@@ -1,18 +1,49 @@
-<aside class="menu-lateral">
-  <div class="menu-logo">
-    <img src="assets/logo/logo-app-lyra.png" alt="Logo App Lyra" class="logo-img" />
+<aside class="menu-lateral" [class.colapsado]="colapsado">
+  <div class="menu-header">
+    <div class="menu-logo">
+      <img
+        *ngIf="!colapsado; else logoColapsado"
+        src="assets/logo/logo-app-lyra.png"
+        alt="Logo App Lyra"
+        class="logo-img"
+      />
+
+      <ng-template #logoColapsado>
+        <img
+          src="assets/logo/Logo App Lyra_Mesa de trabajo 1 copia 4.png"
+          alt="Logo App Lyra compacto"
+          class="logo-img logo-img-colapsado"
+        />
+      </ng-template>
+    </div>
+
+    <button
+      type="button"
+      class="btn-toggle"
+      (click)="toggleSidebar()"
+      [attr.aria-label]="colapsado ? 'Expandir menu lateral' : 'Colapsar menu lateral'"
+      [title]="colapsado ? 'Expandir menu' : 'Colapsar menu'"
+    >
+      <span class="flecha" [class.derecha]="colapsado" aria-hidden="true"></span>
+    </button>
   </div>
 
   <nav class="menu-nav" aria-label="Navegacion principal">
-    <a routerLink="/libros" routerLinkActive="activo" class="menu-item">Libros</a>
-    <button type="button" class="menu-item deshabilitado" disabled>Usuarios</button>
-    <button type="button" class="menu-item deshabilitado" disabled>Explorar</button>
-    <button type="button" class="menu-item deshabilitado" disabled>Amigos</button>
-    <a routerLink="/biblioteca" routerLinkActive="activo" class="menu-item">Mi biblioteca</a>
-    <button type="button" class="menu-item deshabilitado" disabled>Cuenta</button>
+    <ng-container *ngFor="let item of menuItems">
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="activo"
+        class="menu-item"
+        [attr.aria-label]="colapsado ? item.label : null"
+      >
+        <i class="menu-icono" [ngClass]="item.iconClass" aria-hidden="true"></i>
+        <span class="menu-texto">{{ item.label }}</span>
+      </a>
+    </ng-container>
   </nav>
 
   <button type="button" class="btn-cerrar" (click)="cerrarSesion()">
-    Cerrar sesion
+    <i class="menu-icono bi bi-box-arrow-right" aria-hidden="true"></i>
+    <span class="menu-texto">Cerrar sesion</span>
   </button>
 </aside>

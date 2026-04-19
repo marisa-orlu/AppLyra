@@ -1,46 +1,56 @@
 .home-panel {
 	min-height: 100vh;
-	background: #efeff2;
+	background:
+		radial-gradient(circle at 20% 0%, rgba(229, 182, 206, 0.32), transparent 44%),
+		linear-gradient(180deg, #f6f2fa 0%, #efe8f4 100%);
 }
 
 .home-header {
 	background: linear-gradient(90deg, #c7b6d8 0%, #e5b6ce 100%);
-	padding: 2rem;
+	padding: 2rem 1rem;
 }
 
 .home-header h1 {
 	margin: 0;
 	text-align: center;
-	color: #f7f3f8;
-	font-size: 2.1rem;
-	letter-spacing: 0.4px;
+	color: #ffffff;
+	font-size: clamp(1.6rem, 3vw, 2.2rem);
+	letter-spacing: 0.3px;
 }
 
 .home-grid {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(180px, 1fr));
-	gap: 2rem;
-	max-width: 760px;
-	padding: 3.5rem 2rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 240px));
+	justify-content: center;
+	gap: 1.35rem;
+	max-width: 980px;
+	margin: 0 auto;
+	padding: 3rem 1.2rem;
 }
 
 .home-card {
-	min-height: 108px;
+	min-height: 120px;
 	border: none;
-	border-radius: 2px;
-	background: linear-gradient(90deg, #c7b6d8 0%, #e5b6ce 100%);
-	color: #221c23;
-	font-size: 2rem;
+	border-radius: 16px;
+	background:
+		linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.84) 100%),
+		linear-gradient(135deg, #d2c2e4 0%, #ecbfd5 100%);
+	box-shadow: 0 14px 30px rgba(103, 75, 121, 0.18);
+	color: #2d2540;
+	font-size: 1.35rem;
+	font-weight: 700;
 	text-decoration: none;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	text-align: center;
+	padding: 0.9rem;
 	transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .home-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+	transform: translateY(-4px);
+	box-shadow: 0 20px 34px rgba(103, 75, 121, 0.24);
 }
 
 .home-card.bloqueada {
@@ -50,14 +60,14 @@
 
 @media (max-width: 900px) {
 	.home-grid {
-		grid-template-columns: repeat(2, minmax(150px, 1fr));
+		grid-template-columns: repeat(2, minmax(170px, 240px));
 		gap: 1rem;
 		padding: 1.4rem 1rem;
 	}
 
 	.home-card {
-		min-height: 90px;
-		font-size: 1.3rem;
+		min-height: 100px;
+		font-size: 1.15rem;
 	}
 }
 

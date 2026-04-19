@@ -12,22 +12,14 @@ interface AccesoMenu {
   styleUrl: './biblioteca.component.css'
 })
 export class BibliotecaComponent {
-  tituloPanel = 'Administrador';
+  tituloPanel = 'Te damos la bienvenida a Lyra';
 
   accesos: AccesoMenu[] = [
     { titulo: 'Libros', ruta: '/libros' },
-    { titulo: 'Usuarios' },
-    { titulo: 'Explorar' },
-    { titulo: 'Amigos' },
-    { titulo: 'Mi biblioteca', ruta: '/biblioteca' },
-    { titulo: 'Cuenta' }
+    { titulo: 'Usuarios', ruta: '/usuarios' },
+    { titulo: 'Explorar', ruta: '/explorar' },
+    { titulo: 'Amigos', ruta: '/amigos' },
+    { titulo: 'Mi biblioteca', ruta: '/mi-biblioteca' },
+    { titulo: 'Cuenta', ruta: '/cuenta' }
   ];
-
-  constructor() {
-    const rol = localStorage.getItem('rol');
-    if (rol === 'USER' || rol === 'ROLE_USER') {
-      this.tituloPanel = 'Usuario';
-    }
-  }
-
 }
