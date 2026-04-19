@@ -10,7 +10,7 @@ public record LibroUsuarioCrearDTO(
         Long idUsuario,
 
         @NotNull(message = "El libro es obligatorio")
-        Long idLibro,
+        Long id_libro,
 
         @NotBlank(message = "El estado no puede estar vacío")
         @Pattern(regexp = "leido|leyendo|pendiente",

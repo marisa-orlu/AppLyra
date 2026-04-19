@@ -28,7 +28,7 @@ public record LibroDTO(
 
     public static LibroDTO of(Libro l) {
         return new LibroDTO(
-                l.getId_libro(),
+                l.getIdLibro(),
                 l.getTitulo_libro(),
                 l.getAutor(),
                 l.getGenero(),

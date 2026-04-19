@@ -17,7 +17,7 @@ public record FraseFavoritaDTO(
         return new FraseFavoritaDTO(
                 f.getId_frase(),
                 f.getUsuario().getId(),
-                f.getLibro().getId_libro(),
+                f.getLibro().getIdLibro(),
                 f.getContenido(),
                 f.getPagina(),
                 f.getFecha()

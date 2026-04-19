@@ -1,5 +1,6 @@
 package com.lyra.DTOs.LibroUsuarioDTOs;
 
+import com.lyra.model.EstadoLibro;
 import com.lyra.model.LibroUsuario;
 
 import java.util.Date;
@@ -7,8 +8,8 @@ import java.util.Date;
 public record LibroUsuarioDTO(
         Long id,
         Long idUsuario,
-        Long idLibro,
-        String estado,
+        Long id_libro,
+        EstadoLibro estado,
         Integer puntuacion,
         Boolean isPrestamo,
         Date fechaAgregacion
@@ -18,7 +19,7 @@ public record LibroUsuarioDTO(
         return new LibroUsuarioDTO(
                 lu.getId_libro_usuario(),
                 lu.getUsuario().getId(),
-                lu.getLibro().getId_libro(),
+                lu.getLibro().getIdLibro(),
                 lu.getEstado(),
                 lu.getPuntuacion(),
                 lu.getIs_prestamo(),

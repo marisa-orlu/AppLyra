@@ -46,7 +46,7 @@ public class ResenaController {
                 .toList();
     }
 
-    @GetMapping("/libro/{idLibro}")
+    @GetMapping("/libro/{id_libro}")
     public List<ResenaDTO> obtenerPorLibro(@PathVariable Long idLibro) {
         return resenaService.obtenerPorLibro(idLibro)
                 .stream()

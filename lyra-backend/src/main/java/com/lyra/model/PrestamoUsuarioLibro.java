@@ -40,6 +40,7 @@ public class PrestamoUsuarioLibro {
     @Column(name = "fecha_fin")
     private Date fecha_fin;
 
-    private String estado;
+    @Column(name = "estado")
+    private EstadoPrestamo estado;
 }
 

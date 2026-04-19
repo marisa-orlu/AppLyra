@@ -1,5 +1,6 @@
 package com.lyra.services;
 
+import com.lyra.model.EstadoLibro;
 import com.lyra.model.Libro;
 import com.lyra.model.LibroUsuario;
 import com.lyra.model.Usuario;
@@ -38,7 +39,7 @@ public class LibroUsuarioService {
         LibroUsuario nuevo = LibroUsuario.builder()
                 .usuario(usuario)
                 .libro(libro)
-                .estado(estado)
+                .estado(EstadoLibro.PENDIENTE)
                 .fecha_agregacion(new Date())
                 .is_prestamo(false)
                 .puntuacion(null)
@@ -48,13 +49,16 @@ public class LibroUsuarioService {
     }
 
     // Cambiar estado (leído, leyendo, pendiente)
-    public LibroUsuario cambiarEstado(Long idLibroUsuario, String nuevoEstado) {
+    public LibroUsuario cambiarEstado(Long idLibroUsuario, Integer nuevoEstado) {
         LibroUsuario lu = libroUsuarioRepository.findById(idLibroUsuario)
                 .orElseThrow(() -> new RuntimeException("Registro no encontrado"));
 
-        lu.setEstado(nuevoEstado);
+        EstadoLibro estado = EstadoLibro.fromValor(nuevoEstado);
+
+        lu.setEstado(estado);
         return libroUsuarioRepository.save(lu);
     }
+
 
     // Añadir o actualizar puntuación
     public LibroUsuario puntuarLibro(Long idLibroUsuario, Integer puntuacion) {

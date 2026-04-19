@@ -8,6 +8,6 @@ public record PrestamoCrearDTO(
         Long idUsuario,
 
         @NotNull(message = "El libro es obligatorio")
-        Long idLibro
+        Long id_libro
 ) {}
 
