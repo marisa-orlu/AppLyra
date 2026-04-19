@@ -1,5 +1,6 @@
 package com.lyra.services;
 
+import com.lyra.model.EstadoPrestamo;
 import com.lyra.model.Libro;
 import com.lyra.model.PrestamoUsuarioLibro;
 import com.lyra.model.Usuario;
@@ -21,12 +22,12 @@ public class PrestamoUsuarioLibroService {
     private final LibroRepository libroRepository;
 
     // Crear un préstamo (estado inicial: pendiente)
-    public PrestamoUsuarioLibro crearPrestamo(Long idUsuario, Long idLibro) {
+    public PrestamoUsuarioLibro crearPrestamo(Long idUsuario, Long id_libro) {
 
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        Libro libro = libroRepository.findById(idLibro)
+        Libro libro = libroRepository.findById(id_libro)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
         PrestamoUsuarioLibro prestamo = PrestamoUsuarioLibro.builder()
@@ -34,7 +35,7 @@ public class PrestamoUsuarioLibroService {
                 .libro(libro)
                 .fecha_inicio(new Date())
                 .fecha_fin(null)
-                .estado("pendiente")
+                .estado(EstadoPrestamo.PENDIENTE)
                 .build();
 
         return prestamoRepository.save(prestamo);
@@ -47,13 +48,15 @@ public class PrestamoUsuarioLibroService {
     }
 
     // Cambiar estado del préstamo
-    public PrestamoUsuarioLibro cambiarEstado(Long idPrestamo, String nuevoEstado) {
+    public PrestamoUsuarioLibro cambiarEstado(Long idPrestamo, Integer nuevoEstado) {
         PrestamoUsuarioLibro prestamo = obtenerPorId(idPrestamo);
 
-        prestamo.setEstado(nuevoEstado);
+        EstadoPrestamo estado = EstadoPrestamo.fromValor(nuevoEstado);
+
+        prestamo.setEstado(estado);
 
         // Si se marca como devuelto, se establece fecha_fin
-        if ("devuelto".equalsIgnoreCase(nuevoEstado)) {
+        if (EstadoPrestamo.DEVUELTO.name().equalsIgnoreCase(estado.name())) {
             prestamo.setFecha_fin(new Date());
         }
 
@@ -62,17 +65,17 @@ public class PrestamoUsuarioLibroService {
 
     // Aceptar préstamo
     public PrestamoUsuarioLibro aceptarPrestamo(Long idPrestamo) {
-        return cambiarEstado(idPrestamo, "aceptado");
+        return cambiarEstado(idPrestamo, EstadoPrestamo.ACEPTADO.getValor());
     }
 
     // Rechazar préstamo
     public PrestamoUsuarioLibro rechazarPrestamo(Long idPrestamo) {
-        return cambiarEstado(idPrestamo, "rechazado");
+        return cambiarEstado(idPrestamo, EstadoPrestamo.RECHAZADO.getValor());
     }
 
     // Marcar como devuelto
     public PrestamoUsuarioLibro devolverPrestamo(Long idPrestamo) {
-        return cambiarEstado(idPrestamo, "devuelto");
+        return cambiarEstado(idPrestamo, EstadoPrestamo.DEVUELTO.getValor());
     }
 
     // Obtener préstamos de un usuario
@@ -84,8 +87,8 @@ public class PrestamoUsuarioLibroService {
     }
 
     // Obtener préstamos de un libro
-    public List<PrestamoUsuarioLibro> obtenerPorLibro(Long idLibro) {
-        Libro libro = libroRepository.findById(idLibro)
+    public List<PrestamoUsuarioLibro> obtenerPorLibro(Long id_libro) {
+        Libro libro = libroRepository.findById(id_libro)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
         return prestamoRepository.findByLibro(libro);

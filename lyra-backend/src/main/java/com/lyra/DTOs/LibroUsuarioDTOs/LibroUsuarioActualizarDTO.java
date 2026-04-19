@@ -1,8 +1,11 @@
 package com.lyra.DTOs.LibroUsuarioDTOs;
 
+import com.lyra.model.EstadoLibro;
+
 public record LibroUsuarioActualizarDTO(
-        String estado,
+        EstadoLibro estado,
         Integer puntuacion,
         Boolean isPrestamo
-) {}
+
+        ) {}
 

@@ -23,8 +23,8 @@ import java.util.List;
 public class Libro {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_libro;
+    @Column(name = "id_libro")
+    private Long idLibro;
 
     @Column(name = "titulo_libro")
     private String titulo_libro;

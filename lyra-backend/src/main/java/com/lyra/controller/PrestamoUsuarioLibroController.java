@@ -19,13 +19,13 @@ public class PrestamoUsuarioLibroController {
     @PostMapping
     public PrestamoDTO crear(@RequestBody PrestamoCrearDTO dto) {
         return PrestamoDTO.of(
-                prestamoService.crearPrestamo(dto.idUsuario(), dto.idLibro())
+                prestamoService.crearPrestamo(dto.idUsuario(), dto.id_libro())
         );
     }
 
     @PutMapping("/{id}")
     public PrestamoDTO actualizarEstado(@PathVariable Long id, @RequestBody PrestamoActualizarDTO dto) {
-        return PrestamoDTO.of(prestamoService.cambiarEstado(id, dto.estado()));
+        return PrestamoDTO.of(prestamoService.cambiarEstado(id, dto.estado().getValor()));
     }
 
     @PutMapping("/{id}/aceptar")
@@ -51,7 +51,7 @@ public class PrestamoUsuarioLibroController {
                 .toList();
     }
 
-    @GetMapping("/libro/{idLibro}")
+    @GetMapping("/libro/{id_libro}")
     public List<PrestamoDTO> obtenerPorLibro(@PathVariable Long idLibro) {
         return prestamoService.obtenerPorLibro(idLibro)
                 .stream()

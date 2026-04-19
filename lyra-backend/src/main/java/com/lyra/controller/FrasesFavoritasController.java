@@ -47,7 +47,7 @@ public class FrasesFavoritasController {
                 .toList();
     }
 
-    @GetMapping("/libro/{idLibro}")
+    @GetMapping("/libro/{id_libro}")
     public List<FraseFavoritaDTO> obtenerPorLibro(@PathVariable Long idLibro) {
         return frasesService.obtenerPorLibro(idLibro)
                 .stream()

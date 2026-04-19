@@ -17,7 +17,7 @@ public record ResenaDTO(
         return new ResenaDTO(
                 r.getId_resena(),
                 r.getUsuario().getId(),
-                r.getLibro().getId_libro(),
+                r.getLibro().getIdLibro(),
                 r.getTexto(),
                 r.getPuntuacion(),
                 r.getFecha_publicacion()

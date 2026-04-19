@@ -20,13 +20,13 @@ public class LibroUsuarioController {
     @PostMapping
     public LibroUsuarioDTO agregar(@RequestBody LibroUsuarioCrearDTO dto) {
         return LibroUsuarioDTO.of(
-                libroUsuarioService.agregarLibro(dto.idUsuario(), dto.idLibro(), dto.estado())
+                libroUsuarioService.agregarLibro(dto.idUsuario(), dto.id_libro(), dto.estado())
         );
     }
 
     @PutMapping("/{id}/estado")
-    public LibroUsuarioDTO cambiarEstado(@PathVariable Long id, @RequestParam String estado) {
-        return LibroUsuarioDTO.of(libroUsuarioService.cambiarEstado(id, estado));
+    public LibroUsuarioDTO cambiarEstado(@PathVariable Long id, @RequestParam  LibroUsuarioActualizarDTO dto) {
+        return LibroUsuarioDTO.of(libroUsuarioService.cambiarEstado(id, dto.estado().getValor()));
     }
 
     @PutMapping("/{id}/puntuacion")
