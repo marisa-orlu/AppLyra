@@ -1,0 +1,150 @@
+.mi-biblioteca-page {
+  min-height: 100vh;
+  padding: 1.4rem;
+  background: #efeff2;
+}
+
+.mi-biblioteca-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mi-biblioteca-header h1 {
+  margin: 0;
+  color: #2a2530;
+}
+
+.mi-biblioteca-header p {
+  margin: 0.4rem 0 0;
+  color: #6a6672;
+}
+
+.header-acciones {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.btn-header {
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid #d1d4dd;
+  background: #ffffff;
+  color: #242833;
+  padding: 0 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-anadir {
+  border-color: #b8c7ef;
+}
+
+.btn-carpeta {
+  border-color: #d9c4e8;
+}
+
+.estado {
+  margin: 0.8rem 0;
+  color: #3f3a45;
+}
+
+.estado-info {
+  color: #1f5f94;
+}
+
+.estado-error {
+  color: #b21f3a;
+}
+
+.lista-libros {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.2rem;
+}
+
+.card-libro-usuario {
+  background: #ffffff;
+  border: 1px solid #d7d7dc;
+  border-radius: 8px;
+  padding: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.portada {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border: 1px solid #ececf1;
+  border-radius: 4px;
+  margin-bottom: 0.8rem;
+}
+
+.contenido {
+  font-size: 0.92rem;
+  color: #232323;
+}
+
+.contenido h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1.04rem;
+}
+
+.contenido p {
+  margin: 0.3rem 0;
+}
+
+.acciones-card {
+  margin-top: 0.6rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.btn-accion {
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.btn-ver {
+  color: #2f6ee8;
+}
+
+.btn-borrar {
+  color: #f63a3a;
+}
+
+.btn-accion:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .mi-biblioteca-page {
+    padding: 0.9rem;
+  }
+
+  .mi-biblioteca-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-acciones {
+    width: 100%;
+  }
+
+  .btn-header {
+    flex: 1;
+  }
+
+  .portada {
+    width: 100%;
+    height: auto;
+  }
+}

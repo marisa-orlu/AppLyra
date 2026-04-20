@@ -15,6 +15,11 @@ export class DetalleLibroComponent implements OnInit, OnDestroy {
   libro: Libro | null = null;
   cargando = false;
   error = '';
+  desdeBiblioteca = false;
+  estadoBiblioteca: string | null = null;
+  fechaAgregacionBiblioteca: string | null = null;
+  prestadoBiblioteca: boolean | null = null;
+  puntuacionBiblioteca: number | null = null;
   private portadaObjectUrl: string | null = null;
 
   constructor(
@@ -24,6 +29,8 @@ export class DetalleLibroComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.cargarContextoBiblioteca();
+
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = Number(idParam);
 
@@ -67,7 +74,7 @@ export class DetalleLibroComponent implements OnInit, OnDestroy {
   }
 
   volverListado(): void {
-    this.router.navigate(['/libros']);
+    this.router.navigate([this.desdeBiblioteca ? '/mi-biblioteca' : '/libros']);
   }
 
   onPortadaError(event: Event): void {
@@ -97,5 +104,26 @@ export class DetalleLibroComponent implements OnInit, OnDestroy {
 
   private resolverPortada(portada: unknown): string {
     return this.librosService.resolverPortada(portada, this.portadaDefault);
+  }
+
+  private cargarContextoBiblioteca(): void {
+    const query = this.route.snapshot.queryParamMap;
+
+    this.desdeBiblioteca = query.get('fromBiblioteca') === '1';
+    this.estadoBiblioteca = query.get('estado');
+    this.fechaAgregacionBiblioteca = query.get('fechaAgregacion');
+
+    const prestado = query.get('prestado');
+    if (prestado === '1') {
+      this.prestadoBiblioteca = true;
+    } else if (prestado === '0') {
+      this.prestadoBiblioteca = false;
+    } else {
+      this.prestadoBiblioteca = null;
+    }
+
+    const puntuacion = query.get('puntuacion');
+    const puntuacionNumero = Number(puntuacion);
+    this.puntuacionBiblioteca = Number.isFinite(puntuacionNumero) ? puntuacionNumero : null;
   }
 }

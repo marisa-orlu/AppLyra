@@ -8,6 +8,7 @@ import { ListadoLibrosComponent } from './components/Libros/listado-libros/lista
 import { GestionLibrosComponent } from './components/Libros/gestion-libros/gestion-libros.component';
 import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
 import { AuthGuard } from './guards/auth.guard';
+import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-biblioteca.component';
 
 
 const routes: Routes = [
@@ -59,7 +60,7 @@ const routes: Routes = [
   },
   {
     path: 'mi-biblioteca',
-    component: EnProcesoComponent,
+    component: MiBibliotecaComponent,
     canActivate: [AuthGuard]
   },
   {

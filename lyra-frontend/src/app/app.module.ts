@@ -12,6 +12,7 @@ import { GestionLibrosComponent } from './components/Libros/gestion-libros/gesti
 import { DetalleLibroComponent } from './components/Libros/detalle-libro/detalle-libro.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
+import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-biblioteca.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { EnProcesoComponent } from './components/en-proceso/en-proceso.component
     GestionLibrosComponent,
     DetalleLibroComponent,
     MenuComponent,
-    EnProcesoComponent
+    EnProcesoComponent,
+    MiBibliotecaComponent
   ],
   imports: [
     BrowserModule,

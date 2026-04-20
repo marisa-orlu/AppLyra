@@ -56,6 +56,24 @@
   margin: 0 0 1rem;
 }
 
+.info-biblioteca {
+  margin: 0 0 1rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #dfd6e7;
+  border-radius: 8px;
+  background: #f8f4fc;
+}
+
+.info-biblioteca h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1rem;
+  color: #4b3f58;
+}
+
+.info-biblioteca p {
+  margin: 0.35rem 0;
+}
+
 .valoracion {
   display: flex;
   align-items: center;
