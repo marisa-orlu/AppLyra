@@ -28,13 +28,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        // EXCEPCIÓN PARA ARCHIVOS PÚBLICOS
+        String path = request.getRequestURI();
+        if (path.startsWith("/uploads/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = getTokenFromRequest(request);
 
         if (StringUtils.hasText(token) && jwtService.validateToken(token)) {
             Long userId = jwtService.getUserIdFromToken(token);
 
             usuarioRepository.findById(userId).ifPresent(usuario -> {
-                
+
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                                 usuario, null, usuario.getAuthorities()
@@ -46,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearer = request.getHeader(JwtService.TOKEN_HEADER);
