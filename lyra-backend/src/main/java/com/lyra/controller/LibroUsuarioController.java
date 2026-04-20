@@ -2,6 +2,7 @@ package com.lyra.controller;
 
 
 import com.lyra.DTOs.LibroUsuarioDTOs.*;
+import com.lyra.repository.LibroUsuarioRepository;
 import com.lyra.services.LibroUsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 public class LibroUsuarioController {
 
     private final LibroUsuarioService libroUsuarioService;
+    private final LibroUsuarioRepository libroUsuarioRepository;
 
     @PostMapping
     public LibroUsuarioDTO agregar(@RequestBody LibroUsuarioCrearDTO dto) {
@@ -54,5 +56,13 @@ public class LibroUsuarioController {
                 .map(LibroUsuarioDTO::of)
                 .toList();
     }
+
+    public List<LibroUsuarioDTO> obtenerPorIdUsuario(Long idUsuario) {
+        return libroUsuarioRepository.findAllByIdUsuarioWithLibro(idUsuario)
+                .stream()
+                .map(LibroUsuarioDTO::of)
+                .toList();
+    }
+
 }
 
