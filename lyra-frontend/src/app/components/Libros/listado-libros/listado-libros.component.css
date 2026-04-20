@@ -1,6 +1,7 @@
 .panel-libros {
 	min-height: 100vh;
 	background: #efeff2;
+	position: relative;
 }
 
 .cabecera-libros {
@@ -111,6 +112,10 @@
 	color: #2f6ee8;
 }
 
+.btn-editar {
+	color: #146c43;
+}
+
 .btn-borrar {
 	color: #f63a3a;
 }
@@ -123,6 +128,114 @@
 .estado-error {
 	color: #b00020;
 }
+
+.paginacion {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.85rem;
+	padding: 0.4rem 1rem 1.4rem;
+}
+
+.paginacion-info {
+	margin: 0;
+	font-size: 0.9rem;
+	color: #3f3f46;
+}
+
+.btn-pagina {
+	height: 34px;
+	padding: 0 0.8rem;
+	border: 1px solid #cfd2db;
+	border-radius: 8px;
+	background: #ffffff;
+	color: #1f2937;
+	cursor: pointer;
+}
+
+.btn-pagina:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(39, 39, 43, 0.42);
+	backdrop-filter: blur(1px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1400;
+	padding: 1rem;
+}
+
+.modal-confirmacion {
+	width: min(420px, 100%);
+	background: #ffffff;
+	border-radius: 12px;
+	padding: 1.35rem 1.4rem 1.1rem;
+	box-shadow: 0 18px 34px rgba(0, 0, 0, 0.2);
+	border: 1px solid #e8e8ec;
+}
+
+.modal-confirmacion h3 {
+	margin: 0 0 0.85rem;
+	font-size: 1.42rem;
+	font-weight: 600;
+	color: #18181b;
+}
+
+.modal-confirmacion p {
+	margin: 0;
+	font-size: 1.04rem;
+	line-height: 1.35;
+	color: #4d4d55;
+}
+
+.modal-confirmacion p strong {
+	color: #22232a;
+}
+
+.modal-acciones {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.8rem;
+	margin-top: 1.35rem;
+}
+
+.btn-modal {
+	min-width: 106px;
+	height: 36px;
+	padding: 0 1rem;
+	border-radius: 9px;
+	border: 1px solid transparent;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: transform 0.14s ease, opacity 0.14s ease;
+}
+
+.btn-modal:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.btn-cancelar {
+	background: linear-gradient(90deg, #8aa3ef 0%, #7d95df 100%);
+	color: #ffffff;
+	border-color: #8ea4e6;
+}
+
+.btn-eliminar {
+	background: #f3f4f8;
+	color: #ef1e1e;
+	border-color: #e1e3ea;
+}
+
+.btn-modal:not(:disabled):hover {
+	transform: translateY(-1px);
+}
+
 
 @media (max-width: 900px) {
 	.cabecera-libros {
@@ -138,5 +251,18 @@
 	.estado {
 		padding-left: 1rem;
 		padding-right: 1rem;
+	}
+
+	.paginacion {
+		flex-direction: column;
+		gap: 0.65rem;
+	}
+
+	.modal-confirmacion {
+		padding: 1.15rem;
+	}
+
+	.modal-confirmacion h3 {
+		font-size: 1.2rem;
 	}
 }

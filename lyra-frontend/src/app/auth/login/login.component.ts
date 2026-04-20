@@ -41,8 +41,33 @@ export class LoginComponent {
 
         this.authService.saveToken(token);
 
+        const resAny = res as unknown as Record<string, unknown>;
+        const idCandidatos = [
+          resAny['id'],
+          resAny['id_usuario'],
+          resAny['idUsuario'],
+          resAny['userId']
+        ];
+
+        let userId: number | null = null;
+        for (const candidate of idCandidatos) {
+          const id = Number(candidate);
+          if (Number.isFinite(id) && id > 0) {
+            userId = id;
+            break;
+          }
+        }
+
+        if (!userId) {
+          userId = this.authService.extractUserIdFromToken(token);
+        }
+
+        if (userId) {
+          this.authService.saveUserId(userId);
+        }
+
         if (role) {
-          localStorage.setItem('rol', role);
+          this.authService.saveRole(role);
         }
 
         console.log('Login correcto', {

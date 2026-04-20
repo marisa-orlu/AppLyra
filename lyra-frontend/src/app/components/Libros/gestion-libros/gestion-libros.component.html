@@ -1,1 +1,133 @@
-<p>gestion-libros works!</p>
+<section class="crear-libro-page">
+	<div class="fondo-luz fondo-luz-izq" aria-hidden="true"></div>
+	<div class="fondo-luz fondo-luz-der" aria-hidden="true"></div>
+
+	<header class="crear-header">
+		<p class="eyebrow">Biblioteca Lyra</p>
+		<h1>{{ esEdicion ? 'Editar libro' : 'Añadir nuevo libro' }}</h1>
+		<p class="subtitulo">
+			{{ esEdicion
+				? 'Actualiza los datos del libro seleccionado.'
+				: 'Completa los datos para publicar un nuevo titulo en el catalogo.' }}
+		</p>
+	</header>
+
+	<div class="crear-layout">
+		<aside class="panel-preview" aria-label="Vista previa">
+			<h2>Vista previa</h2>
+			<div class="portada-preview">
+				<img
+					[src]="portadaPreview"
+					[alt]="nuevoLibro.titulo || 'Portada del libro'"
+				/>
+			</div>
+
+			<h3>{{ nuevoLibro.titulo || 'Titulo del libro' }}</h3>
+			<p class="autor">{{ nuevoLibro.autor || 'Autor del libro' }}</p>
+			<p class="meta">{{ nuevoLibro.genero || 'Genero' }} · {{ nuevoLibro.anio_publicacion || 'Año' }}</p>
+		</aside>
+
+		<form class="form-crear" (ngSubmit)="crearLibro()" #formLibro="ngForm">
+			<div class="campo">
+				<label for="titulo">Titulo</label>
+				<input
+					id="titulo"
+					name="titulo"
+					type="text"
+					[(ngModel)]="nuevoLibro.titulo"
+					required
+					maxlength="120"
+					placeholder="Ej: El mapa de los anhelos"
+				/>
+			</div>
+
+			<div class="campos-doble">
+				<div class="campo">
+					<label for="autor">Autor</label>
+					<input
+						id="autor"
+						name="autor"
+						type="text"
+						[(ngModel)]="nuevoLibro.autor"
+						required
+						maxlength="120"
+						placeholder="Ej: Alice Kellen"
+					/>
+				</div>
+
+				<div class="campo">
+					<label for="anio">Año publicacion</label>
+					<input
+						id="anio"
+						name="anio"
+						type="number"
+						[(ngModel)]="nuevoLibro.anio_publicacion"
+						required
+						min="1000"
+						[max]="maxAnioPublicacion"
+					/>
+				</div>
+			</div>
+
+			<div class="campos-doble">
+				<div class="campo">
+					<label for="genero">Genero</label>
+					<input
+						id="genero"
+						name="genero"
+						type="text"
+						[(ngModel)]="nuevoLibro.genero"
+						required
+						maxlength="60"
+						placeholder="Ej: Romance"
+					/>
+				</div>
+
+				<div class="campo" *ngIf="!esEdicion">
+					<label for="portada">Portada (imagen)</label>
+					<input
+						id="portada"
+						name="portada"
+						type="file"
+						accept="image/*"
+						(change)="onPortadaSeleccionada($event)"
+						required
+					/>
+				</div>
+
+				<div class="campo" *ngIf="esEdicion">
+					<label for="portadaNombre">Portada actual</label>
+					<input
+						id="portadaNombre"
+						name="portadaNombre"
+						type="text"
+						[ngModel]="nuevoLibro.portada || 'Sin portada'"
+						readonly
+					/>
+				</div>
+			</div>
+
+			<div class="campo">
+				<label for="sinopsis">Sinopsis</label>
+				<textarea
+					id="sinopsis"
+					name="sinopsis"
+					rows="4"
+					[(ngModel)]="nuevoLibro.sinopsis"
+					maxlength="1200"
+					placeholder="Describe brevemente el libro..."
+				></textarea>
+			</div>
+
+			<p *ngIf="error" class="estado estado-error">{{ error }}</p>
+			<p *ngIf="exito" class="estado estado-exito">{{ exito }}</p>
+
+			<div class="acciones-form">
+				<button type="button" class="btn-secundario" (click)="volverListado()">Cancelar</button>
+				<button type="submit" class="btn-principal" [disabled]="guardando || !formLibro.form.valid">
+					{{ guardando ? 'Guardando...' : (esEdicion ? 'Guardar cambios' : 'Guardar libro') }}
+				</button>
+			</div>
+		</form>
+	</div>
+</section>

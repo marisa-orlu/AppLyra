@@ -6,10 +6,13 @@ import com.lyra.model.Libro;
 import com.lyra.services.LibroService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.Page;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,28 +24,39 @@ public class LibroController {
 
     private final LibroService libroService;
 
-    @PostMapping
-    public ResponseEntity<LibroDTO> crear(@RequestBody LibroDTO dto) {
-        Libro libro = libroService.crearLibro(dto);
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<LibroDTO> crear(
+            @RequestPart("data") LibroCrearDTO dto,
+            @RequestPart("file") MultipartFile file
+    ) {
+        Libro libro = libroService.crearLibro(dto, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(LibroDTO.of(libro));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<LibroDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(LibroDTO.of(libroService.obtenerPorId(id)));
     }
-
+/*
     @GetMapping
-    public ResponseEntity<List<LibroDTO>> obtenerTodos() {
-        List<LibroDTO> libros = libroService.obtenerTodos()
+    public ResponseEntity<Page<LibroDTO>> obtenerTodos(@PageableDefault Pageable pageable) {
+        Page<LibroDTO> libros = libroService.obtenerTodos(pageable)
                 .stream()
                 .map(LibroDTO::of)
                 .toList();
         return ResponseEntity.ok(libros);
     }
 
+ */
+    @GetMapping
+    public Page<LibroDTO> obtenerTodos(@PageableDefault(page = 0, size = 15) Pageable pageable) {
+        return libroService.obtenerTodos(pageable)
+                .map(LibroDTO::of);
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<LibroDTO> actualizar(@PathVariable Long id, @RequestBody Libro libro) {
+    public ResponseEntity<LibroDTO> actualizar(@PathVariable Long id, @RequestBody LibroDTO libro) {
         return ResponseEntity.ok(LibroDTO.of(libroService.actualizarLibro(id, libro)));
     }
 

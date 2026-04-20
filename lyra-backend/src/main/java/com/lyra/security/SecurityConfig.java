@@ -118,7 +118,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/usuarios/rol/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/resenas/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/libros").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/usuarios/{id}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/usuarios/{id}").hasAnyRole("ADMIN")
+
+                        .requestMatchers("/uploads/**").permitAll()
+
+                        // Modificar libros → USER y ADMIN
+                        .requestMatchers(HttpMethod.PUT, "/libros/**").hasAnyRole("ADMIN" ,"USER")
+                        .requestMatchers(HttpMethod.PATCH, "/libros/**").hasAnyRole("USER", "ADMIN")
+
+                        // Borrar libros → solo ADMIN
+                        .requestMatchers(HttpMethod.DELETE, "/libros/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

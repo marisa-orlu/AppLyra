@@ -35,8 +35,10 @@ public class LibroUsuario {
     @JoinColumn(name = "id_libro")
     private Libro libro;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado")
     private EstadoLibro estado;
+
 
     @Column(name = "fecha_agregacion")
     private Date fecha_agregacion;

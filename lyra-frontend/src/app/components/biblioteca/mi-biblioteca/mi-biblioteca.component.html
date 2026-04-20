@@ -1,0 +1,48 @@
+<section class="mi-biblioteca-page">
+  <header class="mi-biblioteca-header">
+    <div>
+      <h1>Mi biblioteca</h1>
+      <p *ngIf="idUsuario">Usuario: {{ idUsuario }}</p>
+    </div>
+
+    <div class="header-acciones">
+      <button type="button" class="btn-header btn-anadir" (click)="irAnadirLibro()">Añadir libro</button>
+      <button type="button" class="btn-header btn-carpeta" (click)="crearCarpeta()">Crear carpeta</button>
+    </div>
+  </header>
+
+  <p *ngIf="cargando" class="estado">Cargando tu biblioteca...</p>
+  <p *ngIf="mensajeInfo && !error" class="estado estado-info">{{ mensajeInfo }}</p>
+  <p *ngIf="error" class="estado estado-error">{{ error }}</p>
+
+  <div class="lista-libros" *ngIf="!cargando && !error">
+    <article class="card-libro-usuario" *ngFor="let item of librosUsuario; trackBy: trackByLibroUsuario">
+      <img [src]="item.portada" [alt]="item.titulo" class="portada" />
+
+      <div class="contenido">
+        <h3>{{ item.titulo }}</h3>
+        <p><strong>Autor:</strong> {{ item.autor }}</p>
+        <p><strong>Genero:</strong> {{ item.genero }}</p>
+        <p><strong>Estado:</strong> {{ item.estado }}</p>
+        <p><strong>Fecha de agregacion:</strong> {{ item.fechaAgregacion }}</p>
+        <p><strong>Prestamo:</strong> {{ item.isPrestamo ? 'Si' : 'No' }}</p>
+        <p><strong>Puntuacion:</strong> {{ item.puntuacion ?? 'Sin puntuacion' }}</p>
+
+        <div class="acciones-card">
+          <button type="button" class="btn-accion btn-ver" (click)="irDetalleLibro(item)">Ver</button>
+          <button
+            type="button"
+            class="btn-accion btn-borrar"
+            [disabled]="eliminandoId === item.idLibroUsuario"
+            (click)="eliminarDeBiblioteca(item)"
+          >
+            {{ eliminandoId === item.idLibroUsuario ? 'Eliminando...' : 'Eliminar' }}
+          </button>
+        </div>
+
+      </div>
+    </article>
+
+    <p *ngIf="librosUsuario.length === 0" class="estado">No hay libros en tu biblioteca todavia.</p>
+  </div>
+</section>

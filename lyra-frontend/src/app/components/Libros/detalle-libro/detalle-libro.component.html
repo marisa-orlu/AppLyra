@@ -1,0 +1,55 @@
+<section class="detalle-panel">
+  <header class="detalle-header">
+    <h1>{{ libro?.titulo || 'Detalle del libro' }}</h1>
+    <span class="subtitulo">Detalle del libro</span>
+  </header>
+
+  <p *ngIf="cargando" class="estado">Cargando detalle...</p>
+  <p *ngIf="error" class="estado estado-error">{{ error }}</p>
+
+  <div class="detalle-cuerpo" *ngIf="!cargando && !error && libro">
+    <div class="detalle-portada">
+      <img
+        [src]="libro.portada || portadaDefault"
+        [alt]="libro.titulo"
+        class="portada"
+        (error)="onPortadaError($event)"
+      />
+    </div>
+
+    <div class="detalle-info">
+      <p><strong>Autor:</strong> {{ libro.autor }}</p>
+      <p><strong>Categoria:</strong> {{ libro.genero || 'Sin genero' }}</p>
+      <p><strong>Anio:</strong> {{ libro.anio_publicacion || 'Sin dato' }}</p>
+
+      <div class="info-biblioteca" *ngIf="desdeBiblioteca">
+        <h3>Datos en mi biblioteca</h3>
+        <p><strong>Estado:</strong> {{ estadoBiblioteca || 'Sin estado' }}</p>
+        <p><strong>Fecha de agregacion:</strong> {{ fechaAgregacionBiblioteca || 'Sin fecha' }}</p>
+        <p><strong>Prestamo:</strong> {{ prestadoBiblioteca === null ? 'Sin dato' : (prestadoBiblioteca ? 'Si' : 'No') }}</p>
+        <p><strong>Puntuacion:</strong> {{ puntuacionBiblioteca ?? 'Sin puntuacion' }}</p>
+      </div>
+
+      <div class="valoracion" aria-label="Valoracion del libro">
+        <strong>Valoracion:</strong>
+        <i class="bi bi-star"></i>
+        <i class="bi bi-star"></i>
+        <i class="bi bi-star"></i>
+        <i class="bi bi-star"></i>
+        <i class="bi bi-star"></i>
+      </div>
+
+      <p class="sinopsis" *ngIf="libro.sinopsis"><strong>Sinopsis:</strong> {{ libro.sinopsis }}</p>
+
+      <div class="comentarios">
+        <p class="comentarios-titulo"><strong>Comentarios:</strong></p>
+        <textarea rows="3" placeholder="Escribe un comentario..." disabled></textarea>
+        <button type="button" class="btn-comentar" disabled>Comentar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="detalle-footer">
+    <button type="button" class="btn-cerrar" (click)="volverListado()">Cerrar</button>
+  </footer>
+</section>
