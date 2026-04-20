@@ -10,6 +10,7 @@ import { LoginResponse } from '../interfaces/login-response';
 export class AuthService {
 
   private tokenKey = 'token';
+  private roleKey = 'rol';
   private apiUrl = 'http://localhost:8080/usuarios';
 
   constructor(private http: HttpClient) {}
@@ -27,11 +28,31 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, token);
   }
 
+  saveRole(role: string): void {
+    localStorage.setItem(this.roleKey, role);
+  }
+
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
+  getRole(): string | null {
+    return localStorage.getItem(this.roleKey);
+  }
+
+  isAdmin(): boolean {
+    const role = this.getRole();
+
+    if (!role) {
+      return false;
+    }
+
+    const normalizedRole = role.toUpperCase().replace('ROLE_', '');
+    return normalizedRole === 'ADMIN';
+  }
+
   logout() {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.roleKey);
   }
 }

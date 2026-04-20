@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Libro } from '../../../interfaces/libroDTO';
 import { LibrosService } from '../../../services/libros.service';
@@ -9,12 +9,13 @@ import { LibrosService } from '../../../services/libros.service';
   templateUrl: './detalle-libro.component.html',
   styleUrl: './detalle-libro.component.css'
 })
-export class DetalleLibroComponent implements OnInit {
+export class DetalleLibroComponent implements OnInit, OnDestroy {
   readonly portadaDefault = 'assets/portadas/quijote.jpg';
 
   libro: Libro | null = null;
   cargando = false;
   error = '';
+  private portadaObjectUrl: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -35,6 +36,22 @@ export class DetalleLibroComponent implements OnInit {
     this.librosService.obtenerPorId(id).subscribe({
       next: (data: unknown) => {
         this.libro = this.mapearLibro(data);
+
+        this.librosService.obtenerPortadaSegura(this.libro.portada, this.portadaDefault).subscribe(url => {
+          if (this.portadaObjectUrl) {
+            this.librosService.liberarObjectUrl(this.portadaObjectUrl, this.portadaDefault);
+            this.portadaObjectUrl = null;
+          }
+
+          if (url.startsWith('blob:')) {
+            this.portadaObjectUrl = url;
+          }
+
+          if (this.libro) {
+            this.libro.portada = url;
+          }
+        });
+
         this.cargando = false;
       },
       error: () => {
@@ -42,6 +59,11 @@ export class DetalleLibroComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.librosService.liberarObjectUrl(this.portadaObjectUrl, this.portadaDefault);
+    this.portadaObjectUrl = null;
   }
 
   volverListado(): void {
@@ -74,17 +96,6 @@ export class DetalleLibroComponent implements OnInit {
   }
 
   private resolverPortada(portada: unknown): string {
-    if (typeof portada !== 'string' || !portada.trim()) {
-      return this.portadaDefault;
-    }
-
-    const valor = portada.trim();
-
-    if (valor.startsWith('http://') || valor.startsWith('https://') || valor.startsWith('assets/')) {
-      return valor;
-    }
-
-    const nombreArchivo = valor.split('/').pop()?.split('\\').pop() ?? valor;
-    return `assets/portadas/${nombreArchivo}`;
+    return this.librosService.resolverPortada(portada, this.portadaDefault);
   }
 }

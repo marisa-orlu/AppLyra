@@ -5,6 +5,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import { BibliotecaComponent } from './components/biblioteca/biblioteca.component';
 import { DetalleLibroComponent } from './components/Libros/detalle-libro/detalle-libro.component';
 import { ListadoLibrosComponent } from './components/Libros/listado-libros/listado-libros.component';
+import { GestionLibrosComponent } from './components/Libros/gestion-libros/gestion-libros.component';
 import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -24,6 +25,16 @@ const routes: Routes = [
   {
     path: 'libros',
     component: ListadoLibrosComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'libros/nuevo',
+    component: GestionLibrosComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'libros/editar/:id',
+    component: GestionLibrosComponent,
     canActivate: [AuthGuard]
   },
   {

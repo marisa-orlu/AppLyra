@@ -42,7 +42,7 @@ export class LoginComponent {
         this.authService.saveToken(token);
 
         if (role) {
-          localStorage.setItem('rol', role);
+          this.authService.saveRole(role);
         }
 
         console.log('Login correcto', {

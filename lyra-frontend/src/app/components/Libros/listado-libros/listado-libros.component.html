@@ -5,7 +5,7 @@
 
 	<div class="acciones">
 		<button type="button" class="icono-filtro" aria-label="Filtrar libros">&#x1F5D0;</button>
-		<button type="button" class="btn-anadir">
+		<button type="button" class="btn-anadir" (click)="irAnadirLibro()">
 			Anadir libro
 			<span class="mas">+</span>
 		</button>
@@ -32,15 +32,81 @@
 					<a
 						[routerLink]="['/libros', libro.id]"
 						class="btn-accion btn-ver"
-						aria-label="Ver libro"
+						aria-label="Ver detalle del libro"
 					>
-						Ver
+						Ver detalle
 					</a>
-					<button type="button" class="btn-accion btn-borrar" aria-label="Eliminar libro">X</button>
+					<button
+						type="button"
+						class="btn-accion btn-editar"
+						aria-label="Editar libro"
+						(click)="irEditarLibro(libro.id)"
+					>
+						Editar
+					</button>
+					<button
+						*ngIf="esAdmin"
+						type="button"
+						class="btn-accion btn-borrar"
+						aria-label="Eliminar libro"
+						(click)="abrirConfirmacionEliminar(libro)"
+					>
+						X
+					</button>
 				</div>
 			</div>
 		</article>
 
 		<p class="estado" *ngIf="libros.length === 0">No hay libros disponibles.</p>
+	</div>
+
+	<div class="paginacion" *ngIf="!cargando && !error && totalPaginas > 0">
+		<button
+			type="button"
+			class="btn-pagina"
+			(click)="irPaginaAnterior()"
+			[disabled]="paginaActual === 0"
+		>
+			Anterior
+		</button>
+
+		<p class="paginacion-info">
+			Pagina {{ paginaActual + 1 }} de {{ totalPaginas }} · {{ totalElementos }} libros
+		</p>
+
+		<button
+			type="button"
+			class="btn-pagina"
+			(click)="irPaginaSiguiente()"
+			[disabled]="paginaActual >= totalPaginas - 1"
+		>
+			Siguiente
+		</button>
+	</div>
+
+	<div
+		*ngIf="mostrarConfirmacion"
+		class="modal-overlay"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="titulo-confirmacion"
+		(click)="cancelarEliminar()"
+	>
+		<div class="modal-confirmacion" (click)="$event.stopPropagation()">
+			<h3 id="titulo-confirmacion">Confirmar</h3>
+			<p>
+				Estas seguro de que quieres eliminar
+				<strong>{{ libroAEliminar?.titulo }}</strong>?
+			</p>
+
+			<div class="modal-acciones">
+				<button type="button" class="btn-modal btn-cancelar" (click)="cancelarEliminar()" [disabled]="eliminando">
+					Cancelar
+				</button>
+				<button type="button" class="btn-modal btn-eliminar" (click)="confirmarEliminar()" [disabled]="eliminando">
+					{{ eliminando ? 'Eliminando...' : 'Eliminar' }}
+				</button>
+			</div>
+		</div>
 	</div>
 </section>

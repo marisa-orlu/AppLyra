@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 import { BibliotecaComponent } from './components/biblioteca/biblioteca.component';
 import { ListadoLibrosComponent } from './components/Libros/listado-libros/listado-libros.component';
 import { GestionLibrosComponent } from './components/Libros/gestion-libros/gestion-libros.component';
@@ -26,6 +27,7 @@ import { EnProcesoComponent } from './components/en-proceso/en-proceso.component
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
     AuthModule
   ],
   providers: [],
