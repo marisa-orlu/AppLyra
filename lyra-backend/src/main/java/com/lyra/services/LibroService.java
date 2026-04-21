@@ -2,9 +2,11 @@ package com.lyra.services;
 
 import com.lyra.DTOs.LibroDTOs.LibroCrearDTO;
 import com.lyra.DTOs.LibroDTOs.LibroDTO;
+import com.lyra.exception.OperacionNoPermitidaException;
 import com.lyra.exception.RecursoNoEncontradoException;
 import com.lyra.model.FileMetadata;
 import com.lyra.model.Libro;
+import com.lyra.model.Usuario;
 import com.lyra.repository.LibroRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,8 @@ public class LibroService {
 
 
     // Crear libro
-    public Libro crearLibro(LibroCrearDTO dto, MultipartFile file) {
-
-        FileMetadata fileMetadata = storageService.store(file);
+    public Libro crearLibro(LibroCrearDTO dto, MultipartFile file, Usuario usuarioAutenticado) {
+        FileMetadata fileMetadata = (file != null && !file.isEmpty()) ? storageService.store(file) : null;
 
         Libro libro = Libro.builder()
                 .titulo_libro(dto.titulo())
@@ -35,9 +36,10 @@ public class LibroService {
                 .genero(dto.genero())
                 .anio_publicacion(dto.anio_publicacion())
                 .sinopsis(dto.sinopsis())
-                .portada(fileMetadata.getFilename())   // Guardamos el nombre del archivo
+                .portada(fileMetadata != null ? fileMetadata.getFilename() : null)
                 .build();
 
+        libro.setUsuarioCreador(usuarioAutenticado);
         return libroRepository.save(libro);
     }
 
@@ -55,41 +57,67 @@ public class LibroService {
     }
 
     // Actualizar libro
-    public Libro actualizarLibro(Long id, LibroDTO dto) {
+    public Libro actualizarLibro(Long id, LibroDTO dto, Usuario usuarioAutenticado) {
         Libro libro = libroRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Libro no encontrado con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Libro no encontrado"));
 
-        // Solo pisa si viene valor
-        if (dto.titulo() != null && !dto.titulo().isBlank()) {
-            libro.setTitulo_libro(dto.titulo());
+        if (usuarioAutenticado == null || usuarioAutenticado.getId() == null) {
+            throw new OperacionNoPermitidaException("Usuario no autenticado");
         }
-        if (dto.autor() != null) {
-            libro.setAutor(dto.autor());
+
+        if (libro.getUsuarioCreador() == null || libro.getUsuarioCreador().getId() == null) {
+            throw new OperacionNoPermitidaException("El libro no tiene usuario creador asignado");
         }
-        if (dto.genero() != null) {
-            libro.setGenero(dto.genero());
+
+        if (!esCreador(libro, usuarioAutenticado) && !esAdmin(usuarioAutenticado)) {
+            throw new OperacionNoPermitidaException("No tienes permisos para editar este libro");
         }
-        if (dto.anio_publicacion() != null) {
-            libro.setAnio_publicacion(dto.anio_publicacion());
-        }
-        if (dto.sinopsis() != null) {
-            libro.setSinopsis(dto.sinopsis());
-        }
-        if (dto.portada() != null) {
-            libro.setPortada(dto.portada());
-        }
+
+
+        if (dto.titulo() != null && !dto.titulo().isBlank()) libro.setTitulo_libro(dto.titulo());
+        if (dto.autor() != null) libro.setAutor(dto.autor());
+        if (dto.genero() != null) libro.setGenero(dto.genero());
+        if (dto.anio_publicacion() != null) libro.setAnio_publicacion(dto.anio_publicacion());
+        if (dto.sinopsis() != null) libro.setSinopsis(dto.sinopsis());
+        if (dto.portada() != null) libro.setPortada(dto.portada());
 
         return libroRepository.save(libro);
     }
 
+    private boolean esAdmin(Usuario usuario) {
+        return usuario != null
+                && usuario.getRol() != null
+                && "ADMIN".equalsIgnoreCase(usuario.getRol().name()); // o toString() según tu enum
+    }
 
-
+    private boolean esCreador(Libro libro, Usuario usuario) {
+        return libro != null
+                && libro.getUsuarioCreador() != null
+                && libro.getUsuarioCreador().getId() != null
+                && usuario != null
+                && usuario.getId() != null
+                && libro.getUsuarioCreador().getId().equals(usuario.getId());
+    }
 
     // Eliminar libro
-    public void eliminarLibro(Long id) {
+    public void eliminarLibro(Long id, Usuario usuarioAutenticado) {
         Libro libro = obtenerPorId(id);
+
+        if (usuarioAutenticado == null || usuarioAutenticado.getId() == null) {
+            throw new OperacionNoPermitidaException("Usuario no autenticado");
+        }
+
+        if (libro.getUsuarioCreador() == null || libro.getUsuarioCreador().getId() == null) {
+            throw new OperacionNoPermitidaException("El libro no tiene usuario creador asignado");
+        }
+
+        if (!libro.getUsuarioCreador().getId().equals(usuarioAutenticado.getId())) {
+            throw new OperacionNoPermitidaException("No puedes eliminar un libro que no has creado");
+        }
+
         libroRepository.delete(libro);
     }
+
 
     // Búsquedas
     public List<Libro> buscarPorTitulo(String titulo) {

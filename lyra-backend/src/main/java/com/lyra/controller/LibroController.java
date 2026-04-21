@@ -3,6 +3,7 @@ package com.lyra.controller;
 import com.lyra.DTOs.LibroDTOs.*;
 import com.lyra.DTOs.LibroDTOs.LibroCrearDTO;
 import com.lyra.model.Libro;
+import com.lyra.model.Usuario;
 import com.lyra.services.LibroService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.util.List;
 
@@ -27,11 +30,14 @@ public class LibroController {
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<LibroDTO> crear(
             @RequestPart("data") LibroCrearDTO dto,
-            @RequestPart("file") MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal Usuario usuarioAutenticado
     ) {
-        Libro libro = libroService.crearLibro(dto, file);
+        Libro libro = libroService.crearLibro(dto, file, usuarioAutenticado);
         return ResponseEntity.status(HttpStatus.CREATED).body(LibroDTO.of(libro));
     }
+
+
 
 
     @GetMapping("/{id}")
@@ -56,15 +62,26 @@ public class LibroController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LibroDTO> actualizar(@PathVariable Long id, @RequestBody LibroDTO libro) {
-        return ResponseEntity.ok(LibroDTO.of(libroService.actualizarLibro(id, libro)));
+    public ResponseEntity<LibroDTO> actualizar(
+            @PathVariable Long id,
+            @RequestBody LibroDTO libro,
+            @AuthenticationPrincipal Usuario usuarioAutenticado
+    ) {
+        return ResponseEntity.ok(
+                LibroDTO.of(libroService.actualizarLibro(id, libro, usuarioAutenticado))
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminar(@PathVariable Long id) {
-        libroService.eliminarLibro(id);
+    public ResponseEntity<?> eliminar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Usuario usuarioAutenticado
+    ) {
+        libroService.eliminarLibro(id, usuarioAutenticado);
         return ResponseEntity.noContent().build();
     }
+
+
 
     @GetMapping("/buscar/titulo")
     public ResponseEntity<List<LibroDTO>> buscarPorTitulo(@RequestParam String titulo) {

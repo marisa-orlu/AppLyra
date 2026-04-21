@@ -2,6 +2,7 @@ package com.lyra.controller;
 
 
 import com.lyra.DTOs.LibroUsuarioDTOs.*;
+import com.lyra.model.LibroUsuario;
 import com.lyra.repository.LibroUsuarioRepository;
 import com.lyra.services.LibroUsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -24,6 +25,20 @@ public class LibroUsuarioController {
         return LibroUsuarioDTO.of(
                 libroUsuarioService.agregarLibro(dto.idUsuario(), dto.id_libro(), dto.estado())
         );
+    }
+
+    @PutMapping("/{idLibroUsuario}")
+    public LibroUsuarioDTO editarLibroUsuario(
+            @PathVariable Long idLibroUsuario,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody EditarLibroUsuarioDTO dto
+    ) {
+        LibroUsuario actualizado = libroUsuarioService.editarLibroUsuario(
+                idLibroUsuario,
+                dto.estado(),
+                dto.isPrestamo(),
+                dto.puntuacion()
+        );
+        return LibroUsuarioDTO.of(actualizado);
     }
 
     @PutMapping("/{id}/estado")

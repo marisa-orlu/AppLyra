@@ -1,5 +1,8 @@
 package com.lyra.services;
 
+import com.lyra.DTOs.LibroUsuarioDTOs.LibroUsuarioDTO;
+import com.lyra.exception.OperacionNoPermitidaException;
+import com.lyra.exception.RecursoNoEncontradoException;
 import com.lyra.model.EstadoLibro;
 import com.lyra.model.Libro;
 import com.lyra.model.LibroUsuario;
@@ -7,8 +10,11 @@ import com.lyra.model.Usuario;
 import com.lyra.repository.LibroRepository;
 import com.lyra.repository.LibroUsuarioRepository;
 import com.lyra.repository.UsuarioRepository;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.Date;
 import java.util.List;
@@ -57,6 +63,29 @@ public class LibroUsuarioService {
 
         lu.setEstado(estado);
         return libroUsuarioRepository.save(lu);
+    }
+
+
+    public LibroUsuario editarLibroUsuario(Long idLibroUsuario, Integer estado, Boolean isPrestamo, Integer puntuacion) {
+        LibroUsuario libroUsuario = libroUsuarioRepository.findById(idLibroUsuario)
+                .orElseThrow(() -> new RecursoNoEncontradoException("LibroUsuario no encontrado con id: " + idLibroUsuario));
+
+        if (estado != null) {
+            libroUsuario.setEstado(EstadoLibro.fromValor(estado));
+        }
+
+        if (isPrestamo != null) {
+            libroUsuario.setIs_prestamo(isPrestamo);
+        }
+
+        if (puntuacion != null) {
+            if (puntuacion < 0 || puntuacion > 5) {
+                throw new OperacionNoPermitidaException("La puntuacion debe estar entre 0 y 5");
+            }
+            libroUsuario.setPuntuacion(puntuacion);
+        }
+
+        return libroUsuarioRepository.save(libroUsuario);
     }
 
 
