@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -37,6 +37,18 @@ export interface LibroUsuarioDto {
   };
 }
 
+export interface LibroUsuarioCrearDto {
+  idUsuario: number;
+  id_libro: number;
+  estado: string;
+}
+
+export interface EditarLibroUsuarioDto {
+  estado?: number | null;
+  isPrestamo?: boolean | null;
+  puntuacion?: number | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -60,10 +72,78 @@ export class BibliotecaService {
     });
   }
 
+  anadirABiblioteca(idUsuario: number, idLibro: number, estado = 'PENDIENTE'): Observable<LibroUsuarioDto> {
+    const payload: LibroUsuarioCrearDto = {
+      idUsuario,
+      id_libro: idLibro,
+      estado
+    };
+
+    return this.http.post<LibroUsuarioDto>(this.apiUrl, payload, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  actualizarPuntuacion(idLibroUsuario: number, puntuacion: number): Observable<LibroUsuarioDto> {
+    const params = new HttpParams().set('puntuacion', puntuacion);
+
+    return this.http.put<LibroUsuarioDto>(`${this.apiUrl}/${idLibroUsuario}/puntuacion`, null, {
+      params,
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  editarLibroUsuario(idLibroUsuario: number, data: EditarLibroUsuarioDto): Observable<LibroUsuarioDto> {
+    return this.http.put<LibroUsuarioDto>(`${this.apiUrl}/${idLibroUsuario}`, data, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  actualizarEstado(idLibroUsuario: number, estado: string): Observable<LibroUsuarioDto> {
+    const estadoNormalizado = (estado || 'PENDIENTE').toUpperCase();
+    const valorEstado = this.obtenerValorEstado(estadoNormalizado);
+
+    const params = new HttpParams()
+      .set('estado', estadoNormalizado)
+      .set('valor', valorEstado)
+      .set('estado.valor', valorEstado);
+
+    const body = {
+      estado: estadoNormalizado,
+      valor: valorEstado
+    };
+
+    return this.http.put<LibroUsuarioDto>(`${this.apiUrl}/${idLibroUsuario}/estado`, body, {
+      params,
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  actualizarPrestamo(idLibroUsuario: number, prestamo: boolean): Observable<LibroUsuarioDto> {
+    const params = new HttpParams().set('prestamo', prestamo);
+
+    return this.http.put<LibroUsuarioDto>(`${this.apiUrl}/${idLibroUsuario}/prestamo`, null, {
+      params,
+      headers: this.getAuthHeaders()
+    });
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return token
       ? new HttpHeaders({ Authorization: `Bearer ${token}` })
       : new HttpHeaders();
+  }
+
+  private obtenerValorEstado(estado: string): number {
+    switch (estado) {
+      case 'LEYENDO':
+        return 1;
+      case 'LEIDO':
+        return 2;
+      case 'PENDIENTE':
+      default:
+        return 0;
+    }
   }
 }

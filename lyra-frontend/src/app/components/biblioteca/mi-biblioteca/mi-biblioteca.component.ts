@@ -3,9 +3,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { BibliotecaService, LibroUsuarioDto } from '../../../services/biblioteca.service';
-import { LibrosService } from '../../../services/libros.service';
+import { LibrosService, PageResponse } from '../../../services/libros.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { Libro } from '../../../interfaces/libroDTO';
 
 interface LibroUsuarioVista {
   idLibroUsuario: number;
@@ -21,6 +22,13 @@ interface LibroUsuarioVista {
   portada: string;
 }
 
+interface LibroCatalogoVista {
+  idLibro: number;
+  titulo: string;
+  autor: string;
+  genero: string;
+}
+
 @Component({
   selector: 'app-mi-biblioteca',
   standalone: false,
@@ -29,6 +37,12 @@ interface LibroUsuarioVista {
 })
 export class MiBibliotecaComponent implements OnInit {
   readonly portadaDefault = 'assets/portadas/quijote.jpg';
+  readonly estrellasDisponibles = [1, 2, 3, 4, 5];
+  readonly estadosDisponibles = [
+    { valor: 0, etiqueta: 'Pendiente' },
+    { valor: 1, etiqueta: 'Leyendo' },
+    { valor: 2, etiqueta: 'Leido' }
+  ];
 
   idUsuario: number | null = null;
   cargando = false;
@@ -36,6 +50,18 @@ export class MiBibliotecaComponent implements OnInit {
   mensajeInfo = '';
   error = '';
   librosUsuario: LibroUsuarioVista[] = [];
+  mostrarPopupAnadir = false;
+  mostrarPopupEditar = false;
+  cargandoCatalogo = false;
+  guardandoEdicion = false;
+  anadiendoLibroId: number | null = null;
+  filtroTitulo = '';
+  filtroAutor = '';
+  librosCatalogo: LibroCatalogoVista[] = [];
+  libroEditando: LibroUsuarioVista | null = null;
+  estadoEdicion = 0;
+  prestamoEdicion = false;
+  puntuacionEdicionEstrellas = 0;
 
   constructor(
     private authService: AuthService,
@@ -97,8 +123,89 @@ export class MiBibliotecaComponent implements OnInit {
     });
   }
 
+  obtenerEstrellasSeleccionadas(item: LibroUsuarioVista): number {
+    const puntuacion = Number(item.puntuacion ?? 0);
+
+    if (!Number.isFinite(puntuacion) || puntuacion <= 0) {
+      return 0;
+    }
+
+    return Math.max(0, Math.min(5, Math.round(puntuacion)));
+  }
+
+  abrirPopupEditar(item: LibroUsuarioVista): void {
+    this.error = '';
+    this.mensajeInfo = '';
+    this.libroEditando = item;
+    this.estadoEdicion = this.normalizarEstado(item.estado);
+    this.prestamoEdicion = Boolean(item.isPrestamo);
+    this.puntuacionEdicionEstrellas = this.obtenerEstrellasSeleccionadas(item);
+    this.mostrarPopupEditar = true;
+  }
+
+  cerrarPopupEditar(): void {
+    if (this.guardandoEdicion) {
+      return;
+    }
+
+    this.mostrarPopupEditar = false;
+    this.libroEditando = null;
+  }
+
+  seleccionarEstrellasEdicion(estrellas: number): void {
+    this.puntuacionEdicionEstrellas = Math.max(0, Math.min(5, estrellas));
+  }
+
+  guardarEdicionLibro(): void {
+    const item = this.libroEditando;
+
+    if (!item || this.guardandoEdicion || item.idLibroUsuario <= 0) {
+      return;
+    }
+
+    const puntuacionNuevaEscalaCinco = this.puntuacionEdicionEstrellas > 0 ? this.puntuacionEdicionEstrellas : null;
+    const puntuacionAnterior = item.puntuacion ?? null;
+    const estadoAnterior = this.normalizarEstado(item.estado);
+    const prestamoAnterior = Boolean(item.isPrestamo);
+
+    const hayCambioEstado = estadoAnterior !== this.estadoEdicion;
+    const hayCambioPrestamo = prestamoAnterior !== this.prestamoEdicion;
+    const hayCambioPuntuacion = (puntuacionAnterior ?? null) !== puntuacionNuevaEscalaCinco;
+
+    if (!hayCambioEstado && !hayCambioPrestamo && !hayCambioPuntuacion) {
+      this.mensajeInfo = 'No hay cambios para guardar.';
+      this.cerrarPopupEditar();
+      return;
+    }
+
+    this.error = '';
+    this.guardandoEdicion = true;
+
+    this.bibliotecaService.editarLibroUsuario(item.idLibroUsuario, {
+      estado: this.estadoEdicion,
+      isPrestamo: this.prestamoEdicion,
+      puntuacion: puntuacionNuevaEscalaCinco
+    }).subscribe({
+      next: () => {
+        item.estado = this.etiquetaEstadoDesdeValor(this.estadoEdicion);
+        item.isPrestamo = this.prestamoEdicion;
+        item.puntuacion = puntuacionNuevaEscalaCinco;
+        this.mensajeInfo = `Cambios guardados en "${item.titulo}".`;
+        this.guardandoEdicion = false;
+        this.cerrarPopupEditar();
+      },
+      error: (err: HttpErrorResponse) => {
+        const detalle = this.extraerDetalleError(err.error);
+        this.error = detalle
+          ? `No se pudieron guardar los cambios: ${detalle}`
+          : 'No se pudieron guardar los cambios del libro.';
+        this.guardandoEdicion = false;
+      }
+    });
+  }
+
   irAnadirLibro(): void {
-    this.router.navigate(['/libros']);
+    this.abrirPopupAnadirLibro();
   }
 
   crearCarpeta(): void {
@@ -119,6 +226,66 @@ export class MiBibliotecaComponent implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.error = this.construirMensajeError(err);
         this.cargando = false;
+      }
+    });
+  }
+
+  abrirPopupAnadirLibro(): void {
+    this.mostrarPopupAnadir = true;
+    this.filtroTitulo = '';
+    this.filtroAutor = '';
+    this.error = '';
+    this.mensajeInfo = '';
+
+    if (this.librosCatalogo.length === 0) {
+      this.cargarCatalogoCompleto();
+    }
+  }
+
+  cerrarPopupAnadirLibro(): void {
+    this.mostrarPopupAnadir = false;
+    this.anadiendoLibroId = null;
+  }
+
+  get librosCatalogoFiltrados(): LibroCatalogoVista[] {
+    const titulo = this.filtroTitulo.trim().toLowerCase();
+    const autor = this.filtroAutor.trim().toLowerCase();
+
+    return this.librosCatalogo.filter(item => {
+      const cumpleTitulo = !titulo || item.titulo.toLowerCase().includes(titulo);
+      const cumpleAutor = !autor || item.autor.toLowerCase().includes(autor);
+      return cumpleTitulo && cumpleAutor;
+    });
+  }
+
+  yaEnBiblioteca(idLibro: number): boolean {
+    return this.librosUsuario.some(item => item.idLibro === idLibro);
+  }
+
+  anadirLibroABiblioteca(item: LibroCatalogoVista): void {
+    if (!this.idUsuario || this.anadiendoLibroId) {
+      return;
+    }
+
+    if (this.yaEnBiblioteca(item.idLibro)) {
+      this.mensajeInfo = 'Ese libro ya esta en tu biblioteca.';
+      return;
+    }
+
+    this.error = '';
+    this.mensajeInfo = '';
+    this.anadiendoLibroId = item.idLibro;
+
+    this.bibliotecaService.anadirABiblioteca(this.idUsuario, item.idLibro).subscribe({
+      next: (nuevo: LibroUsuarioDto) => {
+        const mapeado = this.mapearLibroUsuario(nuevo);
+        this.librosUsuario = [mapeado, ...this.librosUsuario];
+        this.mensajeInfo = `Libro "${item.titulo}" anadido a tu biblioteca.`;
+        this.anadiendoLibroId = null;
+      },
+      error: (err: HttpErrorResponse) => {
+        this.error = this.construirMensajeError(err);
+        this.anadiendoLibroId = null;
       }
     });
   }
@@ -192,12 +359,12 @@ export class MiBibliotecaComponent implements OnInit {
       item.libro?.id ??
       0;
 
-    const estado = (item.estado ?? 'SIN ESTADO').toString();
+    const estado = (item.estado ?? 'PENDIENTE').toString().toUpperCase();
     const fechaBruta = item.fecha_agregacion ?? item.fechaAgregacion ?? null;
     const fechaAgregacion = this.formatearFecha(fechaBruta);
 
     const isPrestamo = Boolean(item.is_prestamo ?? item.isPrestamo ?? false);
-    const puntuacion = item.puntuacion ?? null;
+    const puntuacion = this.normalizarPuntuacion(item.puntuacion ?? null);
 
     const titulo = (
       item.libro?.titulo_libro ??
@@ -244,6 +411,46 @@ export class MiBibliotecaComponent implements OnInit {
     }).format(parsed);
   }
 
+  private normalizarEstado(estado: string): number {
+    const normalizado = (estado || '').toUpperCase();
+
+    switch (normalizado) {
+      case 'LEYENDO':
+        return 1;
+      case 'LEIDO':
+        return 2;
+      case 'PENDIENTE':
+      default:
+        return 0;
+    }
+  }
+
+  private etiquetaEstadoDesdeValor(valor: number): string {
+    switch (valor) {
+      case 1:
+        return 'LEYENDO';
+      case 2:
+        return 'LEIDO';
+      case 0:
+      default:
+        return 'PENDIENTE';
+    }
+  }
+
+  private normalizarPuntuacion(puntuacion: number | null): number | null {
+    if (puntuacion === null || puntuacion === undefined) {
+      return null;
+    }
+
+    const valor = Number(puntuacion);
+
+    if (!Number.isFinite(valor)) {
+      return null;
+    }
+
+    return Math.max(0, Math.min(5, Math.round(valor)));
+  }
+
   private completarDatosLibrosFaltantes(): void {
     const faltantes = this.librosUsuario.filter(item =>
       item.idLibro > 0 &&
@@ -278,5 +485,49 @@ export class MiBibliotecaComponent implements OnInit {
         resultado.item.portada = this.librosService.resolverPortada(libro.portada, this.portadaDefault);
       });
     });
+  }
+
+  private cargarCatalogoCompleto(): void {
+    this.cargandoCatalogo = true;
+    this.librosCatalogo = [];
+
+    this.cargarPaginaCatalogo(0, []);
+  }
+
+  private cargarPaginaCatalogo(page: number, acumulado: LibroCatalogoVista[]): void {
+    this.librosService.obtenerTodos(page, 30).subscribe({
+      next: (data: PageResponse<Libro>) => {
+        const respuesta = Array.isArray(data?.content) ? data.content : [];
+        const nuevos = respuesta.map((item: any) => this.mapearCatalogo(item));
+        const combinado = [...acumulado, ...nuevos];
+
+        if (data?.last || respuesta.length === 0) {
+          const unicos = new Map<number, LibroCatalogoVista>();
+          combinado.forEach(libro => {
+            if (libro.idLibro > 0) {
+              unicos.set(libro.idLibro, libro);
+            }
+          });
+          this.librosCatalogo = Array.from(unicos.values());
+          this.cargandoCatalogo = false;
+          return;
+        }
+
+        this.cargarPaginaCatalogo(page + 1, combinado);
+      },
+      error: () => {
+        this.error = 'No se pudo cargar el catalogo de libros para anadir.';
+        this.cargandoCatalogo = false;
+      }
+    });
+  }
+
+  private mapearCatalogo(item: any): LibroCatalogoVista {
+    return {
+      idLibro: Number(item?.id ?? item?.id_libro ?? 0),
+      titulo: (item?.titulo ?? item?.titulo_libro ?? 'Sin titulo').toString(),
+      autor: (item?.autor ?? 'Autor desconocido').toString(),
+      genero: (item?.genero ?? 'Sin genero').toString()
+    };
   }
 }
