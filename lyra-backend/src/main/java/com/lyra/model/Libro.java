@@ -57,4 +57,9 @@ public class Libro {
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<PrestamoUsuarioLibro> prestamos;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_usuario_creador", nullable = false)
+    private Usuario usuarioCreador;
+
 }

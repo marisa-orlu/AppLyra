@@ -4,6 +4,12 @@ import { Observable } from 'rxjs';
 import { LoginRequest } from '../interfaces/login-request';
 import { LoginResponse } from '../interfaces/login-response';
 
+interface RegisterRequest {
+  nombre: string;
+  email: string;
+  contrasena: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -23,6 +29,23 @@ export class AuthService {
     };
 
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, payload);
+  }
+
+  register(data: RegisterRequest, file?: File | null): Observable<unknown> {
+    const payload: RegisterRequest = {
+      nombre: data.nombre.trim(),
+      email: data.email.trim().toLowerCase(),
+      contrasena: data.contrasena
+    };
+
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+    if (file) {
+      formData.append('file', file);
+    }
+
+    return this.http.post<unknown>(this.apiUrl, formData);
   }
 
   saveToken(token: string) {

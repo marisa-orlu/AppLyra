@@ -26,10 +26,23 @@
         <p><strong>Estado:</strong> {{ item.estado }}</p>
         <p><strong>Fecha de agregacion:</strong> {{ item.fechaAgregacion }}</p>
         <p><strong>Prestamo:</strong> {{ item.isPrestamo ? 'Si' : 'No' }}</p>
-        <p><strong>Puntuacion:</strong> {{ item.puntuacion ?? 'Sin puntuacion' }}</p>
+        <div class="valoracion-editable">
+          <strong>Puntuacion:</strong>
+          <div class="estrellas" aria-label="Valoracion actual">
+            <span
+              *ngFor="let estrella of estrellasDisponibles"
+              class="estrella-btn estrella-lectura"
+              [class.activa]="estrella <= obtenerEstrellasSeleccionadas(item)"
+            >
+              ★
+            </span>
+          </div>
+          <span class="valor-num">{{ item.puntuacion ?? 0 }}/5</span>
+        </div>
 
         <div class="acciones-card">
           <button type="button" class="btn-accion btn-ver" (click)="irDetalleLibro(item)">Ver</button>
+          <button type="button" class="btn-accion btn-editar" (click)="abrirPopupEditar(item)">Editar</button>
           <button
             type="button"
             class="btn-accion btn-borrar"
@@ -44,5 +57,149 @@
     </article>
 
     <p *ngIf="librosUsuario.length === 0" class="estado">No hay libros en tu biblioteca todavia.</p>
+  </div>
+
+  <div
+    *ngIf="mostrarPopupAnadir"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-popup-anadir"
+    (click)="cerrarPopupAnadirLibro()"
+  >
+    <div class="modal-catalogo" (click)="$event.stopPropagation()">
+      <header class="modal-catalogo-header">
+        <h2 id="titulo-popup-anadir">Anadir libro a mi biblioteca</h2>
+        <button type="button" class="btn-cerrar" (click)="cerrarPopupAnadirLibro()">X</button>
+      </header>
+
+      <div class="filtros-catalogo">
+        <input
+          class="filtro-input"
+          type="text"
+          placeholder="Buscar por titulo"
+          [value]="filtroTitulo"
+          (input)="filtroTitulo = ($any($event.target)).value"
+        />
+        <input
+          class="filtro-input"
+          type="text"
+          placeholder="Buscar por autor"
+          [value]="filtroAutor"
+          (input)="filtroAutor = ($any($event.target)).value"
+        />
+      </div>
+
+      <p *ngIf="cargandoCatalogo" class="estado">Cargando catalogo...</p>
+
+      <div class="tabla-contenedor" *ngIf="!cargandoCatalogo">
+        <table class="tabla-catalogo">
+          <thead>
+            <tr>
+              <th>Titulo</th>
+              <th>Autor</th>
+              <th>Genero</th>
+              <th>Accion</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let libro of librosCatalogoFiltrados">
+              <td>{{ libro.titulo }}</td>
+              <td>{{ libro.autor }}</td>
+              <td>{{ libro.genero }}</td>
+              <td>
+                <button
+                  type="button"
+                  class="btn-mas"
+                  [class.btn-anadido]="yaEnBiblioteca(libro.idLibro)"
+                  [disabled]="yaEnBiblioteca(libro.idLibro) || anadiendoLibroId === libro.idLibro"
+                  (click)="anadirLibroABiblioteca(libro)"
+                >
+                  {{
+                    anadiendoLibroId === libro.idLibro
+                      ? '...'
+                      : (yaEnBiblioteca(libro.idLibro) ? 'Anadido' : '+')
+                  }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p *ngIf="!cargandoCatalogo && librosCatalogoFiltrados.length === 0" class="estado">
+        No hay resultados con los filtros actuales.
+      </p>
+    </div>
+  </div>
+
+  <div
+    *ngIf="mostrarPopupEditar"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-popup-editar"
+    (click)="cerrarPopupEditar()"
+  >
+    <div class="modal-edicion" (click)="$event.stopPropagation()">
+      <header class="modal-catalogo-header">
+        <h2 id="titulo-popup-editar">Editar libro en mi biblioteca</h2>
+        <button type="button" class="btn-cerrar" (click)="cerrarPopupEditar()">X</button>
+      </header>
+
+      <div class="modal-edicion-cuerpo" *ngIf="libroEditando as item">
+        <p class="libro-edicion-titulo"><strong>{{ item.titulo }}</strong></p>
+
+        <label class="campo-edicion">
+          <span>Estado</span>
+          <select
+            [value]="estadoEdicion"
+            (change)="estadoEdicion = ($any($event.target)).value"
+            [disabled]="guardandoEdicion"
+          >
+            <option *ngFor="let estado of estadosDisponibles" [value]="estado.valor">
+              {{ estado.etiqueta }}
+            </option>
+          </select>
+        </label>
+
+        <label class="campo-edicion checkbox-edicion">
+          <input
+            type="checkbox"
+            [checked]="prestamoEdicion"
+            (change)="prestamoEdicion = ($any($event.target)).checked"
+            [disabled]="guardandoEdicion"
+          />
+          <span>Prestamo activo</span>
+        </label>
+
+        <div class="campo-edicion">
+          <span>Puntuacion</span>
+          <div class="estrellas" aria-label="Editar puntuacion">
+            <button
+              type="button"
+              *ngFor="let estrella of estrellasDisponibles"
+              class="estrella-btn"
+              [class.activa]="estrella <= puntuacionEdicionEstrellas"
+              [disabled]="guardandoEdicion"
+              (click)="seleccionarEstrellasEdicion(estrella)"
+              [attr.aria-label]="'Seleccionar ' + estrella + ' estrellas'"
+            >
+              ★
+            </button>
+          </div>
+          <span class="valor-num">{{ puntuacionEdicionEstrellas }}/5</span>
+        </div>
+
+        <div class="acciones-modal-edicion">
+          <button type="button" class="btn-accion btn-ver" (click)="cerrarPopupEditar()" [disabled]="guardandoEdicion">
+            Cancelar
+          </button>
+          <button type="button" class="btn-accion btn-editar" (click)="guardarEdicionLibro()" [disabled]="guardandoEdicion">
+            {{ guardandoEdicion ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>

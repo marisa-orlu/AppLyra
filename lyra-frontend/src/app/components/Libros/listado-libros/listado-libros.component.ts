@@ -10,6 +10,7 @@ interface LibroVista {
   autor: string;
   genero: string | null;
   portada: string | null;
+  creadorId: number | null;
 }
 
 @Component({
@@ -23,6 +24,7 @@ export class ListadoLibrosComponent implements OnInit, OnDestroy {
   cargando = false;
   error = '';
   esAdmin = false;
+  usuarioActualId: number | null = null;
   mostrarConfirmacion = false;
   eliminando = false;
   libroAEliminar: LibroVista | null = null;
@@ -41,6 +43,7 @@ export class ListadoLibrosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.esAdmin = this.authService.isAdmin();
+    this.usuarioActualId = this.authService.getUserId();
     this.listarLibros();
   }
 
@@ -88,7 +91,8 @@ export class ListadoLibrosComponent implements OnInit, OnDestroy {
           titulo: item.titulo ?? item.titulo_libro ?? 'Sin titulo',
           autor: item.autor ?? 'Autor desconocido',
           genero: item.genero ?? null,
-          portada: this.resolverPortada(item.portada)
+          portada: this.resolverPortada(item.portada),
+          creadorId: this.obtenerCreadorId(item)
         }));
 
         this.libros.forEach(libro => {
@@ -164,8 +168,37 @@ export class ListadoLibrosComponent implements OnInit, OnDestroy {
     });
   }
 
+  puedeGestionar(libro: LibroVista): boolean {
+    if (this.esAdmin) {
+      return true;
+    }
+
+    if (!this.usuarioActualId) {
+      return false;
+    }
+
+    return libro.creadorId === this.usuarioActualId;
+  }
+
+  private obtenerCreadorId(item: any): number | null {
+    const candidatos = [
+      item?.id_usuario_creador,
+      item?.idUsuarioCreador,
+      item?.usuarioCreador?.id,
+      item?.usuarioCreador?.id_usuario
+    ];
+
+    for (const candidato of candidatos) {
+      const id = Number(candidato);
+      if (Number.isFinite(id) && id > 0) {
+        return id;
+      }
+    }
+
+    return null;
+  }
+
   private resolverPortada(portada: unknown): string {
     return this.librosService.resolverPortada(portada, this.portadaDefault);
   }
-
 }

@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,12 +29,16 @@ public class UsuarioController {
     private final JwtService jwtService;
 
     // Registrar usuario
-    @PostMapping
-    public ResponseEntity<UsuarioDTO> registrar(@RequestBody UsuarioRegistroDTO dto) {
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<UsuarioDTO> registrar(
+            @RequestPart("data") UsuarioRegistroDTO dto,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(UsuarioDTO.of(usuarioService.crearUsuario(dto)));
+                .body(UsuarioDTO.of(usuarioService.crearUsuario(dto, file)));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDTO> obtenerPorId(@PathVariable Long id) {

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -19,6 +20,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, String>> handleMaxSize(MaxUploadSizeExceededException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "El archivo supera el tamaño maximo permitido");
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(body); // 413
+    }
+
 
     // Email duplicado, nombre duplicado → 409
     @ExceptionHandler(EmailYaRegistradoException.class)
