@@ -9,6 +9,7 @@ interface LibroVista {
   titulo: string;
   autor: string;
   genero: string | null;
+  anioPublicacion: number | null;
   portada: string | null;
   creadorId: number | null;
 }
@@ -21,6 +22,11 @@ interface LibroVista {
 })
 export class ListadoLibrosComponent implements OnInit, OnDestroy {
   libros: LibroVista[] = [];
+  mostrarFiltros = false;
+  filtroTitulo = '';
+  filtroAutor = '';
+  filtroAnio = '';
+  filtroCategoria = '';
   cargando = false;
   error = '';
   esAdmin = false;
@@ -91,6 +97,7 @@ export class ListadoLibrosComponent implements OnInit, OnDestroy {
           titulo: item.titulo ?? item.titulo_libro ?? 'Sin titulo',
           autor: item.autor ?? 'Autor desconocido',
           genero: item.genero ?? null,
+          anioPublicacion: this.obtenerAnioPublicacion(item),
           portada: this.resolverPortada(item.portada),
           creadorId: this.obtenerCreadorId(item)
         }));
@@ -115,6 +122,56 @@ export class ListadoLibrosComponent implements OnInit, OnDestroy {
 
   trackByLibro(_: number, libro: LibroVista): number {
     return libro.id;
+  }
+
+  toggleFiltros(): void {
+    this.mostrarFiltros = !this.mostrarFiltros;
+  }
+
+  limpiarFiltros(): void {
+    this.filtroTitulo = '';
+    this.filtroAutor = '';
+    this.filtroAnio = '';
+    this.filtroCategoria = '';
+  }
+
+  get hayFiltrosActivos(): boolean {
+    return !!(
+      this.filtroTitulo.trim() ||
+      this.filtroAutor.trim() ||
+      this.filtroAnio.trim() ||
+      this.filtroCategoria.trim()
+    );
+  }
+
+  get categoriasDisponibles(): string[] {
+    const unicas = new Set<string>();
+
+    this.libros.forEach(libro => {
+      const genero = (libro.genero ?? '').trim();
+      if (genero) {
+        unicas.add(genero);
+      }
+    });
+
+    return Array.from(unicas).sort((a, b) => a.localeCompare(b, 'es'));
+  }
+
+  get librosFiltrados(): LibroVista[] {
+    const titulo = this.filtroTitulo.trim().toLowerCase();
+    const autor = this.filtroAutor.trim().toLowerCase();
+    const categoria = this.filtroCategoria.trim().toLowerCase();
+    const anioFiltro = Number(this.filtroAnio.trim());
+    const filtrarPorAnio = this.filtroAnio.trim() !== '' && Number.isFinite(anioFiltro);
+
+    return this.libros.filter(libro => {
+      const coincideTitulo = !titulo || libro.titulo.toLowerCase().includes(titulo);
+      const coincideAutor = !autor || libro.autor.toLowerCase().includes(autor);
+      const coincideCategoria = !categoria || (libro.genero ?? '').toLowerCase() === categoria;
+      const coincideAnio = !filtrarPorAnio || libro.anioPublicacion === anioFiltro;
+
+      return coincideTitulo && coincideAutor && coincideCategoria && coincideAnio;
+    });
   }
 
   irAnadirLibro(): void {
@@ -196,6 +253,11 @@ export class ListadoLibrosComponent implements OnInit, OnDestroy {
     }
 
     return null;
+  }
+
+  private obtenerAnioPublicacion(item: any): number | null {
+    const anio = Number(item?.anio_publicacion ?? item?.anioPublicacion ?? null);
+    return Number.isFinite(anio) ? anio : null;
   }
 
   private resolverPortada(portada: unknown): string {

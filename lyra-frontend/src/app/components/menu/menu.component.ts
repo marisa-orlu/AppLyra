@@ -11,10 +11,10 @@ import { AuthService } from '../../services/auth.service';
 export class MenuComponent {
   colapsado = false;
 
-  menuItems = [
+  private readonly menuItemsBase = [
     { label: 'Home', route: '/home', iconClass: 'bi bi-house', disabled: false },
     { label: 'Libros', route: '/libros', iconClass: 'bi bi-book', disabled: false },
-    { label: 'Usuarios', route: '/usuarios', iconClass: 'bi bi-people', disabled: false },
+    { label: 'Usuarios', route: '/usuarios', iconClass: 'bi bi-people', disabled: false, adminOnly: true },
     { label: 'Explorar', route: '/explorar', iconClass: 'bi bi-search', disabled: false },
     { label: 'Amigos', route: '/amigos', iconClass: 'bi bi-chat-dots-fill', disabled: false },
     { label: 'Mi biblioteca', route: '/mi-biblioteca', iconClass: 'bi bi-bookmarks-fill', disabled: false },
@@ -25,6 +25,11 @@ export class MenuComponent {
     private authService: AuthService,
     private router: Router
   ) {}
+
+  get menuItems() {
+    const esAdmin = this.authService.isAdmin();
+    return this.menuItemsBase.filter(item => !item.adminOnly || esAdmin);
+  }
 
   toggleSidebar(): void {
     this.colapsado = !this.colapsado;

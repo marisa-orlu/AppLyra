@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -38,10 +38,11 @@ interface LibroCatalogoVista {
 export class MiBibliotecaComponent implements OnInit {
   readonly portadaDefault = 'assets/portadas/quijote.jpg';
   readonly estrellasDisponibles = [1, 2, 3, 4, 5];
+  readonly estadosFiltroBiblioteca = ['PENDIENTE', 'LEYENDO', 'LEIDO'];
   readonly estadosDisponibles = [
-    { valor: 0, etiqueta: 'Pendiente' },
-    { valor: 1, etiqueta: 'Leyendo' },
-    { valor: 2, etiqueta: 'Leido' }
+    { valor: 1, etiqueta: 'Pendiente' },
+    { valor: 2, etiqueta: 'Leyendo' },
+    { valor: 3, etiqueta: 'Leido' }
   ];
 
   idUsuario: number | null = null;
@@ -54,14 +55,23 @@ export class MiBibliotecaComponent implements OnInit {
   mostrarPopupEditar = false;
   cargandoCatalogo = false;
   guardandoEdicion = false;
+  mensajeEdicion = '';
   anadiendoLibroId: number | null = null;
+  mostrarFiltrosBiblioteca = false;
+  filtroBibliotecaTitulo = '';
+  filtroBibliotecaAutor = '';
+  filtroBibliotecaCategoria = '';
+  filtroBibliotecaEstado = '';
+  filtroBibliotecaPuntuacion = '';
+
   filtroTitulo = '';
   filtroAutor = '';
   librosCatalogo: LibroCatalogoVista[] = [];
   libroEditando: LibroUsuarioVista | null = null;
-  estadoEdicion = 0;
+  estadoEdicion = 1;
   prestamoEdicion = false;
   puntuacionEdicionEstrellas = 0;
+  private readonly objectUrls: string[] = [];
 
   constructor(
     private authService: AuthService,
@@ -79,6 +89,11 @@ export class MiBibliotecaComponent implements OnInit {
     }
 
     this.cargarBiblioteca(this.idUsuario);
+  }
+
+  ngOnDestroy(): void {
+    this.objectUrls.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
+    this.objectUrls.length = 0;
   }
 
   trackByLibroUsuario(_: number, item: LibroUsuarioVista): number {
@@ -134,8 +149,14 @@ export class MiBibliotecaComponent implements OnInit {
   }
 
   abrirPopupEditar(item: LibroUsuarioVista): void {
+    if (!Number.isFinite(item.idLibroUsuario) || item.idLibroUsuario <= 0) {
+      this.error = 'No se puede editar este registro porque no tiene identificador valido en biblioteca.';
+      return;
+    }
+
     this.error = '';
     this.mensajeInfo = '';
+    this.mensajeEdicion = '';
     this.libroEditando = item;
     this.estadoEdicion = this.normalizarEstado(item.estado);
     this.prestamoEdicion = Boolean(item.isPrestamo);
@@ -150,6 +171,7 @@ export class MiBibliotecaComponent implements OnInit {
 
     this.mostrarPopupEditar = false;
     this.libroEditando = null;
+    this.mensajeEdicion = '';
   }
 
   seleccionarEstrellasEdicion(estrellas: number): void {
@@ -159,7 +181,16 @@ export class MiBibliotecaComponent implements OnInit {
   guardarEdicionLibro(): void {
     const item = this.libroEditando;
 
-    if (!item || this.guardandoEdicion || item.idLibroUsuario <= 0) {
+    if (!item) {
+      return;
+    }
+
+    if (this.guardandoEdicion) {
+      return;
+    }
+
+    if (item.idLibroUsuario <= 0) {
+      this.mensajeEdicion = 'No se puede guardar: el registro no tiene un id valido.';
       return;
     }
 
@@ -173,12 +204,25 @@ export class MiBibliotecaComponent implements OnInit {
     const hayCambioPuntuacion = (puntuacionAnterior ?? null) !== puntuacionNuevaEscalaCinco;
 
     if (!hayCambioEstado && !hayCambioPrestamo && !hayCambioPuntuacion) {
-      this.mensajeInfo = 'No hay cambios para guardar.';
-      this.cerrarPopupEditar();
+      this.mensajeEdicion = 'No hay cambios para guardar.';
       return;
     }
 
+    console.log('[MiBiblioteca] guardarEdicionLibro -> valores calculados', {
+      idLibroUsuario: item.idLibroUsuario,
+      estadoAnterior,
+      estadoNuevo: this.estadoEdicion,
+      prestamoAnterior,
+      prestamoNuevo: this.prestamoEdicion,
+      puntuacionAnterior,
+      puntuacionNueva: puntuacionNuevaEscalaCinco,
+      hayCambioEstado,
+      hayCambioPrestamo,
+      hayCambioPuntuacion
+    });
+
     this.error = '';
+    this.mensajeEdicion = '';
     this.guardandoEdicion = true;
 
     this.bibliotecaService.editarLibroUsuario(item.idLibroUsuario, {
@@ -187,18 +231,37 @@ export class MiBibliotecaComponent implements OnInit {
       puntuacion: puntuacionNuevaEscalaCinco
     }).subscribe({
       next: () => {
+        console.log('[MiBiblioteca] editarLibroUsuario -> OK', {
+          idLibroUsuario: item.idLibroUsuario,
+          estadoGuardado: this.estadoEdicion,
+          prestamoGuardado: this.prestamoEdicion,
+          puntuacionGuardada: puntuacionNuevaEscalaCinco
+        });
+
         item.estado = this.etiquetaEstadoDesdeValor(this.estadoEdicion);
         item.isPrestamo = this.prestamoEdicion;
         item.puntuacion = puntuacionNuevaEscalaCinco;
         this.mensajeInfo = `Cambios guardados en "${item.titulo}".`;
+        this.mensajeEdicion = '';
         this.guardandoEdicion = false;
         this.cerrarPopupEditar();
       },
       error: (err: HttpErrorResponse) => {
+        console.error('[MiBiblioteca] editarLibroUsuario -> ERROR', {
+          status: err.status,
+          body: err.error,
+          idLibroUsuario: item.idLibroUsuario,
+          estadoEnviado: this.estadoEdicion,
+          prestamoEnviado: this.prestamoEdicion,
+          puntuacionEnviada: puntuacionNuevaEscalaCinco
+        });
+
         const detalle = this.extraerDetalleError(err.error);
-        this.error = detalle
+        const mensaje = detalle
           ? `No se pudieron guardar los cambios: ${detalle}`
           : 'No se pudieron guardar los cambios del libro.';
+        this.error = mensaje;
+        this.mensajeEdicion = mensaje;
         this.guardandoEdicion = false;
       }
     });
@@ -208,6 +271,62 @@ export class MiBibliotecaComponent implements OnInit {
     this.abrirPopupAnadirLibro();
   }
 
+  toggleFiltrosBiblioteca(): void {
+    this.mostrarFiltrosBiblioteca = !this.mostrarFiltrosBiblioteca;
+  }
+
+  limpiarFiltrosBiblioteca(): void {
+    this.filtroBibliotecaTitulo = '';
+    this.filtroBibliotecaAutor = '';
+    this.filtroBibliotecaCategoria = '';
+    this.filtroBibliotecaEstado = '';
+    this.filtroBibliotecaPuntuacion = '';
+  }
+
+  get hayFiltrosBibliotecaActivos(): boolean {
+    return !!(
+      this.filtroBibliotecaTitulo.trim() ||
+      this.filtroBibliotecaAutor.trim() ||
+      this.filtroBibliotecaCategoria.trim() ||
+      this.filtroBibliotecaEstado.trim() ||
+      this.filtroBibliotecaPuntuacion.trim()
+    );
+  }
+
+  get categoriasBibliotecaDisponibles(): string[] {
+    const unicas = new Set<string>();
+
+    this.librosUsuario.forEach(item => {
+      const categoria = (item.genero ?? '').trim();
+      if (categoria) {
+        unicas.add(categoria);
+      }
+    });
+
+    return Array.from(unicas).sort((a, b) => a.localeCompare(b, 'es'));
+  }
+
+  get librosUsuarioFiltrados(): LibroUsuarioVista[] {
+    const titulo = this.filtroBibliotecaTitulo.trim().toLowerCase();
+    const autor = this.filtroBibliotecaAutor.trim().toLowerCase();
+    const categoria = this.filtroBibliotecaCategoria.trim().toLowerCase();
+    const estado = this.filtroBibliotecaEstado.trim().toUpperCase();
+    const puntuacion = Number(this.filtroBibliotecaPuntuacion.trim());
+    const filtrarPorPuntuacion = this.filtroBibliotecaPuntuacion.trim() !== '' && Number.isFinite(puntuacion);
+
+    return this.librosUsuario.filter(item => {
+      const coincideTitulo = !titulo || item.titulo.toLowerCase().includes(titulo);
+      const coincideAutor = !autor || item.autor.toLowerCase().includes(autor);
+      const coincideCategoria = !categoria || item.genero.toLowerCase() === categoria;
+      const coincideEstado = !estado || item.estado.toUpperCase() === estado;
+
+      const puntuacionItem = this.obtenerEstrellasSeleccionadas(item);
+      const coincidePuntuacion = !filtrarPorPuntuacion || puntuacionItem === puntuacion;
+
+      return coincideTitulo && coincideAutor && coincideCategoria && coincideEstado && coincidePuntuacion;
+    });
+  }
+
   crearCarpeta(): void {
     this.mensajeInfo = 'La funcionalidad de carpetas estara disponible pronto.';
   }
@@ -215,11 +334,14 @@ export class MiBibliotecaComponent implements OnInit {
   private cargarBiblioteca(idUsuario: number): void {
     this.cargando = true;
     this.error = '';
+    this.objectUrls.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
+    this.objectUrls.length = 0;
 
     this.bibliotecaService.obtenerBiblioteca(idUsuario).subscribe({
       next: (data: LibroUsuarioDto[]) => {
         const respuesta = Array.isArray(data) ? data : [];
         this.librosUsuario = respuesta.map(item => this.mapearLibroUsuario(item));
+        this.librosUsuario.forEach(item => this.cargarPortadaSegura(item));
         this.completarDatosLibrosFaltantes();
         this.cargando = false;
       },
@@ -280,6 +402,7 @@ export class MiBibliotecaComponent implements OnInit {
       next: (nuevo: LibroUsuarioDto) => {
         const mapeado = this.mapearLibroUsuario(nuevo);
         this.librosUsuario = [mapeado, ...this.librosUsuario];
+        this.cargarPortadaSegura(mapeado);
         this.mensajeInfo = `Libro "${item.titulo}" anadido a tu biblioteca.`;
         this.anadiendoLibroId = null;
       },
@@ -343,6 +466,7 @@ export class MiBibliotecaComponent implements OnInit {
     const idLibroUsuario =
       item.id_libro_usuario ??
       item.idLibroUsuario ??
+      item.id ??
       0;
 
     const idUsuario =
@@ -416,22 +540,21 @@ export class MiBibliotecaComponent implements OnInit {
 
     switch (normalizado) {
       case 'LEYENDO':
-        return 1;
-      case 'LEIDO':
         return 2;
+      case 'LEIDO':
+        return 3;
       case 'PENDIENTE':
       default:
-        return 0;
+        return 1;
     }
   }
 
   private etiquetaEstadoDesdeValor(valor: number): string {
     switch (valor) {
-      case 1:
-        return 'LEYENDO';
       case 2:
+        return 'LEYENDO';
+      case 3:
         return 'LEIDO';
-      case 0:
       default:
         return 'PENDIENTE';
     }
@@ -483,7 +606,17 @@ export class MiBibliotecaComponent implements OnInit {
         resultado.item.autor = (libro.autor ?? resultado.item.autor).toString();
         resultado.item.genero = (libro.genero ?? resultado.item.genero).toString();
         resultado.item.portada = this.librosService.resolverPortada(libro.portada, this.portadaDefault);
+        this.cargarPortadaSegura(resultado.item);
       });
+    });
+  }
+
+  private cargarPortadaSegura(item: LibroUsuarioVista): void {
+    this.librosService.obtenerPortadaSegura(item.portada, this.portadaDefault).subscribe(url => {
+      if (url.startsWith('blob:')) {
+        this.objectUrls.push(url);
+      }
+      item.portada = url;
     });
   }
 

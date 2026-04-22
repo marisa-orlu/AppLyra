@@ -4,18 +4,81 @@
     </header>
 
     <div class="acciones">
-        <button type="button" class="icono-filtro" aria-label="Filtrar libros">&#x1F5D0;</button>
+        <button
+            type="button"
+            class="icono-filtro"
+            [class.activo]="mostrarFiltros"
+            [attr.aria-expanded]="mostrarFiltros"
+            aria-label="Abrir filtros"
+            (click)="toggleFiltros()"
+        >
+            <i class="bi bi-funnel-fill"></i>
+        </button>
         <button type="button" class="btn-anadir" (click)="irAnadirLibro()">
             Anadir libro
             <span class="mas">+</span>
         </button>
     </div>
 
+    <section class="panel-filtros" *ngIf="mostrarFiltros" aria-label="Filtros de libros">
+        <div class="filtros-grid">
+            <label class="campo-filtro">
+                <span>Titulo</span>
+                <input
+                    type="text"
+                    [value]="filtroTitulo"
+                    (input)="filtroTitulo = ($any($event.target)).value"
+                    placeholder="Buscar por titulo"
+                />
+            </label>
+
+            <label class="campo-filtro">
+                <span>Autor</span>
+                <input
+                    type="text"
+                    [value]="filtroAutor"
+                    (input)="filtroAutor = ($any($event.target)).value"
+                    placeholder="Buscar por autor"
+                />
+            </label>
+
+            <label class="campo-filtro">
+                <span>Anio de publicacion</span>
+                <input
+                    type="number"
+                    min="0"
+                    [value]="filtroAnio"
+                    (input)="filtroAnio = ($any($event.target)).value"
+                    placeholder="Ej: 2024"
+                />
+            </label>
+
+            <label class="campo-filtro">
+                <span>Categoria</span>
+                <select
+                    [value]="filtroCategoria"
+                    (change)="filtroCategoria = ($any($event.target)).value"
+                >
+                    <option value="">Todas</option>
+                    <option *ngFor="let categoria of categoriasDisponibles" [value]="categoria">
+                        {{ categoria }}
+                    </option>
+                </select>
+            </label>
+        </div>
+
+        <div class="filtros-acciones">
+            <button type="button" class="btn-limpiar" (click)="limpiarFiltros()" [disabled]="!hayFiltrosActivos">
+                Limpiar filtros
+            </button>
+        </div>
+    </section>
+
     <p *ngIf="cargando" class="estado">Cargando libros...</p>
     <p *ngIf="error" class="estado estado-error">{{ error }}</p>
 
     <div class="grid-libros" *ngIf="!cargando && !error">
-        <article class="card-libro" *ngFor="let libro of libros; trackBy: trackByLibro">
+        <article class="card-libro" *ngFor="let libro of librosFiltrados; trackBy: trackByLibro">
             <img
                 [src]="libro.portada || portadaDefault"
                 [alt]="libro.titulo"
@@ -59,6 +122,7 @@
         </article>
 
         <p class="estado" *ngIf="libros.length === 0">No hay libros disponibles.</p>
+        <p class="estado" *ngIf="libros.length > 0 && librosFiltrados.length === 0">No hay resultados con esos filtros.</p>
     </div>
 
     <div class="paginacion" *ngIf="!cargando && !error && totalPaginas > 0">

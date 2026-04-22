@@ -1,0 +1,191 @@
+.cuenta-page {
+  min-height: 100vh;
+  padding: 1.4rem;
+  background: #efeff2;
+}
+
+.estado {
+  margin: 0 0 0.9rem;
+  color: #343042;
+}
+
+.estado-error {
+  color: #b11d3b;
+}
+
+.estado-exito {
+  color: #157264;
+}
+
+.tarjeta-cuenta {
+  width: min(500px, 100%);
+  height: 380px;
+  margin: 0 auto;
+  padding: 1.05rem 1.15rem 1.1rem;
+  border: 2px solid #f5def4;
+  background: #ececee;
+  box-shadow: 0 4px 12px rgba(36, 40, 49, 0.14);
+}
+
+.cuenta-header {
+  text-align: center;
+  border-bottom: 1px solid #9b9cab;
+  padding-bottom: 0.55rem;
+}
+
+.cuenta-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  color: #252534;
+}
+
+.username {
+  margin: 0.18rem 0 0;
+  color: #535463;
+  font-size: 1.06rem;
+}
+
+.avatar {
+  width: 84px;
+  height: 84px;
+  margin: 1rem auto 0.85rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #bdc2cc;
+  background: #d8dbe2;
+  display: grid;
+  place-items: center;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2d3040;
+}
+
+.datos-cuenta {
+  color: #222330;
+  font-size: 1.03rem;
+}
+
+.datos-cuenta p {
+  margin: 0.55rem 0;
+}
+
+.acciones-cuenta {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-principal,
+.btn-secundario {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-principal {
+  background: #3878e8;
+  color: #fff;
+}
+
+.btn-principal:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-secundario {
+  background: #808287;
+  color: #fff;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 22, 29, 0.56);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  z-index: 1100;
+}
+
+.modal-editar {
+  width: min(620px, 100%);
+  background: #ececee;
+  border-radius: 14px;
+  border: 1px solid #3d3d4e;
+  padding: 1rem;
+}
+
+.modal-editar h2 {
+  margin: 0 0 0.9rem;
+  color: #242532;
+}
+
+.campo-form {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.72rem;
+}
+
+.campo-form span {
+  color: #2c2f40;
+  font-size: 1rem;
+}
+
+.campo-form input,
+.campo-form textarea {
+  border: 1px solid #cbced8;
+  border-radius: 8px;
+  padding: 0.58rem 0.65rem;
+  font-size: 1rem;
+}
+
+.campo-form textarea {
+  resize: vertical;
+}
+
+.hint-foto {
+  margin: 0.2rem 0 0.8rem;
+  color: #454857;
+  font-size: 0.86rem;
+}
+
+.acciones-form {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+@media (max-width: 700px) {
+  .cuenta-page {
+    padding: 0.9rem;
+  }
+
+  .tarjeta-cuenta {
+    width: 100%;
+  }
+
+  .cuenta-header h1 {
+    font-size: 1.55rem;
+  }
+
+  .acciones-form {
+    flex-direction: column-reverse;
+  }
+
+  .btn-principal,
+  .btn-secundario {
+    width: 100%;
+  }
+}

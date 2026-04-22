@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export interface LibroUsuarioDto {
+  id?: number;
   id_libro_usuario?: number;
   idLibroUsuario?: number;
   id_usuario?: number;
@@ -94,7 +95,29 @@ export class BibliotecaService {
   }
 
   editarLibroUsuario(idLibroUsuario: number, data: EditarLibroUsuarioDto): Observable<LibroUsuarioDto> {
-    return this.http.put<LibroUsuarioDto>(`${this.apiUrl}/${idLibroUsuario}`, data, {
+    const payload: Record<string, unknown> = {};
+
+    if (data.estado !== undefined && data.estado !== null) {
+      payload['estado'] = Number(data.estado);
+    }
+
+    if (data.isPrestamo !== undefined && data.isPrestamo !== null) {
+      const prestamo = Boolean(data.isPrestamo);
+      payload['isPrestamo'] = prestamo;
+      payload['is_prestamo'] = prestamo;
+    }
+
+    if (data.puntuacion !== undefined) {
+      payload['puntuacion'] = data.puntuacion;
+    }
+
+    console.log('[BibliotecaService] PUT /biblioteca/{idLibroUsuario} payload', {
+      idLibroUsuario,
+      dtoOriginal: data,
+      payloadFinal: payload
+    });
+
+    return this.http.put<LibroUsuarioDto>(`${this.apiUrl}/${idLibroUsuario}`, payload, {
       headers: this.getAuthHeaders()
     });
   }
