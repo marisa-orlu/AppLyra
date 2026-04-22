@@ -73,8 +73,10 @@ public class UsuarioService {
     }
 
     public void eliminarUsuario(Long id) {
-        Usuario usuario = obtenerPorId(id);
-        usuarioRepository.delete(usuario);
+        if (!usuarioRepository.existsById(id)) {
+            throw new EntityNotFoundException("Usuario no encontrado con id: " + id);
+        }
+        usuarioRepository.deleteById(id);
     }
 
     public Usuario login(String email, String contrasena) {

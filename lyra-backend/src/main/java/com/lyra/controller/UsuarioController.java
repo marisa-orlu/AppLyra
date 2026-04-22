@@ -128,4 +128,10 @@ public class UsuarioController {
         return ResponseEntity.ok(UsuarioDTO.of(actualizado));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+        usuarioService.eliminarUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
