@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class DataInitializer implements CommandLineRunner {
                     .nombre("AdminLyra")
                     .email("adminLyra@lyra.com")
                     .contrasena(passwordEncoder.encode("admin1234"))
-                    .fechaRegistro(LocalDate.now())
+                    .fechaRegistro(LocalDateTime.now())
                     .rol(Rol.ADMIN)
                     .build();
             usuarioRepository.save(admin);

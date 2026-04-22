@@ -13,6 +13,8 @@ import { DetalleLibroComponent } from './components/Libros/detalle-libro/detalle
 import { MenuComponent } from './components/menu/menu.component';
 import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
 import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-biblioteca.component';
+import { CuentaComponent } from './components/cuenta/cuenta.component';
+import { UsuariosComponent } from './components/usuarios/usuarios.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-
     DetalleLibroComponent,
     MenuComponent,
     EnProcesoComponent,
-    MiBibliotecaComponent
+    MiBibliotecaComponent,
+    CuentaComponent,
+    UsuariosComponent
   ],
   imports: [
     BrowserModule,

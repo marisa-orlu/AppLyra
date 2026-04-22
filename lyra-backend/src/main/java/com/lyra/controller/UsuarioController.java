@@ -118,4 +118,20 @@ public class UsuarioController {
                 .toList();
         return ResponseEntity.ok(resultado);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioDTO> actualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody UsuarioActualizarDTO dto
+    ) {
+        Usuario actualizado = usuarioService.actualizarUsuario(id, dto);
+        return ResponseEntity.ok(UsuarioDTO.of(actualizado));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+        usuarioService.eliminarUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

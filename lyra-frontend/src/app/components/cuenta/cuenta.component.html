@@ -1,0 +1,91 @@
+<section class="cuenta-page">
+  <p *ngIf="cargando" class="estado">Cargando datos de tu cuenta...</p>
+  <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
+  <p *ngIf="exito" class="estado estado-exito">{{ exito }}</p>
+
+  <article class="tarjeta-cuenta" *ngIf="usuario as u">
+    <header class="cuenta-header">
+      <h1>{{ u.nombre }}</h1>
+      <p class="username">{{ usernameGenerado }}</p>
+    </header>
+
+    <div class="avatar" [class.avatar-fallback]="!fotoPerfilUrl">
+      <img *ngIf="fotoPerfilUrl; else avatarFallback" [src]="fotoPerfilUrl" [alt]="u.nombre" />
+      <ng-template #avatarFallback>{{ inicialesUsuario }}</ng-template>
+    </div>
+
+    <div class="datos-cuenta">
+      <p><strong>Email:</strong> {{ u.email }}</p>
+      <p><strong>Registrado:</strong> {{ fechaRegistroFormateada }}</p>
+      <p *ngIf="u.biografia"><strong>Biografia</strong> {{ u.biografia }}</p>
+    </div>
+
+    <div class="acciones-cuenta">
+      <button type="button" class="btn-principal" (click)="abrirEditor()">Editar perfil</button>
+    </div>
+  </article>
+
+  <div
+    class="modal-overlay"
+    *ngIf="mostrarEditor"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-editar-cuenta"
+    (click)="cerrarEditor()"
+  >
+    <form class="modal-editar" (click)="$event.stopPropagation()" (ngSubmit)="guardarCambios()" #formCuenta="ngForm">
+      <h2 id="titulo-editar-cuenta">Editar usuario</h2>
+
+      <label class="campo-form">
+        <span>Nombre</span>
+        <input
+          type="text"
+          name="nombre"
+          [(ngModel)]="formEdicion.nombre"
+          required
+          maxlength="120"
+        />
+      </label>
+
+      <label class="campo-form">
+        <span>Email</span>
+        <input
+          type="email"
+          name="email"
+          [(ngModel)]="formEdicion.email"
+          required
+          maxlength="140"
+        />
+      </label>
+
+      <label class="campo-form">
+        <span>Biografia</span>
+        <textarea
+          name="biografia"
+          [(ngModel)]="formEdicion.biografia"
+          rows="3"
+          maxlength="400"
+          placeholder="Cuéntanos algo de ti"
+        ></textarea>
+      </label>
+
+      <label class="campo-form">
+        <span>Foto perfil</span>
+        <input type="file" accept="image/*" (change)="onFotoSeleccionada($event)" />
+      </label>
+
+      <p class="hint-foto" *ngIf="formEdicion.fotoPerfil">
+        Valor enviado al backend: {{ formEdicion.fotoPerfil }}
+      </p>
+
+      <div class="acciones-form">
+        <button type="submit" class="btn-principal" [disabled]="guardando || !formCuenta.form.valid">
+          {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+        <button type="button" class="btn-secundario" (click)="cerrarEditor()" [disabled]="guardando">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

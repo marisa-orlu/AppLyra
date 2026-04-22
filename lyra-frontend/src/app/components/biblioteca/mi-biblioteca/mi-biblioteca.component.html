@@ -1,22 +1,105 @@
 <section class="mi-biblioteca-page">
-  <header class="mi-biblioteca-header">
-    <div>
-      <h1>Mi biblioteca</h1>
-      <p *ngIf="idUsuario">Usuario: {{ idUsuario }}</p>
-    </div>
+  <header class="cabecera-biblioteca">
+    <h2>Mi biblioteca</h2>
+    <p *ngIf="idUsuario">Usuario: {{ idUsuario }}</p>
+  </header>
+
+  <div class="acciones-superior">
+    <button
+      type="button"
+      class="icono-filtro"
+      [class.activo]="mostrarFiltrosBiblioteca"
+      [attr.aria-expanded]="mostrarFiltrosBiblioteca"
+      aria-label="Abrir filtros de mi biblioteca"
+      (click)="toggleFiltrosBiblioteca()"
+    >
+      <i class="bi bi-funnel-fill"></i>
+    </button>
 
     <div class="header-acciones">
       <button type="button" class="btn-header btn-anadir" (click)="irAnadirLibro()">Añadir libro</button>
       <button type="button" class="btn-header btn-carpeta" (click)="crearCarpeta()">Crear carpeta</button>
     </div>
-  </header>
+  </div>
+
+  <section class="panel-filtros-biblioteca" *ngIf="mostrarFiltrosBiblioteca" aria-label="Filtros de mi biblioteca">
+    <div class="filtros-grid-biblioteca">
+      <label class="campo-filtro">
+        <span>Titulo</span>
+        <input
+          type="text"
+          [value]="filtroBibliotecaTitulo"
+          (input)="filtroBibliotecaTitulo = ($any($event.target)).value"
+          placeholder="Buscar por titulo"
+        />
+      </label>
+
+      <label class="campo-filtro">
+        <span>Autor</span>
+        <input
+          type="text"
+          [value]="filtroBibliotecaAutor"
+          (input)="filtroBibliotecaAutor = ($any($event.target)).value"
+          placeholder="Buscar por autor"
+        />
+      </label>
+
+      <label class="campo-filtro">
+        <span>Categoria</span>
+        <select
+          [value]="filtroBibliotecaCategoria"
+          (change)="filtroBibliotecaCategoria = ($any($event.target)).value"
+        >
+          <option value="">Todas</option>
+          <option *ngFor="let categoria of categoriasBibliotecaDisponibles" [value]="categoria">
+            {{ categoria }}
+          </option>
+        </select>
+      </label>
+
+      <label class="campo-filtro">
+        <span>Estado</span>
+        <select
+          [value]="filtroBibliotecaEstado"
+          (change)="filtroBibliotecaEstado = ($any($event.target)).value"
+        >
+          <option value="">Todos</option>
+          <option *ngFor="let estado of estadosFiltroBiblioteca" [value]="estado">
+            {{ estado }}
+          </option>
+        </select>
+      </label>
+
+      <label class="campo-filtro">
+        <span>Puntuacion</span>
+        <select
+          [value]="filtroBibliotecaPuntuacion"
+          (change)="filtroBibliotecaPuntuacion = ($any($event.target)).value"
+        >
+          <option value="">Todas</option>
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="filtros-acciones-biblioteca">
+      <button type="button" class="btn-limpiar" (click)="limpiarFiltrosBiblioteca()" [disabled]="!hayFiltrosBibliotecaActivos">
+        Limpiar filtros
+      </button>
+    </div>
+  </section>
 
   <p *ngIf="cargando" class="estado">Cargando tu biblioteca...</p>
   <p *ngIf="mensajeInfo && !error" class="estado estado-info">{{ mensajeInfo }}</p>
   <p *ngIf="error" class="estado estado-error">{{ error }}</p>
 
   <div class="lista-libros" *ngIf="!cargando && !error">
-    <article class="card-libro-usuario" *ngFor="let item of librosUsuario; trackBy: trackByLibroUsuario">
+    <article class="card-libro-usuario" *ngFor="let item of librosUsuarioFiltrados; trackBy: trackByLibroUsuario">
       <img [src]="item.portada" [alt]="item.titulo" class="portada" />
 
       <div class="contenido">
@@ -42,7 +125,7 @@
 
         <div class="acciones-card">
           <button type="button" class="btn-accion btn-ver" (click)="irDetalleLibro(item)">Ver</button>
-          <button type="button" class="btn-accion btn-editar" (click)="abrirPopupEditar(item)">Editar</button>
+          <button type="button" class="btn-accion btn-editar" (click)="abrirPopupEditar(item)">Editar mi libro</button>
           <button
             type="button"
             class="btn-accion btn-borrar"
@@ -57,6 +140,9 @@
     </article>
 
     <p *ngIf="librosUsuario.length === 0" class="estado">No hay libros en tu biblioteca todavia.</p>
+    <p *ngIf="librosUsuario.length > 0 && librosUsuarioFiltrados.length === 0" class="estado">
+      No hay resultados con esos filtros.
+    </p>
   </div>
 
   <div
@@ -154,7 +240,7 @@
           <span>Estado</span>
           <select
             [value]="estadoEdicion"
-            (change)="estadoEdicion = ($any($event.target)).value"
+            (change)="estadoEdicion = +($any($event.target)).value"
             [disabled]="guardandoEdicion"
           >
             <option *ngFor="let estado of estadosDisponibles" [value]="estado.valor">
@@ -192,6 +278,7 @@
         </div>
 
         <div class="acciones-modal-edicion">
+          <p class="estado estado-error" *ngIf="mensajeEdicion">{{ mensajeEdicion }}</p>
           <button type="button" class="btn-accion btn-ver" (click)="cerrarPopupEditar()" [disabled]="guardandoEdicion">
             Cancelar
           </button>

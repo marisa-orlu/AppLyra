@@ -9,6 +9,9 @@ import { GestionLibrosComponent } from './components/Libros/gestion-libros/gesti
 import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
 import { AuthGuard } from './guards/auth.guard';
 import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-biblioteca.component';
+import { CuentaComponent } from './components/cuenta/cuenta.component';
+import { UsuariosComponent } from './components/usuarios/usuarios.component';
+import { AdminGuard } from './guards/admin.guard';
 
 
 const routes: Routes = [
@@ -45,8 +48,8 @@ const routes: Routes = [
   },
   {
     path: 'usuarios',
-    component: EnProcesoComponent,
-    canActivate: [AuthGuard]
+    component: UsuariosComponent,
+    canActivate: [AuthGuard, AdminGuard]
   },
   {
     path: 'explorar',
@@ -65,7 +68,7 @@ const routes: Routes = [
   },
   {
     path: 'cuenta',
-    component: EnProcesoComponent,
+    component: CuentaComponent,
     canActivate: [AuthGuard]
   },
   { path: 'biblioteca', redirectTo: 'home', pathMatch: 'full' }

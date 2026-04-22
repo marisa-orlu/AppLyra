@@ -24,12 +24,82 @@
 }
 
 .icono-filtro {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	border: 1px solid #d0d0d7;
 	background: #fff;
 	border-radius: 8px;
 	width: 38px;
 	height: 38px;
 	cursor: pointer;
+	color: #2f3b54;
+	font-size: 1.05rem;
+}
+
+.icono-filtro.activo {
+	background: #eaf0ff;
+	border-color: #9bb2f5;
+	color: #2b58d8;
+}
+
+.panel-filtros {
+	margin: 0.35rem 1.6rem 0.2rem;
+	padding: 0.9rem;
+	border: 1px solid #d8dbe3;
+	border-radius: 12px;
+	background: #fbfcff;
+	box-shadow: 0 6px 18px rgba(30, 41, 59, 0.08);
+}
+
+.filtros-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 0.7rem;
+}
+
+.campo-filtro {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.campo-filtro span {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #4b5568;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+	height: 36px;
+	border: 1px solid #cfd4df;
+	border-radius: 8px;
+	padding: 0 0.6rem;
+	font-size: 0.9rem;
+	background: #fff;
+	color: #1f2937;
+}
+
+.filtros-acciones {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 0.75rem;
+}
+
+.btn-limpiar {
+	height: 34px;
+	padding: 0 0.85rem;
+	border: 1px solid #cfd4df;
+	border-radius: 8px;
+	background: #ffffff;
+	color: #334155;
+	cursor: pointer;
+}
+
+.btn-limpiar:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 
 .btn-anadir {
@@ -247,6 +317,7 @@
 	}
 
 	.acciones,
+	.panel-filtros,
 	.grid-libros,
 	.estado {
 		padding-left: 1rem;

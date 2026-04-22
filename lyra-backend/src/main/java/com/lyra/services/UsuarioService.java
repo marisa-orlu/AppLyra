@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,7 +38,7 @@ public class UsuarioService {
                 .nombre(dto.nombre())
                 .email(dto.email())
                 .contrasena(passwordEncoder.encode(dto.contrasena()))
-                .fechaRegistro(LocalDate.now())
+                .fechaRegistro(LocalDateTime.now())
                 .rol(Rol.USER) // o el rol que uses por defecto
                 .fotoPerfil(fileMetadata != null ? fileMetadata.getFilename() : null)
                 .build();
@@ -72,8 +73,10 @@ public class UsuarioService {
     }
 
     public void eliminarUsuario(Long id) {
-        Usuario usuario = obtenerPorId(id);
-        usuarioRepository.delete(usuario);
+        if (!usuarioRepository.existsById(id)) {
+            throw new EntityNotFoundException("Usuario no encontrado con id: " + id);
+        }
+        usuarioRepository.deleteById(id);
     }
 
     public Usuario login(String email, String contrasena) {

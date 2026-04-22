@@ -1,0 +1,140 @@
+<section class="usuarios-page">
+  <header class="usuarios-header">
+    <h1>Gestion de usuarios</h1>
+    <p>Listado disponible solo para administradores.</p>
+  </header>
+
+  <p *ngIf="cargando" class="estado">Cargando usuarios...</p>
+  <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
+  <p *ngIf="exito" class="estado estado-exito">{{ exito }}</p>
+
+  <section class="panel-filtros" *ngIf="!cargando && !error" aria-label="Filtros de usuarios">
+    <div class="filtros-grid">
+      <label class="campo-filtro">
+        <span>Nombre de usuario</span>
+        <input type="text" [value]="filtroNombre" (input)="filtroNombre = ($any($event.target)).value"
+          placeholder="Buscar por nombre" />
+      </label>
+
+      <label class="campo-filtro">
+        <span>Correo</span>
+        <input type="text" [value]="filtroEmail" (input)="filtroEmail = ($any($event.target)).value"
+          placeholder="Buscar por correo" />
+      </label>
+    </div>
+
+    <div class="filtros-acciones">
+      <button type="button" class="btn-limpiar" (click)="limpiarFiltros()" [disabled]="!hayFiltrosActivos">
+        Limpiar filtros
+      </button>
+    </div>
+  </section>
+
+  <div class="usuarios-grid" *ngIf="!cargando && !error">
+    <article class="card-usuario" *ngFor="let usuario of usuariosFiltrados; trackBy: trackByUsuario">
+      <header class="header-usuario">
+        <div class="info-usuario">
+          <img [src]="obtenerFotoPerfil(usuario)" alt="Foto de perfil" />
+          <div class="datos-usuario">
+            <h3 class="nombre-usuario">{{ usuario.nombre }}</h3>
+            <span class="rol" [ngClass]="{ admin: usuario.rol === 'ADMIN' }">
+              {{ usuario.rol || 'USER' }}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div class="contenido-card">
+        <p><strong>Email:</strong> {{ usuario.email }}</p>
+        <p><strong>Registrado:</strong> {{ formatearFecha(usuario.fechaRegistro) }}</p>
+        <p *ngIf="usuario.biografia"><strong>Biografía:</strong> {{ usuario.biografia }}</p>
+      </div>
+
+      <div class="acciones-card">
+        <button type="button" class="btn-accion btn-editar" (click)="abrirEditor(usuario)">
+          Editar
+        </button>
+
+        <button type="button" class="btn-accion btn-borrar" [disabled]="eliminandoId === usuario.id"
+          (click)="abrirConfirmacionBorrado(usuario)">
+          {{ eliminandoId === usuario.id ? 'Borrando...' : 'Borrar' }}
+        </button>
+      </div>
+    </article>
+
+    <p *ngIf="usuarios.length === 0" class="estado">No hay usuarios registrados.</p>
+    <p *ngIf="usuarios.length > 0 && usuariosFiltrados.length === 0" class="estado">
+      No hay resultados con los filtros actuales.
+    </p>
+  </div>
+
+  <div class="modal-overlay" *ngIf="mostrarEditor" role="dialog" aria-modal="true"
+    aria-labelledby="titulo-editar-usuario" (click)="cerrarEditor()">
+    <form class="modal-panel modal-editar" (click)="$event.stopPropagation()" (ngSubmit)="guardarCambios()"
+      #formUsuario="ngForm">
+      <h2 id="titulo-editar-usuario">Editar usuario</h2>
+
+      <div class="vista-previa-usuario" *ngIf="usuarioEditando">
+        <img [src]="obtenerFotoPerfil(usuarioEditando)" alt="Foto de perfil" />
+        <div>
+          <p class="nombre-modal">{{ usuarioEditando.nombre }}</p>
+          <p class="email-modal">{{ usuarioEditando.email }}</p>
+        </div>
+      </div>
+
+      <label class="campo-form">
+        <span>Nombre</span>
+        <input type="text" name="nombre" [(ngModel)]="formEdicion.nombre" required maxlength="120" />
+      </label>
+
+      <label class="campo-form">
+        <span>Email</span>
+        <input type="email" name="email" [(ngModel)]="formEdicion.email" required maxlength="140" />
+      </label>
+
+      <label class="campo-form">
+        <span>Biografía</span>
+        <textarea name="biografia" [(ngModel)]="formEdicion.biografia" rows="3" maxlength="400"></textarea>
+      </label>
+
+      <label class="campo-form">
+        <span>Foto perfil (nombre de archivo)</span>
+        <input type="text" name="fotoPerfil" [(ngModel)]="formEdicion.fotoPerfil" maxlength="260"
+          placeholder="ejemplo.jpg" />
+      </label>
+
+      <div class="acciones-form">
+        <button type="submit" class="btn-principal" [disabled]="guardando || !formUsuario.form.valid">
+          {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+        <button type="button" class="btn-secundario" (click)="cerrarEditor()" [disabled]="guardando">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-overlay" *ngIf="mostrarConfirmacionBorrado" role="dialog" aria-modal="true"
+    aria-labelledby="titulo-borrar-usuario" (click)="cerrarConfirmacionBorrado()">
+    <div class="modal-panel modal-borrar" (click)="$event.stopPropagation()">
+      <h2 id="titulo-borrar-usuario">Borrar usuario</h2>
+
+      <p>
+        Vas a eliminar a
+        <strong>{{ usuarioAEliminar?.nombre }}</strong>.
+        Esta acción no se puede deshacer.
+      </p>
+
+      <div class="acciones-form">
+        <button type="button" class="btn-principal btn-peligro" (click)="confirmarBorrado()"
+          [disabled]="eliminandoId !== null">
+          {{ eliminandoId !== null ? 'Borrando...' : 'Sí, borrar' }}
+        </button>
+        <button type="button" class="btn-secundario" (click)="cerrarConfirmacionBorrado()"
+          [disabled]="eliminandoId !== null">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
