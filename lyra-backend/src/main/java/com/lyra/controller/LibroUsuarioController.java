@@ -8,6 +8,7 @@ import com.lyra.services.LibroUsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class LibroUsuarioController {
                 libroUsuarioService.agregarLibro(dto.idUsuario(), dto.id_libro(), dto.estado())
         );
     }
-
+/*
     @PutMapping("/{idLibroUsuario}")
     public LibroUsuarioDTO editarLibroUsuario(
             @PathVariable Long idLibroUsuario,
@@ -41,11 +42,26 @@ public class LibroUsuarioController {
         return LibroUsuarioDTO.of(actualizado);
     }
 
-    @PutMapping("/{id}/estado")
-    public LibroUsuarioDTO cambiarEstado(@PathVariable Long id, @RequestParam  LibroUsuarioActualizarDTO dto) {
-        return LibroUsuarioDTO.of(libroUsuarioService.cambiarEstado(id, dto.estado().getValor()));
+ */
+
+    @PutMapping("/{idLibroUsuario}")
+    public LibroUsuarioDTO editarLibroUsuario(
+            @PathVariable Long idLibroUsuario,
+            @RequestBody EditarLibroUsuarioDTO dto
+    ) {
+        LibroUsuario actualizado = libroUsuarioService.editarLibroUsuario(
+                idLibroUsuario,
+                dto.estado(),
+                dto.isPrestamo(),
+                dto.puntuacion()
+        );
+        return LibroUsuarioDTO.of(actualizado);
     }
 
+    @PutMapping("/{id}/estado")
+    public LibroUsuarioDTO cambiarEstado(@PathVariable Long id, @RequestBody LibroUsuarioActualizarDTO dto) {
+        return LibroUsuarioDTO.of(libroUsuarioService.cambiarEstado(id, dto.estado().getValor()));
+    }
     @PutMapping("/{id}/puntuacion")
     public LibroUsuarioDTO puntuar(@PathVariable Long id, @RequestParam Integer puntuacion) {
         return LibroUsuarioDTO.of(libroUsuarioService.puntuarLibro(id, puntuacion));
@@ -78,6 +94,8 @@ public class LibroUsuarioController {
                 .map(LibroUsuarioDTO::of)
                 .toList();
     }
+
+
 
 }
 
