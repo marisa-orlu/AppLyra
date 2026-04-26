@@ -72,6 +72,7 @@ const routes: Routes = [
     component: CuentaComponent,
     canActivate: [AuthGuard]
   },
+  
   { path: 'biblioteca', redirectTo: 'home', pathMatch: 'full' }
 
 ];

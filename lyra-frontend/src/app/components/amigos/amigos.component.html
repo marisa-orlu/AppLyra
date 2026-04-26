@@ -21,8 +21,74 @@
       </p>
 
       <p class="fecha">Lo sigues desde {{ formatearFecha(amigo.fechaSeguimiento) }}</p>
+
+      <button type="button" class="btn-biblioteca" (click)="irABibliotecaAmigo(amigo)">
+        Ver biblioteca
+      </button>
     </article>
 
     <p *ngIf="amigos.length === 0" class="estado">Todavía no sigues a nadie.</p>
   </div>
+
+  <div
+    *ngIf="mostrarModal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-biblioteca-amigo"
+    (click)="cerrarModal()"
+  >
+    <section class="modal-biblioteca" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2 id="titulo-biblioteca-amigo">Biblioteca de {{ amigoSeleccionado?.usuario?.nombre }}</h2>
+          <p *ngIf="amigoSeleccionado?.usuario?.email">{{ amigoSeleccionado?.usuario?.email }}</p>
+        </div>
+        <button type="button" class="btn-cerrar" (click)="cerrarModal()" aria-label="Cerrar popup">X</button>
+      </header>
+
+      <p *ngIf="cargandoBiblioteca" class="estado">Cargando biblioteca...</p>
+      <p *ngIf="errorBiblioteca && !cargandoBiblioteca" class="estado estado-error">{{ errorBiblioteca }}</p>
+
+      <section class="filtros-biblioteca" *ngIf="!cargandoBiblioteca && !errorBiblioteca">
+        <input
+          type="text"
+          class="filtro-input"
+          placeholder="Filtrar por libro"
+          [value]="filtroLibroBiblioteca"
+          (input)="filtroLibroBiblioteca = ($any($event.target)).value"
+        />
+        <input
+          type="text"
+          class="filtro-input"
+          placeholder="Filtrar por autor"
+          [value]="filtroAutorBiblioteca"
+          (input)="filtroAutorBiblioteca = ($any($event.target)).value"
+        />
+        <button
+          type="button"
+          class="btn-limpiar-filtros"
+          (click)="limpiarFiltrosBiblioteca()"
+          [disabled]="!hayFiltrosBibliotecaActivos"
+        >
+          Limpiar
+        </button>
+      </section>
+
+      <div class="grid-biblioteca" *ngIf="!cargandoBiblioteca && !errorBiblioteca">
+        <article class="card-libro" *ngFor="let libro of librosBibliotecaFiltrados; trackBy: trackByLibroBiblioteca">
+          <img [src]="libro.portada" [alt]="libro.titulo" class="portada-libro" />
+          <h3>{{ libro.titulo }}</h3>
+          <p><strong>Autor:</strong> {{ libro.autor }}</p>
+          <p><strong>Genero:</strong> {{ libro.genero }}</p>
+        </article>
+
+        <p *ngIf="librosBiblioteca.length === 0" class="estado">Este usuario no tiene libros en su biblioteca.</p>
+        <p *ngIf="librosBiblioteca.length > 0 && librosBibliotecaFiltrados.length === 0" class="estado">
+          No hay resultados con esos filtros.
+        </p>
+      </div>
+    </section>
+  </div>
 </section>
+
