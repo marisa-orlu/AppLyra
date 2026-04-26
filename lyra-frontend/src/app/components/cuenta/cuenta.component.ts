@@ -32,7 +32,7 @@ export class CuentaComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private usuarioService: UsuarioService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarCuenta();
@@ -91,6 +91,16 @@ export class CuentaComponent implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit'
     }).format(parsed);
+  }
+
+  public recortarBiografia(texto: string | null | undefined, limite: number = 30): string {
+    const palabras = (texto ?? '').trim().split(/\s+/).filter(Boolean);
+
+    if (palabras.length <= limite) {
+      return (texto ?? '').trim();
+    }
+
+    return palabras.slice(0, limite).join(' ') + '...';
   }
 
   abrirEditor(): void {

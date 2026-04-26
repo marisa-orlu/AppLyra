@@ -1,0 +1,28 @@
+<section class="amigos-page">
+  <header class="amigos-header">
+    <h1>Amigos</h1>
+    <p>Personas que sigues.</p>
+  </header>
+
+  <p *ngIf="cargando" class="estado">Cargando amigos...</p>
+  <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
+
+  <div class="amigos-grid" *ngIf="!cargando && !error">
+    <article class="card-amigo" *ngFor="let amigo of amigos; trackBy: trackByAmigo">
+      <div class="avatar-amigo">
+        <img [src]="obtenerFotoPerfil(amigo.usuario)" [alt]="amigo.usuario.nombre" />
+      </div>
+
+      <h3>{{ amigo.usuario.nombre }}</h3>
+      <p class="email">{{ amigo.usuario.email }}</p>
+
+      <p class="bio" *ngIf="amigo.usuario.biografia">
+        {{ recortarBiografia(amigo.usuario.biografia, 30) }}
+      </p>
+
+      <p class="fecha">Lo sigues desde {{ formatearFecha(amigo.fechaSeguimiento) }}</p>
+    </article>
+
+    <p *ngIf="amigos.length === 0" class="estado">Todavía no sigues a nadie.</p>
+  </div>
+</section>

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -23,7 +24,8 @@ export class MenuComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {}
 
   get menuItems() {
@@ -38,6 +40,13 @@ export class MenuComponent {
   cerrarSesion(): void {
     this.authService.logout();
     localStorage.removeItem('rol');
+
+    this.snackBar.open('Sesión cerrada correctamente', 'Cerrar', {
+      duration: 3000,
+      verticalPosition: 'bottom',
+      horizontalPosition: 'center'
+    });
+
     this.router.navigate(['/login']);
   }
 }

@@ -17,7 +17,7 @@
     <div class="datos-cuenta">
       <p><strong>Email:</strong> {{ u.email }}</p>
       <p><strong>Registrado:</strong> {{ fechaRegistroFormateada }}</p>
-      <p *ngIf="u.biografia"><strong>Biografia</strong> {{ u.biografia }}</p>
+      <p *ngIf="u.biografia"><strong>Biografia</strong> {{ recortarBiografia(u.biografia, 30) }}</p>
     </div>
 
     <div class="acciones-cuenta">
@@ -73,10 +73,6 @@
         <span>Foto perfil</span>
         <input type="file" accept="image/*" (change)="onFotoSeleccionada($event)" />
       </label>
-
-      <p class="hint-foto" *ngIf="formEdicion.fotoPerfil">
-        Valor enviado al backend: {{ formEdicion.fotoPerfil }}
-      </p>
 
       <div class="acciones-form">
         <button type="submit" class="btn-principal" [disabled]="guardando || !formCuenta.form.valid">
