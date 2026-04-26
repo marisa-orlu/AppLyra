@@ -12,6 +12,7 @@ import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-
 import { CuentaComponent } from './components/cuenta/cuenta.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { AdminGuard } from './guards/admin.guard';
+import { AmigosComponent } from './components/amigos/amigos.component';
 
 
 const routes: Routes = [
@@ -58,7 +59,7 @@ const routes: Routes = [
   },
   {
     path: 'amigos',
-    component: EnProcesoComponent,
+    component: AmigosComponent,
     canActivate: [AuthGuard]
   },
   {

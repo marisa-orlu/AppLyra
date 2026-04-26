@@ -123,6 +123,21 @@
 }
 
 .btn-cerrar {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(183, 162, 208, 0.55);
+  color: #fff;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-cerrar {
   margin-top: auto;
   border: 1px solid rgba(255, 255, 255, 0.75);
   background: rgba(183, 162, 208, 0.55);
@@ -138,6 +153,22 @@
 
 .btn-cerrar:hover {
   background: rgba(168, 147, 197, 0.8);
+}
+
+.menu-lateral {
+  width: 268px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.2rem 0.95rem;
+  color: #fff;
+  background: linear-gradient(180deg, #c8b3d7 0%, #e3b6ce 45%, #e8bed5 100%);
+  transition: width 0.25s ease, padding 0.25s ease;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
 }
 
 .menu-lateral.colapsado .menu-texto {
