@@ -267,3 +267,17 @@
     grid-template-columns: repeat(2, minmax(130px, 1fr));
   }
 }
+
+.filtros-amigos {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  margin: 0.9rem 0;
+}
+
+@media (max-width: 700px) {
+  .filtros-amigos {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

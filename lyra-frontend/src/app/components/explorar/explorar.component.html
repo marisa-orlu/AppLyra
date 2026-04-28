@@ -1,0 +1,108 @@
+<div class="explorar-container">
+    <div class="search-panel">
+
+        <!-- toggle principal -->
+        <div class="toggle-group">
+            <label [class.checked]="searchTarget === 'libro'">
+                <input type="radio" name="searchTarget" value="libro" [(ngModel)]="searchTarget" />
+                <i class="bi bi-book toggle-icon"></i>
+                <span>Libro</span>
+            </label>
+
+            <label [class.checked]="searchTarget === 'usuario'">
+                <input type="radio" name="searchTarget" value="usuario" [(ngModel)]="searchTarget" />
+                <i class="bi bi-person toggle-icon"></i>
+                <span>Usuario</span>
+            </label>
+        </div>
+
+
+        <!-- sub-campos según tipo -->
+        <div class="subfield-row" *ngIf="searchTarget === 'usuario'">
+            <label [class.checked]="usuarioField === 'nombre'">
+                <input type="radio" name="usuarioField" value="nombre" [(ngModel)]="usuarioField" />
+                Nombre
+            </label>
+
+            <label [class.checked]="usuarioField === 'email'">
+                <input type="radio" name="usuarioField" value="email" [(ngModel)]="usuarioField" />
+                Email
+            </label>
+        </div>
+
+
+        <div class="subfield-row" *ngIf="searchTarget === 'libro'">
+            <label [class.checked]="libroField === 'titulo'">
+                <input type="radio" name="libroField" value="titulo" [(ngModel)]="libroField" />
+                Título
+            </label>
+
+            <label [class.checked]="libroField === 'autor'">
+                <input type="radio" name="libroField" value="autor" [(ngModel)]="libroField" />
+                Autor
+            </label>
+
+            <label [class.checked]="libroField === 'anio'">
+                <input type="radio" name="libroField" value="anio" [(ngModel)]="libroField" />
+                Año
+            </label>
+
+            <label [class.checked]="libroField === 'genero'">
+                <input type="radio" name="libroField" value="genero" [(ngModel)]="libroField" />
+                Categoría
+            </label>
+        </div>
+
+        <!-- input + botón -->
+        <div class="input-row">
+            <input type="text" placeholder="¿Qué estás buscando?" [(ngModel)]="query" (keyup.enter)="onSearch()" />
+            <button type="button" class="btn-search" (click)="onSearch()">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- resultados -->
+    <div class="resultados">
+        <div *ngIf="loading" class="sin-resultados">Buscando…</div>
+        <div *ngIf="!resultados?.length && !loading" class="sin-resultados">Sin resultados</div>
+
+        <div *ngFor="let item of resultados" class="card">
+
+            <ng-container *ngIf="searchTarget === 'usuario'">
+                <div *ngIf="item.fotoPerfilUrl; else avatarFallback" class="avatar">
+                    <img [src]="item.fotoPerfilUrl" alt="" (error)="onFotoError($event, item)" />
+                </div>
+                <ng-template #avatarFallback>
+                    <div class="avatar-placeholder">
+                        {{ (item.nombre || '?').charAt(0).toUpperCase() }}
+                    </div>
+                </ng-template>
+                <div class="texto">
+                    <div class="nombre">{{ item.nombre }}</div>
+                    <div class="email">{{ item.email }}</div>
+                </div>
+                <button class="accion" (click)="anadirAmigo(item)">Seguir</button>
+            </ng-container>
+
+            <ng-container *ngIf="searchTarget === 'libro'">
+                <div *ngIf="item.portadaUrl; else portadaFallback" class="portada">
+                    <img [src]="item.portadaUrl || portadaDefault" alt="" (error)="onPortadaError($event)" />
+                </div>
+                <ng-template #portadaFallback>
+                    <div class="portada">
+                        <img [src]="portadaDefault" alt="Portada por defecto" />
+                    </div>
+                </ng-template>
+                <div class="texto">
+                    <div class="titulo">{{ item.titulo || item.titulo_libro }}</div>
+                    <div class="meta">{{ item.autor }} · {{ item.anio || item.anio_publicacion }}</div>
+                    <span *ngIf="item.genero" class="badge-genero">{{ item.genero }}</span>
+                </div>
+                <button class="accion icon-btn" (click)="anadirLibro(item)" title="Añadir a biblioteca">+</button>
+            </ng-container>
+
+        </div>
+    </div>
+</div>

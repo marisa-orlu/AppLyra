@@ -32,6 +32,17 @@ export class UsuarioSeguidorService {
     );
   }
 
+  anadirSeguidor(idSeguidor: number, idUsuario: number) {
+    const payload: Record<string, unknown> = {
+      idSeguidor,
+      idUsuario
+    };
+
+    return this.http.post<UsuarioSeguidor>(this.apiUrl, payload, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   obtenerSeguidores(idUsuario: number): Observable<UsuarioSeguidor[]> {
     return this.http.get<UsuarioSeguidor[]>(
       `${this.apiUrl}/usuario/${idUsuario}`,

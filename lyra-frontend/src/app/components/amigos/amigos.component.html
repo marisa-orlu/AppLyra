@@ -4,11 +4,22 @@
     <p>Personas que sigues.</p>
   </header>
 
+  <section class="filtros-amigos" *ngIf="!cargando && !error">
+    <input
+      type="text"
+      class="filtro-input"
+      placeholder="Buscar por nombre o correo"
+      [value]="filtroAmigos"
+      (input)="filtroAmigos = ($any($event.target)).value"
+    />
+    <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltroAmigos()" [disabled]="!filtroAmigos.trim()">Limpiar</button>
+  </section>
+
   <p *ngIf="cargando" class="estado">Cargando amigos...</p>
   <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
 
   <div class="amigos-grid" *ngIf="!cargando && !error">
-    <article class="card-amigo" *ngFor="let amigo of amigos; trackBy: trackByAmigo">
+    <article class="card-amigo" *ngFor="let amigo of amigosFiltrados; trackBy: trackByAmigo">
       <div class="avatar-amigo">
         <img [src]="obtenerFotoPerfil(amigo.usuario)" [alt]="amigo.usuario.nombre" />
       </div>
@@ -28,6 +39,7 @@
     </article>
 
     <p *ngIf="amigos.length === 0" class="estado">Todavía no sigues a nadie.</p>
+    <p *ngIf="amigos.length > 0 && amigosFiltrados.length === 0" class="estado">No hay resultados con esos filtros.</p>
   </div>
 
   <div

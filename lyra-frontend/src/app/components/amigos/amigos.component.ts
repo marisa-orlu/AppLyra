@@ -26,6 +26,7 @@ export class AmigosComponent implements OnInit {
     cargando = true;
     error = '';
     amigos: AmigoVista[] = [];
+    filtroAmigos = '';
 
     amigoSeleccionado: AmigoVista | null = null;
     mostrarModal = false;
@@ -157,6 +158,25 @@ export class AmigosComponent implements OnInit {
 
     trackByAmigo(_: number, item: AmigoVista): number {
         return item.usuario.id;
+    }
+
+    get amigosFiltrados(): AmigoVista[] {
+        const termino = this.filtroAmigos.trim().toLowerCase();
+
+        if (!termino) {
+            return this.amigos;
+        }
+
+        return this.amigos.filter(amigo => {
+            const nombre = (amigo.usuario?.nombre ?? '').toString().toLowerCase();
+            const email = (amigo.usuario?.email ?? '').toString().toLowerCase();
+
+            return nombre.includes(termino) || email.includes(termino);
+        });
+    }
+
+    limpiarFiltroAmigos(): void {
+        this.filtroAmigos = '';
     }
 
     private cargarBibliotecaAmigo(idUsuario: number): void {
