@@ -18,8 +18,11 @@ export class MenuComponent {
     { label: 'Usuarios', route: '/usuarios', iconClass: 'bi bi-people', disabled: false, adminOnly: true },
     { label: 'Explorar', route: '/explorar', iconClass: 'bi bi-search', disabled: false },
     { label: 'Amigos', route: '/amigos', iconClass: 'bi bi-chat-dots-fill', disabled: false },
+    { label: 'Préstamos', route: '/prestamos', iconClass: 'bi bi-journal-arrow-down', disabled: false },
     { label: 'Mi biblioteca', route: '/mi-biblioteca', iconClass: 'bi bi-bookmarks-fill', disabled: false },
     { label: 'Cuenta', route: '/cuenta', iconClass: 'bi bi-person-circle', disabled: false }
+    
+
   ];
 
   constructor(

@@ -80,6 +80,7 @@
   border: 1px solid rgba(255, 255, 255, 0.65);
   border-radius: 1.5rem;
   padding: 1rem 0.7rem;
+  margin-bottom: 0.25rem;
 }
 
 .menu-item {
@@ -122,23 +123,10 @@
   color: #fff;
 }
 
-.btn-cerrar {
-  margin-top: 0.5rem;
-  margin-bottom: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  background: rgba(183, 162, 208, 0.55);
-  color: #fff;
-  padding: 0.65rem 0.8rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
 
 .btn-cerrar {
   margin-top: auto;
+  margin-bottom: 4rem;
   border: 1px solid rgba(255, 255, 255, 0.75);
   background: rgba(183, 162, 208, 0.55);
   color: #fff;
