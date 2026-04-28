@@ -114,7 +114,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/download/**", "/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios", "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/libros/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/usuarios").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET, "/usuarios/rol/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/resenas/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/libros").hasAnyRole("USER", "ADMIN")

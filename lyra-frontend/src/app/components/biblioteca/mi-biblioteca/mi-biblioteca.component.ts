@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -7,6 +7,8 @@ import { LibrosService, PageResponse } from '../../../services/libros.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Libro } from '../../../interfaces/libroDTO';
+
+
 
 interface LibroUsuarioVista {
   idLibroUsuario: number;
@@ -72,7 +74,8 @@ export class MiBibliotecaComponent implements OnInit {
   prestamoEdicion = false;
   puntuacionEdicionEstrellas = 0;
   private readonly objectUrls: string[] = [];
-
+  
+  @Input() usuarioId!: number;
   constructor(
     private authService: AuthService,
     private bibliotecaService: BibliotecaService,

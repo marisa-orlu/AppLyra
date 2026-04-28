@@ -32,6 +32,17 @@ export class UsuarioSeguidorService {
     );
   }
 
+  anadirSeguidor(idSeguidor: number, idUsuario: number) {
+    const payload: Record<string, unknown> = {
+      idSeguidor,
+      idUsuario
+    };
+
+    return this.http.post<UsuarioSeguidor>(this.apiUrl, payload, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   obtenerSeguidores(idUsuario: number): Observable<UsuarioSeguidor[]> {
     return this.http.get<UsuarioSeguidor[]>(
       `${this.apiUrl}/usuario/${idUsuario}`,
@@ -46,12 +57,23 @@ export class UsuarioSeguidorService {
           return of([]);
         }
 
+        const relacionesValidas = relaciones
+          .map(relacion => ({
+            relacion,
+            idUsuario: this.extraerIdUsuario(relacion)
+          }))
+          .filter((item): item is { relacion: UsuarioSeguidor; idUsuario: number } => item.idUsuario !== null);
+
+        if (!relacionesValidas.length) {
+          return of([]);
+        }
+
         return forkJoin(
-          relaciones.map(relacion =>
-            this.usuarioService.obtenerPorId(relacion.id_usuario).pipe(
+          relacionesValidas.map(({ relacion, idUsuario }) =>
+            this.usuarioService.obtenerPorId(idUsuario).pipe(
               map(usuario => ({
                 usuario,
-                fechaSeguimiento: relacion.fecha
+                fechaSeguimiento: this.extraerFechaSeguimiento(relacion)
               }))
             )
           )
@@ -65,5 +87,47 @@ export class UsuarioSeguidorService {
     return token
       ? new HttpHeaders({ Authorization: `Bearer ${token}` })
       : new HttpHeaders();
+  }
+
+  private extraerIdUsuario(relacion: UsuarioSeguidor): number | null {
+    const relacionAny = relacion as unknown as Record<string, unknown>;
+    const candidatos = [
+      relacionAny['id_usuario'],
+      relacionAny['idUsuario'],
+      relacionAny['usuario_id'],
+      relacionAny['usuarioId'],
+      relacionAny['idSeguidor']
+    ];
+
+    for (const candidato of candidatos) {
+      const id = Number(candidato);
+      if (Number.isFinite(id) && id > 0) {
+        return id;
+      }
+    }
+
+    return null;
+  }
+
+  private extraerFechaSeguimiento(relacion: UsuarioSeguidor): string {
+    const relacionAny = relacion as unknown as Record<string, unknown>;
+    const candidatos = [
+      relacionAny['fecha'],
+      relacionAny['fechaSeguimiento'],
+      relacionAny['createdAt'],
+      relacionAny['created_at']
+    ];
+
+    for (const candidato of candidatos) {
+      if (typeof candidato === 'string' && candidato.trim()) {
+        return candidato;
+      }
+
+      if (candidato instanceof Date) {
+        return candidato.toISOString();
+      }
+    }
+
+    return '';
   }
 }

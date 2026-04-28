@@ -7,6 +7,7 @@ import { DetalleLibroComponent } from './components/Libros/detalle-libro/detalle
 import { ListadoLibrosComponent } from './components/Libros/listado-libros/listado-libros.component';
 import { GestionLibrosComponent } from './components/Libros/gestion-libros/gestion-libros.component';
 import { EnProcesoComponent } from './components/en-proceso/en-proceso.component';
+import { ExplorarComponent } from './components/explorar/explorar.component';
 import { AuthGuard } from './guards/auth.guard';
 import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-biblioteca.component';
 import { CuentaComponent } from './components/cuenta/cuenta.component';
@@ -54,7 +55,7 @@ const routes: Routes = [
   },
   {
     path: 'explorar',
-    component: EnProcesoComponent,
+    component: ExplorarComponent,
     canActivate: [AuthGuard]
   },
   {
@@ -72,6 +73,7 @@ const routes: Routes = [
     component: CuentaComponent,
     canActivate: [AuthGuard]
   },
+  
   { path: 'biblioteca', redirectTo: 'home', pathMatch: 'full' }
 
 ];

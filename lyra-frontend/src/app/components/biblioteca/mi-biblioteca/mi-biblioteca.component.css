@@ -149,7 +149,7 @@
   padding: 0 1.4rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 .card-libro-usuario {
@@ -158,37 +158,39 @@
   background: #ffffff;
   border: 1px solid #d7d7dc;
   border-radius: 8px;
-  padding: 0.95rem;
+  padding: 0.7rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-  height: 100%;
+  height: auto;
+  min-height: 260px;
 }
 
 .portada {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 2.6 / 4;
   object-fit: cover;
   border: 1px solid #ececf1;
   border-radius: 4px;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.6rem;
 }
 
 .contenido {
   display: flex;
   flex-direction: column;
   flex: 1;
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   color: #232323;
 }
 
 .contenido h3 {
-  margin: 0 0 0.55rem;
-  font-size: 1.04rem;
-  min-height: 2.4em;
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  min-height: 2.1em;
 }
 
 .contenido p {
-  margin: 0.3rem 0;
+  margin: 0.25rem 0;
 }
+
 
 .valoracion-editable {
   margin-top: 0.35rem;
@@ -241,13 +243,20 @@
 
 .acciones-card {
   margin-top: auto;
-  padding-top: 0.8rem;
+  padding-top: 0.6rem;
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem; 
   width: 100%;
 }
+
+.btn-accion {
+  padding: 0.25rem 0.45rem; 
+  font-size: 0.72rem;
+  min-height: 36px;
+}
+
 
 .btn-accion {
   display: inline-flex;

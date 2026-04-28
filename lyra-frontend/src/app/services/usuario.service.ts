@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { UsuarioActualizarRequest, UsuarioCuenta } from '../interfaces/usuario-cuenta';
@@ -29,19 +29,37 @@ export class UsuarioService {
   }
 
   obtenerPorId(id: number): Observable<UsuarioCuenta> {
-    return this.http.get<Record<string, unknown>>(`${this.apiUrl}/${id}`, {
+    const idNormalizado = Number(id);
+
+    if (!Number.isFinite(idNormalizado) || idNormalizado <= 0) {
+      return throwError(() => new Error('Id de usuario invalido'));
+    }
+
+    return this.http.get<Record<string, unknown>>(`${this.apiUrl}/${idNormalizado}`, {
       headers: this.getAuthHeaders()
     }).pipe(map(payload => this.mapearUsuarioCuenta(payload)));
   }
 
   actualizarUsuario(id: number, data: UsuarioActualizarRequest): Observable<UsuarioCuenta> {
-    return this.http.put<Record<string, unknown>>(`${this.apiUrl}/${id}`, data, {
+    const idNormalizado = Number(id);
+
+    if (!Number.isFinite(idNormalizado) || idNormalizado <= 0) {
+      return throwError(() => new Error('Id de usuario invalido'));
+    }
+
+    return this.http.put<Record<string, unknown>>(`${this.apiUrl}/${idNormalizado}`, data, {
       headers: this.getAuthHeaders()
     }).pipe(map(payload => this.mapearUsuarioCuenta(payload)));
   }
 
   eliminarUsuario(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+    const idNormalizado = Number(id);
+
+    if (!Number.isFinite(idNormalizado) || idNormalizado <= 0) {
+      return throwError(() => new Error('Id de usuario invalido'));
+    }
+
+    return this.http.delete<void>(`${this.apiUrl}/${idNormalizado}`, {
       headers: this.getAuthHeaders()
     });
   }
