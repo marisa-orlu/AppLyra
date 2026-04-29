@@ -1,0 +1,50 @@
+<section class="prestamos-page">
+
+  <header class="prestamos-header">
+    <h1>Préstamos</h1>
+    <p>Gestiona los libros que prestas y los que solicitas.</p>
+  </header>
+
+  <div class="prestamos-selector">
+    <label>
+      <input type="radio" name="vista" value="presto" [(ngModel)]="vista" checked />
+      <span>Libros que presto</span>
+    </label>
+
+    <label>
+      <input type="radio" name="vista" value="solicito" [(ngModel)]="vista" />
+      <span>Libros que solicito</span>
+    </label>
+  </div>
+
+  <p *ngIf="cargando" class="estado">Cargando préstamos...</p>
+  <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
+
+  <!-- 📌 Vista: Libros que presto -->
+  <section *ngIf="vista === 'presto' && !cargando" class="prestamos-lista">
+    <h2>Libros que presto</h2>
+
+    <p *ngIf="prestamosComoDuenio?.length === 0" class="estado">No tienes préstamos como dueño.</p>
+
+    <article *ngFor="let p of prestamosComoDuenio" class="prestamo-card">
+      <h3>{{ p.libro?.titulo_libro }}</h3>
+      <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
+      <p><strong>Estado:</strong> {{ p.estado }}</p>
+      <p><strong>Inicio:</strong> {{ formatearFecha(p.fecha_inicio) }}</p>
+    </article>
+  </section>
+
+  <!-- 📌 Vista: Libros que solicito -->
+  <section *ngIf="vista === 'solicito' && !cargando" class="prestamos-lista">
+    <h2>Libros que solicito</h2>
+
+    <p *ngIf="prestamosComoSolicitante?.length === 0" class="estado">No has solicitado préstamos.</p>
+
+    <article *ngFor="let p of prestamosComoSolicitante" class="prestamo-card">
+      <h3>{{ p.libro?.titulo_libro }}</h3>
+      <p><strong>Dueño:</strong> {{ p.usuario?.nombre }}</p>
+      <p><strong>Estado:</strong> {{ p.estado }}</p>
+    </article>
+  </section>
+
+</section>

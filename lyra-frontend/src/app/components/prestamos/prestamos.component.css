@@ -1,0 +1,99 @@
+/* Fondo general */
+.prestamos-page {
+  min-height: 100vh;
+  padding: 1.4rem;
+  background:
+    radial-gradient(circle at top left, rgba(229, 182, 206, 0.28), transparent 42%),
+    linear-gradient(180deg, #f6f2fa 0%, #efe8f4 100%);
+}
+
+/* Header */
+.prestamos-header {
+  background: linear-gradient(90deg, #c7b6d8, #e5b6ce);
+  padding: 1.4rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(97, 63, 125, 0.24);
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+
+.prestamos-header h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.8rem;
+}
+
+.prestamos-header p {
+  margin: 0.4rem 0 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Selector tipo tabs */
+.prestamos-selector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.prestamos-selector label {
+  cursor: pointer;
+  position: relative;
+}
+
+.prestamos-selector input {
+  display: none;
+}
+
+.prestamos-selector span {
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #4b2a68;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 10px rgba(120, 90, 150, 0.15);
+}
+
+.prestamos-selector input:checked + span {
+  background: linear-gradient(90deg, #8f73d6, #e59bbf);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(141, 99, 170, 0.3);
+}
+
+/* Lista de préstamos */
+.prestamos-lista h2 {
+  color: #4b2a68;
+  margin-bottom: 0.8rem;
+  text-align: center;
+}
+
+/* Tarjetas */
+.prestamo-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(203, 181, 219, 0.5);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 18px rgba(111, 81, 134, 0.12);
+  transition: transform 0.15s ease;
+}
+
+.prestamo-card:hover {
+  transform: translateY(-3px);
+}
+
+.prestamo-card h3 {
+  margin: 0 0 0.4rem;
+  color: #2d2240;
+}
+
+.estado {
+  text-align: center;
+  color: #6a5a7a;
+}
+
+.estado-error {
+  color: #b00020;
+  font-weight: bold;
+}

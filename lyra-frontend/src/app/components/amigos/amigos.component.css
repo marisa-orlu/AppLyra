@@ -243,6 +243,13 @@
   color: #56456b;
 }
 
+.acciones-libro { margin-top: 0.6rem; display:flex; gap:0.5rem; align-items:center; }
+.btn-solicitar { padding: 0.35rem 0.6rem; background: linear-gradient(90deg,#6f5bb0,#e57fae); color: #fff; border:none; border-radius:8px; cursor:pointer; font-weight:600 }
+.no-disponible { color:#999; font-size:0.82rem }
+.confirm-solicitud { margin-top:0.6rem; display:flex; gap:0.5rem; align-items:center }
+.btn-confirm { padding:0.35rem 0.6rem; background:#2e7d32; color:#fff; border:none; border-radius:8px; cursor:pointer }
+.btn-cancel { padding:0.35rem 0.6rem; background:#b00020; color:#fff; border:none; border-radius:8px; cursor:pointer }
+
 @media (max-width: 700px) {
   .amigos-page {
     padding: 0 1rem 1rem;

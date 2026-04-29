@@ -6,6 +6,8 @@ import { UsuarioCuenta } from '../../interfaces/usuario-cuenta';
 import { AmigoVista, UsuarioSeguidorService } from '../../usuario-seguidor/usuario-seguidor.component';
 import { LibrosService } from '../../services/libros.service';
 import { BibliotecaService, LibroUsuarioDto } from '../../services/biblioteca.service';
+import { PrestamosService } from '../../services/prestamos.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface LibroBibliotecaVista {
     idLibroUsuario: number;
@@ -14,6 +16,7 @@ interface LibroBibliotecaVista {
     autor: string;
     genero: string;
     portada: string;
+    disponible?: boolean;
 }
 
 @Component({
@@ -44,6 +47,9 @@ export class AmigosComponent implements OnInit {
         private usuarioService: UsuarioService,
         private librosService: LibrosService,
         private bibliotecaService: BibliotecaService
+        ,
+        private prestamosService: PrestamosService,
+        private snackBar: MatSnackBar
     ) { }
 
     ngOnInit(): void {
@@ -225,14 +231,58 @@ export class AmigosComponent implements OnInit {
         const genero = (item.libro?.genero ?? item.genero ?? 'Sin genero').toString();
         const portada = this.librosService.resolverPortada(item.libro?.portada ?? item.portada, this.portadaDefault);
 
+        const disponible = Boolean(
+            item.isPrestamo ?? item.is_prestamo ??
+            ((item.estado ?? '').toString().toUpperCase() === 'DISPONIBLE')
+        );
+
         return {
             idLibroUsuario: Number.isFinite(idLibroUsuario) ? idLibroUsuario : 0,
             idLibro: Number.isFinite(idLibro) ? idLibro : 0,
             titulo,
             autor,
             genero,
-            portada
+            portada,
+            disponible: disponible
         };
+    }
+
+    // Estado local para confirmar solicitudes
+    confirmingSolicitudId: number | null = null;
+
+    solicitarPrestamo(libro: LibroBibliotecaVista): void {
+        if (!this.amigoSeleccionado || !this.amigoSeleccionado.usuario?.id) {
+            return;
+        }
+
+        // Abrir confirmación mínima
+        this.confirmingSolicitudId = libro.idLibro;
+    }
+
+    cancelarSolicitud(): void {
+        this.confirmingSolicitudId = null;
+    }
+
+    confirmarSolicitud(libro: LibroBibliotecaVista): void {
+        const idSolicitante = this.authService.getUserId();
+        const idDuenio = this.amigoSeleccionado?.usuario?.id;
+
+        if (!idSolicitante || !idDuenio) {
+            this.snackBar.open('No se ha detectado el usuario autenticado.', 'Cerrar', { duration: 3000 });
+            this.confirmingSolicitudId = null;
+            return;
+        }
+
+        this.prestamosService.crearPrestamo(idDuenio, idSolicitante, libro.idLibro).subscribe({
+            next: () => {
+                this.snackBar.open('Solicitud de préstamo enviada.', 'Cerrar', { duration: 3000 });
+                this.confirmingSolicitudId = null;
+            },
+            error: () => {
+                this.snackBar.open('Error al enviar la solicitud.', 'Cerrar', { duration: 3000 });
+                this.confirmingSolicitudId = null;
+            }
+        });
     }
 
     private limpiarObjectUrlsBiblioteca(): void {

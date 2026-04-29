@@ -93,6 +93,16 @@
           <h3>{{ libro.titulo }}</h3>
           <p><strong>Autor:</strong> {{ libro.autor }}</p>
           <p><strong>Genero:</strong> {{ libro.genero }}</p>
+          <div class="acciones-libro">
+            <button *ngIf="libro.disponible" type="button" class="btn-solicitar" (click)="solicitarPrestamo(libro)">Solicitar préstamo</button>
+            <span *ngIf="!libro.disponible" class="no-disponible">No disponible para préstamo</span>
+          </div>
+
+          <div *ngIf="confirmingSolicitudId === libro.idLibro" class="confirm-solicitud">
+            <p>Confirmar solicitud de préstamo para <strong>{{ libro.titulo }}</strong>?</p>
+            <button type="button" class="btn-confirm" (click)="confirmarSolicitud(libro)">Confirmar</button>
+            <button type="button" class="btn-cancel" (click)="cancelarSolicitud()">Cancelar</button>
+          </div>
         </article>
 
         <p *ngIf="librosBiblioteca.length === 0" class="estado">Este usuario no tiene libros en su biblioteca.</p>
