@@ -2,6 +2,8 @@ package com.lyra.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -26,21 +28,26 @@ public class PrestamoUsuarioLibro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_prestamo;
 
-    @ManyToOne
-    @JoinColumn(name = "id_usuario")
-    private Usuario usuario;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_duenio", nullable = false)
+    private Usuario duenio;
 
-    @ManyToOne
-    @JoinColumn(name = "id_libro")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_solicitante", nullable = false)
+    private Usuario solicitante;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_libro", nullable = false)
     private Libro libro;
 
-    @Column(name = "fecha_inicio")
-    private Date fecha_inicio;
+    @Column(name = "fecha_inicio", nullable = false)
+    private LocalDate fecha_inicio;
 
     @Column(name = "fecha_fin")
-    private Date fecha_fin;
+    private LocalDate fecha_fin;
 
-    @Column(name = "estado")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
     private EstadoPrestamo estado;
 }
 

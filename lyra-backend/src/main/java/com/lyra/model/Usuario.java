@@ -69,9 +69,11 @@ public class Usuario implements UserDetails{
     @ToString.Exclude
     private List<LibroUsuario> librosUsuario;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<PrestamoUsuarioLibro> prestamos;
+    @OneToMany(mappedBy = "duenio")
+    private List<PrestamoUsuarioLibro> prestamosComoDuenio;
+
+    @OneToMany(mappedBy = "solicitante")
+    private List<PrestamoUsuarioLibro> prestamosComoSolicitante;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

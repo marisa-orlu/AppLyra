@@ -10,7 +10,7 @@ import com.lyra.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -21,76 +21,67 @@ public class PrestamoUsuarioLibroService {
     private final UsuarioRepository usuarioRepository;
     private final LibroRepository libroRepository;
 
-    // Crear un préstamo (estado inicial: pendiente)
-    public PrestamoUsuarioLibro crearPrestamo(Long idUsuario, Long id_libro) {
+    public PrestamoUsuarioLibro crearPrestamo(Long idDuenio, Long idSolicitante, Long idLibro) {
 
-        Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario duenio = usuarioRepository.findById(idDuenio)
+                .orElseThrow(() -> new RuntimeException("Dueño no encontrado"));
 
-        Libro libro = libroRepository.findById(id_libro)
+        Usuario solicitante = usuarioRepository.findById(idSolicitante)
+                .orElseThrow(() -> new RuntimeException("Solicitante no encontrado"));
+
+        Libro libro = libroRepository.findById(idLibro)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
         PrestamoUsuarioLibro prestamo = PrestamoUsuarioLibro.builder()
-                .usuario(usuario)
+                .duenio(duenio)
+                .solicitante(solicitante)
                 .libro(libro)
-                .fecha_inicio(new Date())
-                .fecha_fin(null)
+                .fecha_inicio(LocalDate.now())
                 .estado(EstadoPrestamo.PENDIENTE)
                 .build();
 
         return prestamoRepository.save(prestamo);
     }
 
-    // Obtener préstamo por ID
     public PrestamoUsuarioLibro obtenerPorId(Long id) {
         return prestamoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Préstamo no encontrado"));
     }
 
-    // Cambiar estado del préstamo
     public PrestamoUsuarioLibro cambiarEstado(Long idPrestamo, Integer nuevoEstado) {
         PrestamoUsuarioLibro prestamo = obtenerPorId(idPrestamo);
 
         EstadoPrestamo estado = EstadoPrestamo.fromValor(nuevoEstado);
-
         prestamo.setEstado(estado);
 
-        // Si se marca como devuelto, se establece fecha_fin
-        if (EstadoPrestamo.DEVUELTO.name().equalsIgnoreCase(estado.name())) {
-            prestamo.setFecha_fin(new Date());
+        if (estado == EstadoPrestamo.DEVUELTO) {
+            prestamo.setFecha_fin(LocalDate.now());
         }
 
         return prestamoRepository.save(prestamo);
     }
 
-    // Aceptar préstamo
     public PrestamoUsuarioLibro aceptarPrestamo(Long idPrestamo) {
         return cambiarEstado(idPrestamo, EstadoPrestamo.ACEPTADO.getValor());
     }
 
-    // Rechazar préstamo
     public PrestamoUsuarioLibro rechazarPrestamo(Long idPrestamo) {
         return cambiarEstado(idPrestamo, EstadoPrestamo.RECHAZADO.getValor());
     }
 
-    // Marcar como devuelto
     public PrestamoUsuarioLibro devolverPrestamo(Long idPrestamo) {
         return cambiarEstado(idPrestamo, EstadoPrestamo.DEVUELTO.getValor());
     }
 
-    // Obtener préstamos de un usuario
-    public List<PrestamoUsuarioLibro> obtenerPorUsuario(Long idUsuario) {
-        Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        return prestamoRepository.findByUsuario(usuario);
+    public List<PrestamoUsuarioLibro> obtenerPorDuenio(Long idDuenio) {
+        return prestamoRepository.findByDuenio_Id(idDuenio);
     }
 
-    // Obtener préstamos de un libro
-    public List<PrestamoUsuarioLibro> obtenerPorLibro(Long id_libro) {
-        Libro libro = libroRepository.findById(id_libro)
-                .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
+    public List<PrestamoUsuarioLibro> obtenerPorSolicitante(Long idSolicitante) {
+        return prestamoRepository.findBySolicitante_Id(idSolicitante);
+    }
 
-        return prestamoRepository.findByLibro(libro);
+    public List<PrestamoUsuarioLibro> obtenerPorLibro(Long idLibro) {
+        return prestamoRepository.findByLibro_IdLibro(idLibro);
     }
 }

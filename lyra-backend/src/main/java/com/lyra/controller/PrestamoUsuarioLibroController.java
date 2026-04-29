@@ -19,7 +19,11 @@ public class PrestamoUsuarioLibroController {
     @PostMapping
     public PrestamoDTO crear(@RequestBody PrestamoCrearDTO dto) {
         return PrestamoDTO.of(
-                prestamoService.crearPrestamo(dto.idUsuario(), dto.id_libro())
+                prestamoService.crearPrestamo(
+                        dto.idDuenio(),
+                        dto.idSolicitante(),
+                        dto.idLibro()
+                )
         );
     }
 
@@ -43,15 +47,23 @@ public class PrestamoUsuarioLibroController {
         return PrestamoDTO.of(prestamoService.devolverPrestamo(id));
     }
 
-    @GetMapping("/usuario/{idUsuario}")
-    public List<PrestamoDTO> obtenerPorUsuario(@PathVariable Long idUsuario) {
-        return prestamoService.obtenerPorUsuario(idUsuario)
+    @GetMapping("/duenio/{idDuenio}")
+    public List<PrestamoDTO> obtenerPorDuenio(@PathVariable Long idDuenio) {
+        return prestamoService.obtenerPorDuenio(idDuenio)
                 .stream()
                 .map(PrestamoDTO::of)
                 .toList();
     }
 
-    @GetMapping("/libro/{id_libro}")
+    @GetMapping("/solicitante/{idSolicitante}")
+    public List<PrestamoDTO> obtenerPorSolicitante(@PathVariable Long idSolicitante) {
+        return prestamoService.obtenerPorSolicitante(idSolicitante)
+                .stream()
+                .map(PrestamoDTO::of)
+                .toList();
+    }
+
+    @GetMapping("/libro/{idLibro}")
     public List<PrestamoDTO> obtenerPorLibro(@PathVariable Long idLibro) {
         return prestamoService.obtenerPorLibro(idLibro)
                 .stream()
@@ -59,4 +71,3 @@ public class PrestamoUsuarioLibroController {
                 .toList();
     }
 }
-
