@@ -29,5 +29,4 @@ public interface LibroUsuarioRepository extends JpaRepository<LibroUsuario, Long
 """)
     List<LibroUsuario> findAllByIdUsuarioWithLibro(Long idUsuario);
 
-
 }

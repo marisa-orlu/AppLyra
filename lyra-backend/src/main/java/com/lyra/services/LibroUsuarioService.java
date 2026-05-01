@@ -11,8 +11,11 @@ import com.lyra.repository.LibroRepository;
 import com.lyra.repository.LibroUsuarioRepository;
 import com.lyra.repository.UsuarioRepository;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -122,4 +125,25 @@ public class LibroUsuarioService {
 
         return libroUsuarioRepository.findByUsuarioOrderByPuntuacionDesc(usuario);
     }
+
+    @Transactional
+    public void eliminar(Long idLibroUsuario) {
+        LibroUsuario lu = libroUsuarioRepository.findById(idLibroUsuario)
+                .orElseThrow(() -> new RecursoNoEncontradoException("LibroUsuario no encontrado con id: " + idLibroUsuario));
+        libroUsuarioRepository.delete(lu);
+    }
+
+    @Transactional
+    public void eliminarPorUsuarioYLibro(Long idUsuario, Long idLibro) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+        Libro libro = libroRepository.findById(idLibro)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Libro no encontrado"));
+
+        LibroUsuario lu = libroUsuarioRepository.findByUsuarioAndLibro(usuario, libro)
+                .orElseThrow(() -> new RecursoNoEncontradoException("LibroUsuario no encontrado para ese usuario y libro"));
+
+        libroUsuarioRepository.delete(lu);
+    }
+
 }

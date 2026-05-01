@@ -117,6 +117,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/usuarios").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET, "/usuarios/rol/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/resenas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/biblioteca/usuario/*/libro/*").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/libros").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/usuarios/{id}").hasAnyRole("ADMIN")
 
