@@ -1,3 +1,31 @@
+.explorar-page {
+  min-height: 100vh;
+  padding: 1.4rem;
+  background:
+    radial-gradient(circle at top left, rgba(229, 182, 206, 0.28), transparent 42%),
+    linear-gradient(180deg, #f6f2fa 0%, #efe8f4 100%);
+}
+
+.explorar-header {
+  background: linear-gradient(90deg, #c7b6d8, #e5b6ce);
+  padding: 1.4rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(97, 63, 125, 0.24);
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+
+.explorar-header h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.8rem;
+}
+
+.explorar-header p {
+  margin: 0.4rem 0 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 :root {
   --accent: #7c6abf;
   --accent-light: #ede9f8;
@@ -17,7 +45,7 @@
 }
 
 .search-panel {
-  background: var(--color-background-primary, #fff);
+  background: #fff;
   border: 0.5px solid #e0d9f5;
   border-radius: var(--radius-lg);
   padding: 16px;
@@ -51,11 +79,6 @@
 
 .toggle-group input[type="radio"] { display: none; }
 
-.toggle-group input[type="radio"]:checked + span {
-  /* handled via label checked state below */
-}
-
-
 .toggle-icon {
   font-size: 15px;
 }
@@ -87,22 +110,11 @@
   color: var(--accent);
 }
 
-.toggle-group label:hover:not(.checked) {
-  border-color: #c5b8ef;
-  color: #666;
-}
-
 .subfield-row label.checked {
   border-color: var(--accent);
   background: var(--accent-light);
   color: var(--accent);
 }
-
-.subfield-row label:hover:not(.checked) {
-  border-color: #c5b8ef;
-  color: #666;
-}
-
 
 .input-row {
   display: flex;
@@ -155,7 +167,7 @@
 }
 
 .card {
-  background: var(--color-background-primary, #fff);
+  background: #fff;
   border: 0.5px solid #ede9f8;
   border-radius: var(--radius-md);
   padding: 12px 14px;

@@ -1,4 +1,10 @@
 <section class="cuenta-page">
+
+  <header class="cuenta-top-panel">
+    <h1>Cuenta</h1>
+    <p>Gestiona tu información personal</p>
+  </header>
+  
   <p *ngIf="cargando" class="estado">Cargando datos de tu cuenta...</p>
   <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
   <p *ngIf="exito" class="estado estado-exito">{{ exito }}</p>

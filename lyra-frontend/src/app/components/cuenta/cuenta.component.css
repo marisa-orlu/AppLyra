@@ -4,6 +4,26 @@
   background: #efeff2;
 }
 
+.cuenta-top-panel {
+  background: linear-gradient(90deg, #c7b6d8, #e5b6ce);
+  padding: 1.4rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(97, 63, 125, 0.24);
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+
+.cuenta-top-panel h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.8rem;
+}
+
+.cuenta-top-panel p {
+  margin: 0.4rem 0 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .estado {
   margin: 0 0 0.9rem;
   color: #343042;

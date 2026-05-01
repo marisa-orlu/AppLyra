@@ -1,7 +1,14 @@
-<div class="explorar-container">
+<section class="explorar-page">
+
+  <header class="explorar-header">
+    <h1>Explorar</h1>
+    <p>Busca libros y usuarios dentro de Lyra</p>
+  </header>
+
+  <div class="explorar-container">
+
     <div class="search-panel">
 
-        <!-- toggle principal -->
         <div class="toggle-group">
             <label [class.checked]="searchTarget === 'libro'">
                 <input type="radio" name="searchTarget" value="libro" [(ngModel)]="searchTarget" />
@@ -16,8 +23,6 @@
             </label>
         </div>
 
-
-        <!-- sub-campos según tipo -->
         <div class="subfield-row" *ngIf="searchTarget === 'usuario'">
             <label [class.checked]="usuarioField === 'nombre'">
                 <input type="radio" name="usuarioField" value="nombre" [(ngModel)]="usuarioField" />
@@ -29,7 +34,6 @@
                 Email
             </label>
         </div>
-
 
         <div class="subfield-row" *ngIf="searchTarget === 'libro'">
             <label [class.checked]="libroField === 'titulo'">
@@ -53,7 +57,6 @@
             </label>
         </div>
 
-        <!-- input + botón -->
         <div class="input-row">
             <input type="text" placeholder="¿Qué estás buscando?" [(ngModel)]="query" (keyup.enter)="onSearch()" />
             <button type="button" class="btn-search" (click)="onSearch()">
@@ -63,7 +66,6 @@
 
     </div>
 
-    <!-- resultados -->
     <div class="resultados">
         <div *ngIf="loading" class="sin-resultados">Buscando…</div>
         <div *ngIf="!resultados?.length && !loading" class="sin-resultados">Sin resultados</div>
@@ -105,4 +107,6 @@
 
         </div>
     </div>
-</div>
+
+  </div>
+</section>

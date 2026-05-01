@@ -20,7 +20,6 @@
   <p *ngIf="cargando" class="estado">Cargando préstamos...</p>
   <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
 
-  <!-- 📌 Vista: Libros que presto -->
   <section *ngIf="vista === 'presto' && !cargando" class="prestamos-lista">
     <h2>Libros que presto</h2>
 
@@ -34,7 +33,6 @@
     </article>
   </section>
 
-  <!-- 📌 Vista: Libros que solicito -->
   <section *ngIf="vista === 'solicito' && !cargando" class="prestamos-lista">
     <h2>Libros que solicito</h2>
 

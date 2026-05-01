@@ -1,119 +1,139 @@
 .register-page {
-	min-height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 24px;
-	background: linear-gradient(135deg, #bda9cd 0%, #e9b7cc 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+
+  background: linear-gradient(135deg, #b9a9cf 0%, #e4b6cb 50%, #f3d7e6 100%);
 }
 
 .register-card {
-	width: min(520px, 100%);
-	background: #f7f5f8;
-	border-radius: 12px;
-	box-shadow: 0 16px 36px rgba(45, 25, 60, 0.18);
-	overflow: hidden;
+  width: min(720px, 100%);
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 26px;
+}
+
+/* Logo */
+.register-logo {
+  width: 260px; 
+  margin: 28px auto 14px;
+  display: block;
+  user-select: none;
 }
 
 .register-header {
-	background: linear-gradient(135deg, #bba4ce 0%, #dfadc7 100%);
-	color: #fff;
-	text-align: center;
-	padding: 20px 20px 18px;
+  background: transparent;
+  color: #730182;
+  padding: 0 20px 10px;
 }
 
 .register-header h1 {
-	margin: 0;
-	font-size: 1.9rem;
-	font-weight: 600;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
 }
 
 .register-header p {
-	margin: 8px 0 0;
-	opacity: 0.9;
-	font-size: 0.95rem;
+  margin: 8px 0 0;
+  opacity: 0.8;
+  font-size: 1.05rem; 
 }
 
 .register-form {
-	display: grid;
-	gap: 10px;
-	padding: 18px 20px 22px;
+  display: grid;
+  gap: 16px;
+  padding: 0 60px 26px; 
+  text-align: left;
 }
 
+
 .register-form label {
-	color: #47384f;
-	font-size: 0.92rem;
+  color: #47384f;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .register-form input {
-	width: 100%;
-	border: 1px solid #d9d3dd;
-	border-radius: 8px;
-	padding: 10px 12px;
-	background: #ffffff;
-	color: #352e3b;
+  width: 100%;
+  border: 1px solid #c7b7d6;
+  border-radius: 10px; 
+  padding: 14px 16px;
+  background: #faf7fc;
+  color: #352e3b;
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
 .register-form input:focus {
-	outline: none;
-	border-color: #b48fc5;
-	box-shadow: 0 0 0 3px rgba(180, 143, 197, 0.18);
+  outline: none;
+  border-color: #8f76a6;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(143, 118, 166, 0.25);
 }
 
+/* Mensajes */
 .estado {
-	margin: 4px 0;
-	font-size: 0.9rem;
+  margin: 4px 0;
+  font-size: 0.95rem;
 }
 
 .estado-error {
-	color: #a62929;
+  color: #a62929;
 }
 
 .estado-ok {
-	color: #1f7a37;
+  color: #1f7a37;
 }
 
+/* Botones */
 .btn-principal,
 .btn-secundario {
-	border: none;
-	border-radius: 8px;
-	padding: 11px 12px;
-	color: #fff;
-	cursor: pointer;
-	transition: transform 0.16s ease, opacity 0.16s ease;
+  border: none;
+  border-radius: 8px; 
+  padding: 10px 12px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+  font-size: 1.25rem; 
 }
 
 .btn-principal {
-	margin-top: 4px;
-	background: #b79ac9;
+  margin-top: 10px;
+  background: #b8a1c7;
 }
 
 .btn-secundario {
-	background: #a887be;
+  background: #cbb3d8;
 }
 
 .btn-principal:hover,
 .btn-secundario:hover {
-	transform: translateY(-1px);
+  transform: translateY(-1px);
 }
 
 .btn-principal:disabled,
 .btn-secundario:disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
-	transform: none;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
+/* Responsive */
 @media (max-width: 600px) {
-	.register-page {
-		padding: 14px;
-	}
+  .register-card {
+    width: 100%;
+  }
 
-	.register-header h1 {
-		font-size: 1.55rem;
-	}
+  .register-logo {
+    width: 200px;
+  }
 
-	.register-form {
-		padding: 14px;
-	}
+  .register-form {
+    padding: 0 20px 20px; 
+  }
 }

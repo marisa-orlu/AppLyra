@@ -1,72 +1,80 @@
 <section class="register-page">
-	<div class="register-card">
-		<header class="register-header">
-			<h1>Registro de usuario</h1>
-			<p>Crea tu cuenta para comenzar.</p>
-		</header>
+  <div class="register-card">
 
-		<form class="register-form" (submit)="onSubmit($event)">
-			<label for="nombre">Nombre de usuario</label>
-			<input
-				id="nombre"
-				type="text"
-				[value]="nombre"
-				(input)="nombre = ($any($event.target)).value"
-				placeholder="Ej: maria_lectora"
-				maxlength="80"
-				required
-			/>
+    <img
+      src="assets/logo/Logo App Lyra Color_Mesa de trabajo 1 copia 5.png"
+      alt="Lyra Logo"
+      class="register-logo"
+    />
 
-			<label for="email">Email</label>
-			<input
-				id="email"
-				type="email"
-				[value]="email"
-				(input)="email = ($any($event.target)).value"
-				placeholder="ejemplo@correo.com"
-				maxlength="120"
-				required
-			/>
+    <header class="register-header">
+      <h1>Registro de usuario</h1>
+      <p>Crea tu cuenta para comenzar.</p>
+    </header>
 
-			<label for="contrasena">Contrasena</label>
-			<input
-				id="contrasena"
-				type="password"
-				[value]="contrasena"
-				(input)="contrasena = ($any($event.target)).value"
-				placeholder="Minimo 6 caracteres"
-				minlength="6"
-				required
-			/>
+    <form class="register-form" (submit)="onSubmit($event)">
+      <label for="nombre">Nombre de usuario</label>
+      <input
+        id="nombre"
+        type="text"
+        [value]="nombre"
+        (input)="nombre = ($any($event.target)).value"
+        placeholder="Ej: maria_lectora"
+        maxlength="80"
+        required
+      />
 
-			<label for="repetirContrasena">Repetir contrasena</label>
-			<input
-				id="repetirContrasena"
-				type="password"
-				[value]="repetirContrasena"
-				(input)="repetirContrasena = ($any($event.target)).value"
-				placeholder="Repite la contrasena"
-				minlength="6"
-				required
-			/>
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        [value]="email"
+        (input)="email = ($any($event.target)).value"
+        placeholder="ejemplo@correo.com"
+        maxlength="120"
+        required
+      />
 
-			<label for="foto">Foto de perfil (opcional)</label>
-			<input
-				id="foto"
-				type="file"
-				accept="image/*"
-				(change)="onFileChange($event)"
-			/>
+      <label for="contrasena">Contraseña</label>
+      <input
+        id="contrasena"
+        type="password"
+        [value]="contrasena"
+        (input)="contrasena = ($any($event.target)).value"
+        placeholder="Mínimo 6 caracteres"
+        minlength="6"
+        required
+      />
 
-			<p *ngIf="errorMessage" class="estado estado-error">{{ errorMessage }}</p>
-			<p *ngIf="successMessage" class="estado estado-ok">{{ successMessage }}</p>
+      <label for="repetirContrasena">Repetir contraseña</label>
+      <input
+        id="repetirContrasena"
+        type="password"
+        [value]="repetirContrasena"
+        (input)="repetirContrasena = ($any($event.target)).value"
+        placeholder="Repite la contraseña"
+        minlength="6"
+        required
+      />
 
-			<button type="submit" class="btn-principal" [disabled]="cargando">
-				{{ cargando ? 'Registrando...' : 'Registrarse' }}
-			</button>
-			<button type="button" class="btn-secundario" (click)="volverLogin()" [disabled]="cargando">
-				Volver al login
-			</button>
-		</form>
-	</div>
+      <label for="foto">Foto de perfil (opcional)</label>
+      <input
+        id="foto"
+        type="file"
+        accept="image/*"
+        (change)="onFileChange($event)"
+      />
+
+      <p *ngIf="errorMessage" class="estado estado-error">{{ errorMessage }}</p>
+      <p *ngIf="successMessage" class="estado estado-ok">{{ successMessage }}</p>
+
+      <button type="submit" class="btn-principal" [disabled]="cargando">
+        {{ cargando ? 'Registrando...' : 'Registrarse' }}
+      </button>
+
+      <button type="button" class="btn-secundario" (click)="volverLogin()" [disabled]="cargando">
+        Volver al login
+      </button>
+    </form>
+  </div>
 </section>

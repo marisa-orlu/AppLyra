@@ -30,6 +30,7 @@ export class AmigosComponent implements OnInit {
     error = '';
     amigos: AmigoVista[] = [];
     filtroAmigos = '';
+    filterVisible = false;
 
     amigoSeleccionado: AmigoVista | null = null;
     mostrarModal = false;
@@ -183,6 +184,13 @@ export class AmigosComponent implements OnInit {
 
     limpiarFiltroAmigos(): void {
         this.filtroAmigos = '';
+    }
+
+    toggleFilter(): void {
+        this.filterVisible = !this.filterVisible;
+        if (!this.filterVisible) {
+            this.limpiarFiltroAmigos();
+        }
     }
 
     private cargarBibliotecaAmigo(idUsuario: number): void {
