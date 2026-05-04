@@ -8,24 +8,21 @@
   <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
   <p *ngIf="exito" class="estado estado-exito">{{ exito }}</p>
 
-  <section class="panel-filtros" *ngIf="!cargando && !error" aria-label="Filtros de usuarios">
-    <div class="filtros-grid">
-      <label class="campo-filtro">
-        <span>Nombre de usuario</span>
-        <input type="text" [value]="filtroNombre" (input)="filtroNombre = ($any($event.target)).value"
-          placeholder="Buscar por nombre" />
-      </label>
+  <section class="filtros-usuarios" *ngIf="!cargando && !error">
+    <button type="button" class="icono-filtro" [class.activo]="filterVisible" (click)="toggleFilter()"
+      aria-label="Mostrar filtros">
+      <i class="bi bi-funnel-fill"></i>
+    </button>
 
-      <label class="campo-filtro">
-        <span>Correo</span>
-        <input type="text" [value]="filtroEmail" (input)="filtroEmail = ($any($event.target)).value"
-          placeholder="Buscar por correo" />
-      </label>
-    </div>
+    <div *ngIf="filterVisible" class="panel-filtros-compact" aria-label="Filtros de usuarios">
+      <input type="text" class="filtro-input" [value]="filtroNombre" (input)="filtroNombre = ($any($event.target)).value"
+        placeholder="Buscar por nombre" />
 
-    <div class="filtros-acciones">
-      <button type="button" class="btn-limpiar" (click)="limpiarFiltros()" [disabled]="!hayFiltrosActivos">
-        Limpiar filtros
+      <input type="text" class="filtro-input" [value]="filtroEmail" (input)="filtroEmail = ($any($event.target)).value"
+        placeholder="Buscar por correo" />
+
+      <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltros()" [disabled]="!hayFiltrosActivos">
+        Limpiar
       </button>
     </div>
   </section>

@@ -7,6 +7,7 @@ import com.lyra.repository.LibroUsuarioRepository;
 import com.lyra.services.LibroUsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -94,8 +95,17 @@ public class LibroUsuarioController {
                 .map(LibroUsuarioDTO::of)
                 .toList();
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        libroUsuarioService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 
-
+    @DeleteMapping("/usuario/{idUsuario}/libro/{idLibro}")
+    public ResponseEntity<Void> eliminarPorUsuarioYLibro(@PathVariable Long idUsuario, @PathVariable Long idLibro) {
+        libroUsuarioService.eliminarPorUsuarioYLibro(idUsuario, idLibro);
+        return ResponseEntity.noContent().build();
+    }
 
 }
 

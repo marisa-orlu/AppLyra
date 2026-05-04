@@ -18,6 +18,7 @@ import { MiBibliotecaComponent } from './components/biblioteca/mi-biblioteca/mi-
 import { CuentaComponent } from './components/cuenta/cuenta.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { AmigosComponent } from './components/amigos/amigos.component';
+import { PrestamosComponent } from './components/prestamos/prestamos.component';
 
 
 @NgModule({
@@ -37,6 +38,7 @@ import { AmigosComponent } from './components/amigos/amigos.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    PrestamosComponent,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,

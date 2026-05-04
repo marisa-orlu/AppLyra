@@ -1,118 +1,150 @@
 .login-page {
-	min-height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 24px;
-	background: linear-gradient(100deg, #b9a9cf 0%, #e4b6cb 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+
+    background: linear-gradient(135deg, #b9a9cf 0%, #e4b6cb 50%, #f3d7e6 100%);
 }
 
 .login-card {
-	width: min(620px, 100%);
-	background: #efefef;
-	border-radius: 10px;
-	padding: 42px 18px 28px;
+    width: min(480px, 100%);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 38px 24px 28px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    text-align: center;
+}
+
+.login-logo {
+    width: 180px;
+    margin-bottom: 22px;
+    user-select: none;
 }
 
 h1 {
-	margin: 0 0 46px;
-	text-align: center;
-	font-size: 22px;
-	font-weight: 500;
-	color: #1d1d1d;
+    margin: 0 0 26px;
+    font-size: 22px;
+    font-weight: 500;
+    color: #730182;
 }
 
 form {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 26px;
+    display: grid;
+    gap: 18px;
+    justify-items: center;
+    width: 100%;
+}
+
+form label {
+    width: 100%;
+    text-align: left;
+    color: #47384f;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
 .login-input {
-	width: 100%;
-	max-width: 560px;
-	height: 52px;
-	border: 1px solid #676767;
-	border-radius: 3px;
-	background: transparent;
-	color: #2d2d2d;
-	font-size: 16px;
-	padding: 0 16px;
-	outline: none;
+    width: 100%;
+    max-width: 420px;
+    height: 48px; 
+    border: 1px solid #c7b7d6;
+    border-radius: 8px;
+    background: #faf7fc;
+    color: #2d2d2d;
+    font-size: 15px; 
+    padding: 0 14px;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
 .login-input::placeholder {
-	color: #3c3c3c;
+    color: #7a6f85;
 }
 
 .login-input:focus {
-	border-color: #8f76a6;
-	box-shadow: 0 0 0 2px rgba(143, 118, 166, 0.15);
+    border-color: #8f76a6;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(143, 118, 166, 0.25);
 }
 
+.error-message {
+    color: #b00020;
+    font-size: 14px;
+}
+
+/* Botones aesthetic */
 .btn-primary,
 .btn-secondary {
-	border: none;
-	cursor: pointer;
-	color: #f4f0f6;
-	background: #b8a1c7;
-	transition: filter 0.2s ease;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    background: #b8a1c7;
+    transition: all 0.2s ease;
+    border-radius: 8px;
 }
 
 .btn-primary {
-	width: 100%;
-	max-width: 560px;
-	min-height: 54px;
-	font-size: 38px;
-	font-weight: 300;
+    width: 100%;
+    max-width: 420px;
+    min-height: 48px;
+    font-size: 22px;
+    font-weight: 400;
 }
 
 .btn-secondary {
-	min-width: 240px;
-	min-height: 50px;
-	font-size: 30px;
-	font-weight: 300;
+    min-width: 200px;
+    min-height: 44px;
+    font-size: 18px;
+    font-weight: 400;
+    background: #cbb3d8;
 }
 
 .btn-primary:hover,
 .btn-secondary:hover {
-	filter: brightness(0.95);
+    filter: brightness(0.92);
+    transform: translateY(-1px);
 }
 
 .btn-primary:disabled {
-	cursor: not-allowed;
-	filter: grayscale(0.12);
-	opacity: 0.85;
+    cursor: not-allowed;
+    filter: grayscale(0.12);
+    opacity: 0.85;
 }
 
+/* Responsive */
 @media (max-width: 700px) {
-	.login-card {
-		padding: 28px 14px 22px;
-	}
+    .login-card {
+        padding: 28px 18px 22px;
+    }
 
-	h1 {
-		margin-bottom: 30px;
-		font-size: 20px;
-	}
+    .login-logo {
+        width: 130px;
+    }
 
-	form {
-		gap: 18px;
-	}
+    h1 {
+        margin-bottom: 22px;
+        font-size: 20px;
+    }
 
-	.login-input {
-		height: 48px;
-		font-size: 15px;
-	}
+    form {
+        gap: 16px;
+    }
 
-	.btn-primary {
-		min-height: 48px;
-		font-size: 28px;
-	}
+    .login-input {
+        height: 44px;
+        font-size: 14px;
+    }
 
-	.btn-secondary {
-		min-width: 210px;
-		min-height: 44px;
-		font-size: 24px;
-	}
+    .btn-primary {
+        min-height: 44px;
+        font-size: 20px;
+    }
+
+    .btn-secondary {
+        min-width: 180px;
+        min-height: 40px;
+        font-size: 18px;
+    }
 }

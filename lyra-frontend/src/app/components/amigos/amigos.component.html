@@ -5,14 +5,18 @@
   </header>
 
   <section class="filtros-amigos" *ngIf="!cargando && !error">
-    <input
-      type="text"
-      class="filtro-input"
-      placeholder="Buscar por nombre o correo"
-      [value]="filtroAmigos"
-      (input)="filtroAmigos = ($any($event.target)).value"
-    />
-    <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltroAmigos()" [disabled]="!filtroAmigos.trim()">Limpiar</button>
+
+    <button type="button" class="icono-filtro" [class.activo]="filterVisible" [class.activo]="filterVisible"
+      (click)="toggleFilter()" aria-label="Mostrar filtros">
+      <i class="bi bi-funnel-fill"></i>
+    </button>
+
+
+    <div *ngIf="filterVisible" class="panel-filtros-amigos">
+      <input type="text" class="filtro-input" placeholder="Buscar por nombre o correo" [(ngModel)]="filtroAmigos" />
+      <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltroAmigos()"
+        [disabled]="!filtroAmigos.trim()">Limpiar</button>
+    </div>
   </section>
 
   <p *ngIf="cargando" class="estado">Cargando amigos...</p>
@@ -42,14 +46,8 @@
     <p *ngIf="amigos.length > 0 && amigosFiltrados.length === 0" class="estado">No hay resultados con esos filtros.</p>
   </div>
 
-  <div
-    *ngIf="mostrarModal"
-    class="modal-overlay"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="titulo-biblioteca-amigo"
-    (click)="cerrarModal()"
-  >
+  <div *ngIf="mostrarModal" class="modal-overlay" role="dialog" aria-modal="true"
+    aria-labelledby="titulo-biblioteca-amigo" (click)="cerrarModal()">
     <section class="modal-biblioteca" (click)="$event.stopPropagation()">
       <header class="modal-header">
         <div>
@@ -63,26 +61,12 @@
       <p *ngIf="errorBiblioteca && !cargandoBiblioteca" class="estado estado-error">{{ errorBiblioteca }}</p>
 
       <section class="filtros-biblioteca" *ngIf="!cargandoBiblioteca && !errorBiblioteca">
-        <input
-          type="text"
-          class="filtro-input"
-          placeholder="Filtrar por libro"
-          [value]="filtroLibroBiblioteca"
-          (input)="filtroLibroBiblioteca = ($any($event.target)).value"
-        />
-        <input
-          type="text"
-          class="filtro-input"
-          placeholder="Filtrar por autor"
-          [value]="filtroAutorBiblioteca"
-          (input)="filtroAutorBiblioteca = ($any($event.target)).value"
-        />
-        <button
-          type="button"
-          class="btn-limpiar-filtros"
-          (click)="limpiarFiltrosBiblioteca()"
-          [disabled]="!hayFiltrosBibliotecaActivos"
-        >
+        <input type="text" class="filtro-input" placeholder="Filtrar por libro" [value]="filtroLibroBiblioteca"
+          (input)="filtroLibroBiblioteca = ($any($event.target)).value" />
+        <input type="text" class="filtro-input" placeholder="Filtrar por autor" [value]="filtroAutorBiblioteca"
+          (input)="filtroAutorBiblioteca = ($any($event.target)).value" />
+        <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltrosBiblioteca()"
+          [disabled]="!hayFiltrosBibliotecaActivos">
           Limpiar
         </button>
       </section>
@@ -93,6 +77,17 @@
           <h3>{{ libro.titulo }}</h3>
           <p><strong>Autor:</strong> {{ libro.autor }}</p>
           <p><strong>Genero:</strong> {{ libro.genero }}</p>
+          <div class="acciones-libro">
+            <button *ngIf="libro.disponible" type="button" class="btn-solicitar"
+              (click)="solicitarPrestamo(libro)">Solicitar préstamo</button>
+            <span *ngIf="!libro.disponible" class="no-disponible">No disponible para préstamo</span>
+          </div>
+
+          <div *ngIf="confirmingSolicitudId === libro.idLibro" class="confirm-solicitud">
+            <p>Confirmar solicitud de préstamo para <strong>{{ libro.titulo }}</strong>?</p>
+            <button type="button" class="btn-confirm" (click)="confirmarSolicitud(libro)">Confirmar</button>
+            <button type="button" class="btn-cancel" (click)="cancelarSolicitud()">Cancelar</button>
+          </div>
         </article>
 
         <p *ngIf="librosBiblioteca.length === 0" class="estado">Este usuario no tiene libros en su biblioteca.</p>
@@ -103,4 +98,3 @@
     </section>
   </div>
 </section>
-

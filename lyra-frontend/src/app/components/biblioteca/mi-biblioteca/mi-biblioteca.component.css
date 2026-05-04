@@ -1,12 +1,17 @@
 .mi-biblioteca-page {
   min-height: 100vh;
-  padding: 0 0 1.4rem;
-  background: #efeff2;
+  padding: 1.4rem;
+  background:
+    radial-gradient(circle at top left, rgba(229, 182, 206, 0.28), transparent 42%),
+    linear-gradient(180deg, #f6f2fa 0%, #efe8f4 100%);
 }
 
 .cabecera-biblioteca {
   background: linear-gradient(90deg, #c7b6d8 0%, #e5b6ce 100%);
-  padding: 1.3rem 1.4rem;
+  padding: 2rem 1rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(97, 63, 125, 0.24);
+  text-align: center;
 }
 
 .cabecera-biblioteca h2 {
@@ -18,7 +23,7 @@
 
 .cabecera-biblioteca p {
   margin: 0.35rem 0 0;
-  color: #f2e8f6;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .acciones-superior {
@@ -38,15 +43,15 @@
   border: 1px solid #d0d0d7;
   border-radius: 8px;
   background: #fff;
-  color: #2f3b54;
+  color: #87439d;
   font-size: 1.05rem;
   cursor: pointer;
 }
 
 .icono-filtro.activo {
   background: #eaf0ff;
-  border-color: #9bb2f5;
-  color: #2b58d8;
+  border-color: #e39bf5;
+  color: #aa2bd8;
 }
 
 .header-acciones {
@@ -148,8 +153,8 @@
 .lista-libros {
   padding: 0 1.4rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.8rem;
 }
 
 .card-libro-usuario {
@@ -158,137 +163,101 @@
   background: #ffffff;
   border: 1px solid #d7d7dc;
   border-radius: 8px;
-  padding: 0.7rem;
+  padding: 0.55rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-  height: auto;
-  min-height: 260px;
+  min-height: 200px;
 }
 
 .portada {
   width: 100%;
-  aspect-ratio: 2.6 / 4;
+  aspect-ratio: 2.4 / 4;
   object-fit: cover;
   border: 1px solid #ececf1;
   border-radius: 4px;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.45rem;
 }
 
 .contenido {
   display: flex;
   flex-direction: column;
   flex: 1;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: #232323;
 }
 
 .contenido h3 {
-  margin: 0 0 0.4rem;
-  font-size: 0.95rem;
-  min-height: 2.1em;
+  margin: 0 0 0.3rem;
+  font-size: 0.88rem;
+  min-height: 1.8em;
 }
 
 .contenido p {
-  margin: 0.25rem 0;
+  margin: 0.2rem 0;
 }
 
-
 .valoracion-editable {
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  min-height: 2.2rem;
+  gap: 0.25rem;
+  min-height: 1.8rem;
 }
 
 .estrellas {
   display: inline-flex;
   align-items: center;
-  gap: 0.08rem;
+  gap: 0.05rem;
 }
 
 .estrella-btn {
   border: none;
   background: transparent;
   color: #aeb6c6;
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   line-height: 1;
   padding: 0;
   cursor: pointer;
   transition: color 0.14s ease, transform 0.14s ease;
 }
 
-.estrella-lectura {
-  cursor: default;
-}
-
 .estrella-btn.activa {
   color: #f0a300;
 }
 
-.estrella-btn:hover:not(:disabled) {
-  transform: scale(1.08);
-  color: #f0a300;
-}
-
-.estrella-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .valor-num {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   color: #5f6778;
 }
 
 .acciones-card {
   margin-top: auto;
-  padding-top: 0.6rem;
+  padding-top: 0.4rem;
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 0.35rem; 
+  gap: 0.3rem;
   width: 100%;
 }
 
 .btn-accion {
-  padding: 0.25rem 0.45rem; 
-  font-size: 0.72rem;
-  min-height: 36px;
-}
-
-
-.btn-accion {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0.2rem 0.35rem;
+  font-size: 0.68rem;
+  min-height: 30px;
   border: 1px solid currentColor;
   border-radius: 4px;
   background: transparent;
-  padding: 0.32rem 0.5rem;
-  font-size: 0.75rem;
-  min-height: 42px;
-  line-height: 1.2;
+  line-height: 1.1;
   cursor: pointer;
   white-space: normal;
   overflow-wrap: anywhere;
-  min-width: 0;
-  flex: 1 1 calc(50% - 0.4rem);
-  max-width: 100%;
-}
-
-.btn-ver {
-  color: #2f6ee8;
-}
-
-.btn-editar {
-  color: #7a4fb8;
+  flex: 1 1 calc(50% - 0.3rem);
 }
 
 .btn-borrar {
-  color: #f63a3a;
   flex-basis: 100%;
 }
+
 
 .btn-accion:disabled {
   opacity: 0.62;

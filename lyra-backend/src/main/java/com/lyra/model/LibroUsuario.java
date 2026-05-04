@@ -44,7 +44,7 @@ public class LibroUsuario {
     private Date fecha_agregacion;
 
     @Column(name = "is_prestamo")
-    private Boolean is_prestamo;
+    private Boolean isPrestamo;
 
     private Integer puntuacion;
 }

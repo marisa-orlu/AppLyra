@@ -14,6 +14,7 @@ import { CuentaComponent } from './components/cuenta/cuenta.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { AdminGuard } from './guards/admin.guard';
 import { AmigosComponent } from './components/amigos/amigos.component';
+import { PrestamosComponent } from './components/prestamos/prestamos.component';
 
 
 const routes: Routes = [
@@ -61,6 +62,11 @@ const routes: Routes = [
   {
     path: 'amigos',
     component: AmigosComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'prestamos',
+    component: PrestamosComponent,
     canActivate: [AuthGuard]
   },
   {

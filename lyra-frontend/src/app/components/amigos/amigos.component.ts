@@ -6,6 +6,8 @@ import { UsuarioCuenta } from '../../interfaces/usuario-cuenta';
 import { AmigoVista, UsuarioSeguidorService } from '../../usuario-seguidor/usuario-seguidor.component';
 import { LibrosService } from '../../services/libros.service';
 import { BibliotecaService, LibroUsuarioDto } from '../../services/biblioteca.service';
+import { PrestamosService } from '../../services/prestamos.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface LibroBibliotecaVista {
     idLibroUsuario: number;
@@ -14,6 +16,7 @@ interface LibroBibliotecaVista {
     autor: string;
     genero: string;
     portada: string;
+    disponible?: boolean;
 }
 
 @Component({
@@ -27,6 +30,7 @@ export class AmigosComponent implements OnInit {
     error = '';
     amigos: AmigoVista[] = [];
     filtroAmigos = '';
+    filterVisible = false;
 
     amigoSeleccionado: AmigoVista | null = null;
     mostrarModal = false;
@@ -44,6 +48,9 @@ export class AmigosComponent implements OnInit {
         private usuarioService: UsuarioService,
         private librosService: LibrosService,
         private bibliotecaService: BibliotecaService
+        ,
+        private prestamosService: PrestamosService,
+        private snackBar: MatSnackBar
     ) { }
 
     ngOnInit(): void {
@@ -179,6 +186,13 @@ export class AmigosComponent implements OnInit {
         this.filtroAmigos = '';
     }
 
+    toggleFilter(): void {
+        this.filterVisible = !this.filterVisible;
+        if (!this.filterVisible) {
+            this.limpiarFiltroAmigos();
+        }
+    }
+
     private cargarBibliotecaAmigo(idUsuario: number): void {
         this.cargandoBiblioteca = true;
         this.errorBiblioteca = '';
@@ -190,13 +204,34 @@ export class AmigosComponent implements OnInit {
                 const lista = Array.isArray(data) ? data : [];
                 this.librosBiblioteca = lista.map(item => this.mapearLibro(item));
 
+                // Resolver portadas y completar datos faltantes (cuando el DTO no contiene el objeto libro completo)
                 this.librosBiblioteca.forEach(libro => {
-                    this.librosService.obtenerPortadaSegura(libro.portada, this.portadaDefault).subscribe(url => {
-                        if (url.startsWith('blob:')) {
-                            this.objectUrlsBiblioteca.push(url);
-                        }
-                        libro.portada = url;
-                    });
+                    // Si faltan título/autor y tenemos idLibro, solicitar detalles del libro
+                    if ((libro.titulo === 'Sin titulo' || libro.autor === 'Autor desconocido') && libro.idLibro > 0) {
+                        this.librosService.obtenerPorId(libro.idLibro).subscribe(lib => {
+                            libro.titulo = (lib.titulo ?? libro.titulo).toString();
+                            libro.autor = (lib.autor ?? libro.autor).toString();
+                            libro.genero = (lib.genero ?? libro.genero ?? 'Sin genero').toString();
+                            libro.portada = this.librosService.resolverPortada(lib.portada ?? libro.portada, this.portadaDefault);
+
+                            // resolver la portada segura para la nueva portada
+                            this.librosService.obtenerPortadaSegura(libro.portada, this.portadaDefault).subscribe(url => {
+                                if (url.startsWith('blob:')) {
+                                    this.objectUrlsBiblioteca.push(url);
+                                }
+                                libro.portada = url;
+                            });
+                        }, () => {
+                            // ignore errors fetching libro
+                        });
+                    } else {
+                        this.librosService.obtenerPortadaSegura(libro.portada, this.portadaDefault).subscribe(url => {
+                            if (url.startsWith('blob:')) {
+                                this.objectUrlsBiblioteca.push(url);
+                            }
+                            libro.portada = url;
+                        });
+                    }
                 });
 
                 this.cargandoBiblioteca = false;
@@ -225,19 +260,71 @@ export class AmigosComponent implements OnInit {
         const genero = (item.libro?.genero ?? item.genero ?? 'Sin genero').toString();
         const portada = this.librosService.resolverPortada(item.libro?.portada ?? item.portada, this.portadaDefault);
 
+        const prestamoFlag = Boolean(item.isPrestamo ?? item.is_prestamo ?? false);
+        const disponible = prestamoFlag; // Mostrar botón solo si el propietario marcó el libro como prestable
+
         return {
             idLibroUsuario: Number.isFinite(idLibroUsuario) ? idLibroUsuario : 0,
             idLibro: Number.isFinite(idLibro) ? idLibro : 0,
             titulo,
             autor,
             genero,
-            portada
+            portada,
+            disponible: disponible
         };
+    }
+
+    // Estado local para confirmar solicitudes
+    confirmingSolicitudId: number | null = null;
+
+    solicitarPrestamo(libro: LibroBibliotecaVista): void {
+        if (!this.amigoSeleccionado || !this.amigoSeleccionado.usuario?.id) {
+            return;
+        }
+
+        // Abrir confirmación mínima
+        this.confirmingSolicitudId = libro.idLibro;
+    }
+
+    cancelarSolicitud(): void {
+        this.confirmingSolicitudId = null;
+    }
+
+    confirmarSolicitud(libro: LibroBibliotecaVista): void {
+        const idSolicitante = this.authService.getUserId();
+        const idDuenio = this.amigoSeleccionado?.usuario?.id;
+
+        if (!idSolicitante || !idDuenio) {
+            this.snackBar.open('No se ha detectado el usuario autenticado.', 'Cerrar', { duration: 3000 });
+            this.confirmingSolicitudId = null;
+            return;
+        }
+
+        this.prestamosService.crearPrestamo(idDuenio, idSolicitante, libro.idLibro).subscribe({
+            next: () => {
+                this.snackBar.open('Solicitud de préstamo enviada.', 'Cerrar', { duration: 3000 });
+                this.confirmingSolicitudId = null;
+            },
+            error: () => {
+                this.snackBar.open('Error al enviar la solicitud.', 'Cerrar', { duration: 3000 });
+                this.confirmingSolicitudId = null;
+            }
+        });
     }
 
     private limpiarObjectUrlsBiblioteca(): void {
         this.objectUrlsBiblioteca.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
         this.objectUrlsBiblioteca.length = 0;
+    }
+
+    private parseBoolean(value: unknown): boolean {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value !== 0;
+        if (typeof value === 'string') {
+            const v = value.trim().toLowerCase();
+            return v === 'true' || v === '1' || v === 'yes' || v === 'si';
+        }
+        return false;
     }
 
     private obtenerMensajeError(err: HttpErrorResponse, fallback: string): string {

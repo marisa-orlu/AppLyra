@@ -1,13 +1,16 @@
 .home-panel {
 	min-height: 100vh;
+	padding: 1.4rem;
 	background:
-		radial-gradient(circle at 20% 0%, rgba(229, 182, 206, 0.32), transparent 44%),
+		radial-gradient(circle at top left, rgba(229, 182, 206, 0.28), transparent 42%),
 		linear-gradient(180deg, #f6f2fa 0%, #efe8f4 100%);
 }
 
 .home-header {
 	background: linear-gradient(90deg, #c7b6d8 0%, #e5b6ce 100%);
 	padding: 2rem 1rem;
+	border-radius: 16px;
+	box-shadow: 0 8px 20px rgba(97, 63, 125, 0.24);
 }
 
 .home-header h1 {

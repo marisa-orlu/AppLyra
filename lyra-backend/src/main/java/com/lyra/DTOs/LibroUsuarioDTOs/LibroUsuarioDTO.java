@@ -10,6 +10,7 @@ public record LibroUsuarioDTO(
         Long idUsuario,
         Long idLibro,
         EstadoLibro estado,
+        Boolean isPrestamo,
         Integer puntuacion,
         Date fechaAgregacion,
         String portada
@@ -21,6 +22,7 @@ public record LibroUsuarioDTO(
                 lu.getUsuario() != null ? lu.getUsuario().getId() : null,
                 lu.getLibro() != null ? lu.getLibro().getIdLibro() : null,
                 lu.getEstado(),
+                lu.getIsPrestamo(),
                 lu.getPuntuacion(),
                 lu.getFecha_agregacion(),
                 lu.getLibro() != null ? lu.getLibro().getPortada() : null
