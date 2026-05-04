@@ -204,13 +204,34 @@ export class AmigosComponent implements OnInit {
                 const lista = Array.isArray(data) ? data : [];
                 this.librosBiblioteca = lista.map(item => this.mapearLibro(item));
 
+                // Resolver portadas y completar datos faltantes (cuando el DTO no contiene el objeto libro completo)
                 this.librosBiblioteca.forEach(libro => {
-                    this.librosService.obtenerPortadaSegura(libro.portada, this.portadaDefault).subscribe(url => {
-                        if (url.startsWith('blob:')) {
-                            this.objectUrlsBiblioteca.push(url);
-                        }
-                        libro.portada = url;
-                    });
+                    // Si faltan título/autor y tenemos idLibro, solicitar detalles del libro
+                    if ((libro.titulo === 'Sin titulo' || libro.autor === 'Autor desconocido') && libro.idLibro > 0) {
+                        this.librosService.obtenerPorId(libro.idLibro).subscribe(lib => {
+                            libro.titulo = (lib.titulo ?? libro.titulo).toString();
+                            libro.autor = (lib.autor ?? libro.autor).toString();
+                            libro.genero = (lib.genero ?? libro.genero ?? 'Sin genero').toString();
+                            libro.portada = this.librosService.resolverPortada(lib.portada ?? libro.portada, this.portadaDefault);
+
+                            // resolver la portada segura para la nueva portada
+                            this.librosService.obtenerPortadaSegura(libro.portada, this.portadaDefault).subscribe(url => {
+                                if (url.startsWith('blob:')) {
+                                    this.objectUrlsBiblioteca.push(url);
+                                }
+                                libro.portada = url;
+                            });
+                        }, () => {
+                            // ignore errors fetching libro
+                        });
+                    } else {
+                        this.librosService.obtenerPortadaSegura(libro.portada, this.portadaDefault).subscribe(url => {
+                            if (url.startsWith('blob:')) {
+                                this.objectUrlsBiblioteca.push(url);
+                            }
+                            libro.portada = url;
+                        });
+                    }
                 });
 
                 this.cargandoBiblioteca = false;
@@ -239,10 +260,8 @@ export class AmigosComponent implements OnInit {
         const genero = (item.libro?.genero ?? item.genero ?? 'Sin genero').toString();
         const portada = this.librosService.resolverPortada(item.libro?.portada ?? item.portada, this.portadaDefault);
 
-        const disponible = Boolean(
-            item.isPrestamo ?? item.is_prestamo ??
-            ((item.estado ?? '').toString().toUpperCase() === 'DISPONIBLE')
-        );
+        const prestamoFlag = Boolean(item.isPrestamo ?? item.is_prestamo ?? false);
+        const disponible = prestamoFlag; // Mostrar botón solo si el propietario marcó el libro como prestable
 
         return {
             idLibroUsuario: Number.isFinite(idLibroUsuario) ? idLibroUsuario : 0,
@@ -296,6 +315,16 @@ export class AmigosComponent implements OnInit {
     private limpiarObjectUrlsBiblioteca(): void {
         this.objectUrlsBiblioteca.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
         this.objectUrlsBiblioteca.length = 0;
+    }
+
+    private parseBoolean(value: unknown): boolean {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value !== 0;
+        if (typeof value === 'string') {
+            const v = value.trim().toLowerCase();
+            return v === 'true' || v === '1' || v === 'yes' || v === 'si';
+        }
+        return false;
     }
 
     private obtenerMensajeError(err: HttpErrorResponse, fallback: string): string {

@@ -7,6 +7,6 @@ export interface LibroUsuario {
 	libro: Libro;
 	estado: string | null;
 	fecha_agregacion: string | null;
-	is_prestamo: boolean | null;
+	isPrestamo: boolean | null;
 	puntuacion: number | null;
 }

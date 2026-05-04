@@ -1,6 +1,5 @@
 package com.lyra.services;
 
-import com.lyra.DTOs.LibroUsuarioDTOs.LibroUsuarioDTO;
 import com.lyra.exception.OperacionNoPermitidaException;
 import com.lyra.exception.RecursoNoEncontradoException;
 import com.lyra.model.EstadoLibro;
@@ -10,14 +9,9 @@ import com.lyra.model.Usuario;
 import com.lyra.repository.LibroRepository;
 import com.lyra.repository.LibroUsuarioRepository;
 import com.lyra.repository.UsuarioRepository;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.Date;
 import java.util.List;
@@ -50,7 +44,7 @@ public class LibroUsuarioService {
                 .libro(libro)
                 .estado(EstadoLibro.PENDIENTE)
                 .fecha_agregacion(new Date())
-                .is_prestamo(false)
+                .isPrestamo(false)
                 .puntuacion(null)
                 .build();
 
@@ -78,7 +72,7 @@ public class LibroUsuarioService {
         }
 
         if (isPrestamo != null) {
-            libroUsuario.setIs_prestamo(isPrestamo);
+            libroUsuario.setIsPrestamo(isPrestamo);
         }
 
         if (puntuacion != null) {
@@ -106,7 +100,7 @@ public class LibroUsuarioService {
         LibroUsuario lu = libroUsuarioRepository.findById(idLibroUsuario)
                 .orElseThrow(() -> new RuntimeException("Registro no encontrado"));
 
-        lu.setIs_prestamo(prestamo);
+        lu.setIsPrestamo(prestamo);
         return libroUsuarioRepository.save(lu);
     }
 
