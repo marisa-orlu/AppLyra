@@ -97,3 +97,50 @@
   color: #b00020;
   font-weight: bold;
 }
+
+/* Acciones en tarjetas */
+.prestamo-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.prestamo-actions button {
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-accept {
+  background: linear-gradient(90deg,#67c38b,#48a86f);
+  color: #fff;
+}
+
+.btn-reject {
+  background: linear-gradient(90deg,#f28b82,#e05252);
+  color: #fff;
+}
+
+.btn-return {
+  background: linear-gradient(90deg,#7fb3ff,#4b8ef0);
+  color: #fff;
+}
+
+.btn-confirm {
+  background: linear-gradient(90deg,#ffd36b,#ffb84d);
+  color: #3b2b00;
+}
+
+/* Media (portada) */
+.card-media img {
+  width: 72px;
+  height: 96px;
+  object-fit: cover;
+  float: left;
+  margin-right: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid rgba(203,181,219,0.4);
+}
+.prestamo-card::after { content: ''; display: table; clear: both; }

@@ -15,21 +15,48 @@
       <input type="radio" name="vista" value="solicito" [(ngModel)]="vista" />
       <span>Libros que solicito</span>
     </label>
+
+    <label>
+      <input type="radio" name="vista" value="aceptados" [(ngModel)]="vista" />
+      <span>Aceptados</span>
+    </label>
   </div>
 
   <p *ngIf="cargando" class="estado">Cargando préstamos...</p>
   <p *ngIf="error && !cargando" class="estado estado-error">{{ error }}</p>
 
   <section *ngIf="vista === 'presto' && !cargando" class="prestamos-lista">
-    <h2>Libros que presto</h2>
+    <h2>Solicitudes pendientes</h2>
 
-    <p *ngIf="prestamosComoDuenio?.length === 0" class="estado">No tienes préstamos como dueño.</p>
+    <p *ngIf="prestamosComoDuenioPendientes?.length === 0" class="estado">No tienes solicitudes pendientes.</p>
 
-    <article *ngFor="let p of prestamosComoDuenio" class="prestamo-card">
+    <article *ngFor="let p of prestamosComoDuenioPendientes" class="prestamo-card">
+      <div class="card-media">
+        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+      </div>
       <h3>{{ p.libro?.titulo_libro }}</h3>
       <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
-      <p><strong>Inicio:</strong> {{ formatearFecha(p.fecha_inicio) }}</p>
+      <div class="prestamo-actions">
+        <button class="btn-accept" (click)="debugAceptar(p)">Aceptar préstamo</button>
+        <button class="btn-reject" (click)="debugRechazar(p)">Rechazar</button>
+      </div>
+    </article>
+
+    <h2 style="margin-top:1.2rem">Libros prestados</h2>
+
+    <p *ngIf="prestamosComoDuenioAceptados?.length === 0" class="estado">No tienes libros prestados actualmente.</p>
+
+    <article *ngFor="let p of prestamosComoDuenioAceptados" class="prestamo-card">
+      <div class="card-media">
+        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+      </div>
+      <h3>{{ p.libro?.titulo_libro }}</h3>
+      <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
+      <p><strong>Estado:</strong> {{ p.estado }}</p>
+      <div class="prestamo-actions">
+        <button class="btn-return" (click)="debugDevolver(p)">Marcar como devuelto</button>
+      </div>
     </article>
   </section>
 
@@ -39,9 +66,44 @@
     <p *ngIf="prestamosComoSolicitante?.length === 0" class="estado">No has solicitado préstamos.</p>
 
     <article *ngFor="let p of prestamosComoSolicitante" class="prestamo-card">
+      <div class="card-media">
+        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+      </div>
       <h3>{{ p.libro?.titulo_libro }}</h3>
       <p><strong>Dueño:</strong> {{ p.usuario?.nombre }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
+    </article>
+  </section>
+
+  <section *ngIf="vista === 'aceptados' && !cargando" class="prestamos-lista">
+    <h2>Préstamos aceptados</h2>
+
+    <h3>Me han aceptado (yo solicité)</h3>
+    <p *ngIf="prestamosComoSolicitanteAceptados?.length === 0" class="estado">No tienes préstamos aceptados como solicitante.</p>
+    <article *ngFor="let p of prestamosComoSolicitanteAceptados" class="prestamo-card">
+      <div class="card-media">
+        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+      </div>
+      <h3>{{ p.libro?.titulo_libro }}</h3>
+      <p><strong>Dueño:</strong> {{ p.usuario?.nombre }}</p>
+      <p><strong>Estado:</strong> {{ p.estado }}</p>
+      <div class="prestamo-actions">
+        <button class="btn-return" (click)="debugDevolver(p)">Marcar como devuelto</button>
+      </div>
+    </article>
+
+    <h3 style="margin-top:1rem">Yo acepté</h3>
+    <p *ngIf="prestamosComoDuenioAceptados?.length === 0" class="estado">No tienes préstamos que hayas aceptado.</p>
+    <article *ngFor="let p of prestamosComoDuenioAceptados" class="prestamo-card">
+      <div class="card-media">
+        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+      </div>
+      <h3>{{ p.libro?.titulo_libro }}</h3>
+      <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
+      <p><strong>Estado:</strong> {{ p.estado }}</p>
+      <div class="prestamo-actions">
+        <button class="btn-confirm" (click)="confirmarRecepcion(p)">Confirmar recepción</button>
+      </div>
     </article>
   </section>
 

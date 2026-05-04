@@ -34,6 +34,23 @@ export class PrestamosService {
     return this.http.get<PrestamoUsuarioLibro[]>(`${this.apiUrl}/solicitante/${idSolicitante}`, { headers: this.getAuthHeaders() });
   }
 
+  aceptarPrestamo(idPrestamo: number) {
+    return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}/aceptar`, null, { headers: this.getAuthHeaders() });
+  }
+
+  rechazarPrestamo(idPrestamo: number) {
+    return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}/rechazar`, null, { headers: this.getAuthHeaders() });
+  }
+
+  devolverPrestamo(idPrestamo: number) {
+    return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}/devolver`, null, { headers: this.getAuthHeaders() });
+  }
+
+  cambiarEstado(idPrestamo: number, valor: number) {
+    const body = { estado: valor };
+    return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}`, body, { headers: this.getAuthHeaders() });
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
