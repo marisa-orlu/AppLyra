@@ -23,6 +23,7 @@ export class UsuariosComponent implements OnInit {
   usuarios: UsuarioCuenta[] = [];
   filtroNombre = '';
   filtroEmail = '';
+  filterVisible = false;
 
   mostrarEditor = false;
   mostrarConfirmacionBorrado = false;
@@ -75,6 +76,13 @@ export class UsuariosComponent implements OnInit {
   limpiarFiltros(): void {
     this.filtroNombre = '';
     this.filtroEmail = '';
+  }
+
+  toggleFilter(): void {
+    this.filterVisible = !this.filterVisible;
+    if (!this.filterVisible) {
+      this.limpiarFiltros();
+    }
   }
 
   abrirEditor(usuario: UsuarioCuenta): void {

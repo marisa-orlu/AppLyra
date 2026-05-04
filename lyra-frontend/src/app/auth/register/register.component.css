@@ -9,19 +9,19 @@
 }
 
 .register-card {
-  width: min(720px, 100%);
+  width: min(520px, 100%);
   background: #ffffff;
   border-radius: 18px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   text-align: center;
-  padding-bottom: 26px;
+  padding-bottom: 22px;
 }
 
 /* Logo */
 .register-logo {
-  width: 260px; 
-  margin: 28px auto 14px;
+  width: 180px;
+  margin: 22px auto 10px;
   display: block;
   user-select: none;
 }
@@ -29,43 +29,48 @@
 .register-header {
   background: transparent;
   color: #730182;
-  padding: 0 20px 10px;
+  padding: 0 16px 6px;
 }
 
 .register-header h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 600;
 }
 
 .register-header p {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   opacity: 0.8;
-  font-size: 1.05rem; 
+  font-size: 0.95rem;
 }
 
 .register-form {
   display: grid;
-  gap: 16px;
-  padding: 0 60px 26px; 
+  gap: 14px;
+  padding: 0 40px 20px;
+
+  text-align: center; 
+  justify-items: center; 
+}
+
+.register-form label {
+  color: #47384f;
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  width: 100%;
   text-align: left;
 }
 
 
-.register-form label {
-  color: #47384f;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
 .register-form input {
   width: 100%;
   border: 1px solid #c7b7d6;
-  border-radius: 10px; 
-  padding: 14px 16px;
+  border-radius: 10px;
+  padding: 12px 14px;
   background: #faf7fc;
   color: #352e3b;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
 }
 
@@ -79,7 +84,7 @@
 /* Mensajes */
 .estado {
   margin: 4px 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .estado-error {
@@ -94,16 +99,19 @@
 .btn-principal,
 .btn-secundario {
   border: none;
-  border-radius: 8px; 
+  border-radius: 8px;
   padding: 10px 12px;
   color: #fff;
   cursor: pointer;
   transition: transform 0.16s ease, opacity 0.16s ease;
-  font-size: 1.25rem; 
+  font-size: 1.15rem;
+
+  width: 100%;
+  max-width: 360px; 
 }
 
 .btn-principal {
-  margin-top: 10px;
+  margin-top: 8px;
   background: #b8a1c7;
 }
 
@@ -130,10 +138,10 @@
   }
 
   .register-logo {
-    width: 200px;
+    width: 150px;
   }
 
   .register-form {
-    padding: 0 20px 20px; 
+    padding: 0 18px 18px;
   }
 }
