@@ -54,12 +54,15 @@ public class PrestamoUsuarioLibroService {
         EstadoPrestamo estado = EstadoPrestamo.fromValor(nuevoEstado);
         prestamo.setEstado(estado);
 
+        // Si se confirma la devolución, se registra la fecha fin
         if (estado == EstadoPrestamo.DEVUELTO) {
             prestamo.setFecha_fin(LocalDate.now());
         }
 
         return prestamoRepository.save(prestamo);
     }
+
+    // ESTADOS DEL FLUJO DEL PRÉSTAMO
 
     public PrestamoUsuarioLibro aceptarPrestamo(Long idPrestamo) {
         return cambiarEstado(idPrestamo, EstadoPrestamo.ACEPTADO.getValor());
@@ -69,9 +72,17 @@ public class PrestamoUsuarioLibroService {
         return cambiarEstado(idPrestamo, EstadoPrestamo.RECHAZADO.getValor());
     }
 
-    public PrestamoUsuarioLibro devolverPrestamo(Long idPrestamo) {
+    // SOLICITANTE devuelve  pasa a PENDIENTE_DEVOLUCION
+    public PrestamoUsuarioLibro marcarPendienteDevolucion(Long idPrestamo) {
+        return cambiarEstado(idPrestamo, EstadoPrestamo.PENDIENTE_DEVOLUCION.getValor());
+    }
+
+    // DUEÑO confirma  pasa a DEVUELTO
+    public PrestamoUsuarioLibro confirmarDevolucion(Long idPrestamo) {
         return cambiarEstado(idPrestamo, EstadoPrestamo.DEVUELTO.getValor());
     }
+
+    // CONSULTAS
 
     public List<PrestamoUsuarioLibro> obtenerPorDuenio(Long idDuenio) {
         return prestamoRepository.findByDuenio_Id(idDuenio);

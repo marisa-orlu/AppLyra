@@ -2,7 +2,9 @@ export interface UsuarioCuenta {
   id: number;
   nombre: string;
   email: string;
-  fechaRegistro: string;
+  // puede venir como `fecha_registro` (snake_case) o `fechaRegistro` (camelCase)
+  fecha_registro?: string;
+  fechaRegistro?: string;
   fotoPerfil?: string | null;
   biografia?: string | null;
   rol?: string;

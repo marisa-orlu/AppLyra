@@ -276,9 +276,17 @@ export class AmigosComponent implements OnInit {
 
     // Estado local para confirmar solicitudes
     confirmingSolicitudId: number | null = null;
+    // ids de libros ya solicitados localmente (evita reintentos y permite deshabilitar botón)
+    requestedLibroIds = new Set<number>();
 
     solicitarPrestamo(libro: LibroBibliotecaVista): void {
         if (!this.amigoSeleccionado || !this.amigoSeleccionado.usuario?.id) {
+            return;
+        }
+
+        // Evitar solicitar dos veces si ya se solicitó
+        if (this.requestedLibroIds.has(libro.idLibro)) {
+            this.snackBar.open('Ya has solicitado este libro.', 'Cerrar', { duration: 2500 });
             return;
         }
 
@@ -304,12 +312,22 @@ export class AmigosComponent implements OnInit {
             next: () => {
                 this.snackBar.open('Solicitud de préstamo enviada.', 'Cerrar', { duration: 3000 });
                 this.confirmingSolicitudId = null;
+                // Marcar localmente como solicitado y deshabilitar el botón
+                this.requestedLibroIds.add(libro.idLibro);
+                const local = this.librosBiblioteca.find(l => l.idLibro === libro.idLibro);
+                if (local) {
+                    local.disponible = false;
+                }
             },
             error: () => {
                 this.snackBar.open('Error al enviar la solicitud.', 'Cerrar', { duration: 3000 });
                 this.confirmingSolicitudId = null;
             }
         });
+    }
+
+    isRequested(libroId: number): boolean {
+        return this.requestedLibroIds.has(libroId);
     }
 
     private limpiarObjectUrlsBiblioteca(): void {

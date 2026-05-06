@@ -106,7 +106,7 @@ export class UsuarioService {
       id: Number.isFinite(id) && id > 0 ? id : 0,
       nombre: (payload['nombre'] ?? '').toString(),
       email: (payload['email'] ?? '').toString(),
-      fechaRegistro: fechaRegistroRaw ? fechaRegistroRaw.toString() : '',
+      fecha_registro: fechaRegistroRaw ? fechaRegistroRaw.toString() : '',
       fotoPerfil: (payload['fotoPerfil'] ?? payload['foto_perfil'] ?? null) as string | null,
       biografia: (payload['biografia'] ?? payload['biografia_usuario'] ?? null) as string | null,
       rol: (payload['rol'] ?? '').toString() || undefined

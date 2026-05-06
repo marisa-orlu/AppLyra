@@ -42,9 +42,16 @@ public class PrestamoUsuarioLibroController {
         return PrestamoDTO.of(prestamoService.rechazarPrestamo(id));
     }
 
-    @PutMapping("/{id}/devolver")
-    public PrestamoDTO devolver(@PathVariable Long id) {
-        return PrestamoDTO.of(prestamoService.devolverPrestamo(id));
+    //  Solicitante marca como pendiente de devolución
+    @PutMapping("/{id}/pendiente-devolucion")
+    public PrestamoDTO marcarPendienteDevolucion(@PathVariable Long id) {
+        return PrestamoDTO.of(prestamoService.marcarPendienteDevolucion(id));
+    }
+
+    //Dueño confirma la devolución
+    @PutMapping("/{id}/confirmar-devolucion")
+    public PrestamoDTO confirmarDevolucion(@PathVariable Long id) {
+        return PrestamoDTO.of(prestamoService.confirmarDevolucion(id));
     }
 
     @GetMapping("/duenio/{idDuenio}")
