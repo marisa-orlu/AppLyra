@@ -4,6 +4,7 @@ import { PrestamosService } from '../../services/prestamos.service';
 import { AuthService } from '../../services/auth.service';
 import { PrestamoUsuarioLibro } from '../../interfaces/Model/prestamoUsuarioLibro';
 import { LibrosService } from '../../services/libros.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -19,7 +20,7 @@ export class PrestamosComponent implements OnInit {
 
   prestamosComoDuenio: PrestamoUsuarioLibro[] = [];
   prestamosComoSolicitante: PrestamoUsuarioLibro[] = [];
-  vista: 'presto' | 'solicito' | 'aceptados' = 'presto';
+  vista: 'presto' | 'solicito' | 'aceptados' | 'devueltos' = 'presto';
   readonly portadaDefault = 'assets/portadas/quijote.jpg';
   private objectUrls: string[] = [];
 
@@ -27,6 +28,7 @@ export class PrestamosComponent implements OnInit {
     private prestamosService: PrestamosService,
     private authService: AuthService
     , private librosService: LibrosService
+    , private snackBar: MatSnackBar
   ) {}
 
   ngOnDestroy(): void {
@@ -148,6 +150,14 @@ export class PrestamosComponent implements OnInit {
     return this.prestamosComoSolicitante.filter(p => (p.estado || '').toUpperCase() === 'ACEPTADO');
   }
 
+  get prestamosComoDuenioDevueltos(): PrestamoUsuarioLibro[] {
+    return this.prestamosComoDuenio.filter(p => (p.estado || '').toUpperCase() === 'DEVUELTO');
+  }
+
+  get prestamosComoSolicitanteDevueltos(): PrestamoUsuarioLibro[] {
+    return this.prestamosComoSolicitante.filter(p => (p.estado || '').toUpperCase() === 'DEVUELTO');
+  }
+
   confirmarRecepcion(itemOrId: any): void {
     const id = this.extractId(itemOrId);
     if (!id) {
@@ -156,9 +166,12 @@ export class PrestamosComponent implements OnInit {
       return;
     }
 
-    // Usamos el valor 4 que en el backend corresponde a DEVUELTO
-    this.prestamosService.cambiarEstado(id, 4).subscribe({
-      next: () => this.cargarPrestamos(),
+    // Llamamos al endpoint específico para confirmar la devolución
+    this.prestamosService.confirmarDevolucion(id).subscribe({
+      next: () => {
+        this.snackBar.open('Libro marcado como recibido.', 'Cerrar', { duration: 3000 });
+        this.cargarPrestamos();
+      },
       error: () => { this.error = 'No se pudo confirmar la recepción.'; }
     });
   }
@@ -187,7 +200,7 @@ export class PrestamosComponent implements OnInit {
     }
 
     this.prestamosService.aceptarPrestamo(id).subscribe({
-      next: () => this.cargarPrestamos(),
+      next: () => { this.snackBar.open('Préstamo aceptado.', 'Cerrar', { duration: 2500 }); this.cargarPrestamos(); },
       error: () => { this.error = 'No se pudo aceptar el préstamo.'; }
     });
   }
@@ -201,7 +214,7 @@ export class PrestamosComponent implements OnInit {
     }
 
     this.prestamosService.rechazarPrestamo(id).subscribe({
-      next: () => this.cargarPrestamos(),
+      next: () => { this.snackBar.open('Préstamo rechazado.', 'Cerrar', { duration: 2500 }); this.cargarPrestamos(); },
       error: () => { this.error = 'No se pudo rechazar el préstamo.'; }
     });
   }
@@ -214,9 +227,10 @@ export class PrestamosComponent implements OnInit {
       return;
     }
 
+    // El solicitante solicita la devolución (marca como PENDIENTE_DEVOLUCION)
     this.prestamosService.devolverPrestamo(id).subscribe({
-      next: () => this.cargarPrestamos(),
-      error: () => { this.error = 'No se pudo marcar como devuelto.'; }
+      next: () => { this.snackBar.open('Solicitud de devolución enviada.', 'Cerrar', { duration: 3000 }); this.cargarPrestamos(); },
+      error: () => { this.error = 'No se pudo solicitar la devolución.'; }
     });
   }
 

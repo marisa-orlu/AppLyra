@@ -42,8 +42,14 @@ export class PrestamosService {
     return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}/rechazar`, null, { headers: this.getAuthHeaders() });
   }
 
+  // El solicitante solicita la devolución (marca pendiente de devolución)
   devolverPrestamo(idPrestamo: number) {
-    return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}/devolver`, null, { headers: this.getAuthHeaders() });
+    return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}/pendiente-devolucion`, null, { headers: this.getAuthHeaders() });
+  }
+
+  // El dueño confirma la devolución
+  confirmarDevolucion(idPrestamo: number) {
+    return this.http.put<PrestamoUsuarioLibro>(`${this.apiUrl}/${idPrestamo}/confirmar-devolucion`, null, { headers: this.getAuthHeaders() });
   }
 
   cambiarEstado(idPrestamo: number, valor: number) {

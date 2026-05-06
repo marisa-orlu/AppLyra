@@ -195,8 +195,8 @@ export class UsuariosComponent implements OnInit {
     });
   }
 
-  formatearFecha(valor: string): string {
-    const fecha = (valor ?? '').trim();
+  formatearFecha(valor?: string | null): string {
+    const fecha = (valor ?? '').toString().trim();
 
     if (!fecha) {
       return 'Sin fecha';

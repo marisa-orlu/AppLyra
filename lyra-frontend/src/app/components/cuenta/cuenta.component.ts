@@ -67,7 +67,8 @@ export class CuentaComponent implements OnInit, OnDestroy {
   }
 
   get fechaRegistroFormateada(): string {
-    const valor = (this.usuario?.fechaRegistro ?? '').trim();
+    const raw = (this.usuario?.fechaRegistro ?? this.usuario?.fecha_registro ?? '');
+    const valor = (raw ?? '').toString().trim();
 
     if (!valor) {
       return 'Sin fecha disponible';
