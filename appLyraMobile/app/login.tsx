@@ -1,8 +1,8 @@
-import { login as apiLogin } from '@/services/api';
+import { login as apiLogin, decodeJwtPayload } from '@/services/api';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, ToastAndroid } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
 
 export default function Login() {
   const router = useRouter();
@@ -10,6 +10,38 @@ export default function Login() {
   const [contrasena, setContrasena] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const extractUserId = (res: Record<string, unknown>): string | null => {
+    const pickNumberId = (value: unknown): string | null => {
+      const n = typeof value === 'string' ? Number(value) : Number(value as unknown);
+      return Number.isFinite(n) && n > 0 ? String(n) : null;
+    };
+
+    const anyRes = res as any;
+    const candidates: unknown[] = [
+      anyRes?.id,
+      anyRes?.id_usuario,
+      anyRes?.idUsuario,
+      anyRes?.userId,
+      anyRes?.usuarioId,
+      anyRes?.usuario?.id,
+      anyRes?.usuario?.idUsuario,
+      anyRes?.usuario?.id_usuario,
+      anyRes?.user?.id,
+      anyRes?.user?.userId,
+      anyRes?.data?.id,
+      anyRes?.data?.userId,
+      anyRes?.data?.usuario?.id,
+      anyRes?.data?.user?.id,
+    ];
+
+    for (const c of candidates) {
+      const id = pickNumberId(c);
+      if (id) return id;
+    }
+
+    return null;
+  };
 
   const onSubmit = async () => {
     setErrorMessage('');
@@ -34,20 +66,31 @@ export default function Login() {
       await SecureStore.setItemAsync('token', token);
 
       const resAny = res as Record<string, unknown>;
-      const idCandidates = [resAny['id'], resAny['id_usuario'], resAny['idUsuario'], resAny['userId']];
+      let userId = extractUserId(resAny);
 
-      let userId: string | null = null;
-      for (const candidate of idCandidates) {
-        const id = Number(candidate as unknown);
-        if (Number.isFinite(id) && id > 0) {
-          userId = String(id);
-          break;
+      if (!userId) {
+        const payload = decodeJwtPayload(token);
+        const candidates: unknown[] = [
+          payload?.id,
+          payload?.userId,
+          payload?.usuarioId,
+          payload?.id_usuario,
+          payload?.uid,
+          payload?.sub,
+        ];
+        for (const c of candidates) {
+          const n = typeof c === 'string' ? Number(c) : Number(c as unknown);
+          if (Number.isFinite(n) && n > 0) {
+            userId = String(n);
+            break;
+          }
         }
       }
 
-      if (userId) {
-        await SecureStore.setItemAsync('userId', userId);
-      }
+      if (userId) await SecureStore.setItemAsync('userId', userId);
+
+      const usuario = (resAny as any)?.usuario ?? (resAny as any)?.user ?? (resAny as any)?.data?.usuario ?? null;
+      if (usuario) await SecureStore.setItemAsync('user', JSON.stringify(usuario));
 
       if (role) {
         await SecureStore.setItemAsync('role', String(role));

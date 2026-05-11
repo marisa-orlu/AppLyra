@@ -1,100 +1,86 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
+  const Card = ({ title, onPress }: { title: string; onPress: () => void }) => (
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
+      <Text style={styles.cardText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#e5b6ce', dark: '#1D1A33' }}
-      headerImage={
+    <View style={styles.container}>
+      <View style={styles.topRow}>
         <Image
           source={require('@/assets/images/Logo App Lyra Color_Mesa de trabajo 1 copia 5.png')}
-          style={styles.lyraLogo}
+          style={styles.logo}
+          contentFit="contain"
         />
-      }>
+      </View>
 
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">App Lyra</ThemedText>
-      </ThemedView>
+      <View style={styles.banner}>
+        <Text style={styles.bannerText}>Te damos la bienvenida a Lyra</Text>
+      </View>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <View style={styles.grid}>
+        <Card title="Libros" onPress={() => router.push('/(tabs)/libros' as any)} />
+        <Card title="Mi biblioteca" onPress={() => router.push('/(tabs)/biblioteca' as any)} />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#f3d7e6',
+    paddingTop: Platform.select({ ios: 60, default: 24 }),
+    paddingHorizontal: 16,
+  },
+  topRow: {
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  logo: {
+    width: 180,
+    height: 70,
   },
-  lyraLogo: {
-    height: 160,
-    width: 160,
-    bottom: 10,
-    left: 10,
-    position: 'absolute',
+  banner: {
+    backgroundColor: '#e5b6ce',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    marginBottom: 18,
+  },
+  bannerText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    width: '48%',
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
+    paddingVertical: 22,
+    paddingHorizontal: 12,
+    marginBottom: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardText: {
+    color: '#11181C',
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });
