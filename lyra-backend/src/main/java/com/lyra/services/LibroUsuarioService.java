@@ -1,5 +1,6 @@
 package com.lyra.services;
 
+import com.lyra.DTOs.LibroUsuarioDTOs.LibroUsuarioTop5Dto;
 import com.lyra.exception.OperacionNoPermitidaException;
 import com.lyra.exception.RecursoNoEncontradoException;
 import com.lyra.model.EstadoLibro;
@@ -11,6 +12,8 @@ import com.lyra.repository.LibroUsuarioRepository;
 import com.lyra.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -138,6 +141,22 @@ public class LibroUsuarioService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("LibroUsuario no encontrado para ese usuario y libro"));
 
         libroUsuarioRepository.delete(lu);
+    }
+
+    public List<LibroUsuarioTop5Dto> top5ByUsuario(Long idUsuario) {
+        Pageable pageable = PageRequest.of(0, 5);
+        return libroUsuarioRepository.top5ByUsuario(idUsuario, pageable).stream()
+                .map(lu -> new LibroUsuarioTop5Dto(
+                        lu.getId_libro_usuario(),
+                        lu.getUsuario().getId(),
+                        lu.getLibro().getIdLibro(),
+                        lu.getPuntuacion(),
+                        lu.getLibro().getTitulo_libro(),
+                        lu.getLibro().getAutor(),
+                        lu.getLibro().getGenero(),
+                        lu.getLibro().getPortada()
+                ))
+                .toList();
     }
 
 }

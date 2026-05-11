@@ -49,10 +49,14 @@ export class MiBibliotecaComponent implements OnInit {
 
   idUsuario: number | null = null;
   cargando = false;
+  cargandoTop5 = false;
+  top5Expandido = true;
   eliminandoId: number | null = null;
   mensajeInfo = '';
   error = '';
+  errorTop5 = '';
   librosUsuario: LibroUsuarioVista[] = [];
+  top5Puntuacion: LibroUsuarioVista[] = [];
   mostrarPopupAnadir = false;
   mostrarPopupEditar = false;
   cargandoCatalogo = false;
@@ -73,7 +77,8 @@ export class MiBibliotecaComponent implements OnInit {
   estadoEdicion = 1;
   prestamoEdicion = false;
   puntuacionEdicionEstrellas = 0;
-  private readonly objectUrls: string[] = [];
+  private readonly objectUrlsBiblioteca: string[] = [];
+  private readonly objectUrlsTop5: string[] = [];
   
   @Input() usuarioId!: number;
   constructor(
@@ -92,11 +97,14 @@ export class MiBibliotecaComponent implements OnInit {
     }
 
     this.cargarBiblioteca(this.idUsuario);
+    this.cargarTop5Puntuacion(this.idUsuario);
   }
 
   ngOnDestroy(): void {
-    this.objectUrls.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
-    this.objectUrls.length = 0;
+    this.objectUrlsBiblioteca.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
+    this.objectUrlsBiblioteca.length = 0;
+    this.objectUrlsTop5.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
+    this.objectUrlsTop5.length = 0;
   }
 
   trackByLibroUsuario(_: number, item: LibroUsuarioVista): number {
@@ -131,6 +139,7 @@ export class MiBibliotecaComponent implements OnInit {
     this.bibliotecaService.eliminarDeBiblioteca(item.idLibroUsuario).subscribe({
       next: () => {
         this.librosUsuario = this.librosUsuario.filter(x => x.idLibroUsuario !== item.idLibroUsuario);
+        this.top5Puntuacion = this.top5Puntuacion.filter(x => x.idLibroUsuario !== item.idLibroUsuario);
         this.mensajeInfo = 'Libro eliminado de tu biblioteca.';
         this.eliminandoId = null;
       },
@@ -248,6 +257,10 @@ export class MiBibliotecaComponent implements OnInit {
         this.mensajeEdicion = '';
         this.guardandoEdicion = false;
         this.cerrarPopupEditar();
+
+        if (this.idUsuario) {
+          this.cargarTop5Puntuacion(this.idUsuario);
+        }
       },
       error: (err: HttpErrorResponse) => {
         console.error('[MiBiblioteca] editarLibroUsuario -> ERROR', {
@@ -276,6 +289,10 @@ export class MiBibliotecaComponent implements OnInit {
 
   toggleFiltrosBiblioteca(): void {
     this.mostrarFiltrosBiblioteca = !this.mostrarFiltrosBiblioteca;
+  }
+
+  toggleTop5(): void {
+    this.top5Expandido = !this.top5Expandido;
   }
 
   limpiarFiltrosBiblioteca(): void {
@@ -337,14 +354,14 @@ export class MiBibliotecaComponent implements OnInit {
   private cargarBiblioteca(idUsuario: number): void {
     this.cargando = true;
     this.error = '';
-    this.objectUrls.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
-    this.objectUrls.length = 0;
+    this.objectUrlsBiblioteca.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
+    this.objectUrlsBiblioteca.length = 0;
 
     this.bibliotecaService.obtenerBiblioteca(idUsuario).subscribe({
       next: (data: LibroUsuarioDto[]) => {
         const respuesta = Array.isArray(data) ? data : [];
         this.librosUsuario = respuesta.map(item => this.mapearLibroUsuario(item));
-        this.librosUsuario.forEach(item => this.cargarPortadaSegura(item));
+        this.librosUsuario.forEach(item => this.cargarPortadaSegura(item, this.objectUrlsBiblioteca));
         this.completarDatosLibrosFaltantes();
         this.cargando = false;
       },
@@ -405,7 +422,7 @@ export class MiBibliotecaComponent implements OnInit {
       next: (nuevo: LibroUsuarioDto) => {
         const mapeado = this.mapearLibroUsuario(nuevo);
         this.librosUsuario = [mapeado, ...this.librosUsuario];
-        this.cargarPortadaSegura(mapeado);
+        this.cargarPortadaSegura(mapeado, this.objectUrlsBiblioteca);
         this.mensajeInfo = `Libro "${item.titulo}" anadido a tu biblioteca.`;
         this.anadiendoLibroId = null;
       },
@@ -521,6 +538,27 @@ export class MiBibliotecaComponent implements OnInit {
     };
   }
 
+  private cargarTop5Puntuacion(idUsuario: number): void {
+    this.cargandoTop5 = true;
+    this.errorTop5 = '';
+    this.top5Puntuacion = [];
+    this.objectUrlsTop5.forEach(url => this.librosService.liberarObjectUrl(url, this.portadaDefault));
+    this.objectUrlsTop5.length = 0;
+
+    this.bibliotecaService.obtenerTop5Puntuacion(idUsuario).subscribe({
+      next: (data: LibroUsuarioDto[]) => {
+        const respuesta = Array.isArray(data) ? data : [];
+        this.top5Puntuacion = respuesta.map(item => this.mapearLibroUsuario(item));
+        this.top5Puntuacion.forEach(item => this.cargarPortadaSegura(item, this.objectUrlsTop5));
+        this.cargandoTop5 = false;
+      },
+      error: (err: HttpErrorResponse) => {
+        this.errorTop5 = this.construirMensajeErrorTop5(err);
+        this.cargandoTop5 = false;
+      }
+    });
+  }
+
   private formatearFecha(fecha: string | null): string {
     if (!fecha) {
       return 'Sin fecha';
@@ -609,18 +647,48 @@ export class MiBibliotecaComponent implements OnInit {
         resultado.item.autor = (libro.autor ?? resultado.item.autor).toString();
         resultado.item.genero = (libro.genero ?? resultado.item.genero).toString();
         resultado.item.portada = this.librosService.resolverPortada(libro.portada, this.portadaDefault);
-        this.cargarPortadaSegura(resultado.item);
+        this.cargarPortadaSegura(resultado.item, this.objectUrlsBiblioteca);
       });
     });
   }
 
-  private cargarPortadaSegura(item: LibroUsuarioVista): void {
+  private cargarPortadaSegura(item: LibroUsuarioVista, bucket: string[]): void {
     this.librosService.obtenerPortadaSegura(item.portada, this.portadaDefault).subscribe(url => {
       if (url.startsWith('blob:')) {
-        this.objectUrls.push(url);
+        bucket.push(url);
       }
       item.portada = url;
     });
+  }
+
+  private construirMensajeErrorTop5(err: HttpErrorResponse): string {
+    if (err.status === 200 && err.ok === false) {
+      return 'El servidor devolvio una respuesta invalida al cargar el top 5 (JSON no parseable).';
+    }
+
+    const detalle = this.extraerDetalleError(err.error);
+
+    if (err.status === 403) {
+      return detalle
+        ? `No tienes permisos para cargar tu top 5: ${detalle}`
+        : 'No tienes permisos para cargar tu top 5 (403).';
+    }
+
+    if (err.status === 404) {
+      return detalle
+        ? `No se encontro el endpoint de top 5: ${detalle}`
+        : 'No se encontro el endpoint de top 5 (404).';
+    }
+
+    if (err.status >= 500) {
+      return detalle
+        ? `Error interno del servidor al cargar el top 5: ${detalle}`
+        : 'Error interno del servidor al cargar el top 5 (500).';
+    }
+
+    return detalle
+      ? `No se pudo cargar el top 5 (${err.status || 'sin codigo'}): ${detalle}`
+      : `No se pudo cargar el top 5 (${err.status || 'sin codigo'}).`;
   }
 
   private cargarCatalogoCompleto(): void {

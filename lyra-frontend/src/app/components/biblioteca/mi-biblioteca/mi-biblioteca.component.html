@@ -98,6 +98,61 @@
   <p *ngIf="mensajeInfo && !error" class="estado estado-info">{{ mensajeInfo }}</p>
   <p *ngIf="error" class="estado estado-error">{{ error }}</p>
 
+  <section class="top5-panel" *ngIf="!cargando && !error" aria-label="Top 5 por puntuacion">
+    <header class="top5-header">
+      <div class="top5-header-texto">
+        <h3>Top 5 por puntuacion</h3>
+        <p>Los libros mejor puntuados de tu biblioteca.</p>
+      </div>
+
+      <button
+        type="button"
+        class="btn-header btn-top5-toggle"
+        (click)="toggleTop5()"
+        [attr.aria-expanded]="top5Expandido"
+        aria-label="Mostrar u ocultar top 5 por puntuacion"
+      >
+        {{ top5Expandido ? 'Ocultar' : 'Mostrar' }}
+      </button>
+    </header>
+
+    <ng-container *ngIf="top5Expandido">
+      <p *ngIf="cargandoTop5" class="estado">Cargando top 5...</p>
+      <p *ngIf="!cargandoTop5 && errorTop5" class="estado estado-error">{{ errorTop5 }}</p>
+      <p *ngIf="!cargandoTop5 && !errorTop5 && top5Puntuacion.length === 0" class="estado">
+        Todavia no tienes libros puntuados.
+      </p>
+
+      <div class="lista-libros" *ngIf="!cargandoTop5 && !errorTop5 && top5Puntuacion.length > 0">
+        <article class="card-libro-usuario" *ngFor="let item of top5Puntuacion; trackBy: trackByLibroUsuario">
+          <img [src]="item.portada" [alt]="item.titulo" class="portada" />
+
+          <div class="contenido">
+            <h3>{{ item.titulo }}</h3>
+            <p><strong>Autor:</strong> {{ item.autor }}</p>
+            <div class="valoracion-editable">
+              <strong>Puntuacion:</strong>
+              <div class="estrellas" aria-label="Valoracion top 5">
+                <span
+                  *ngFor="let estrella of estrellasDisponibles"
+                  class="estrella-btn estrella-lectura"
+                  [class.activa]="estrella <= obtenerEstrellasSeleccionadas(item)"
+                >
+                  ★
+                </span>
+              </div>
+              <span class="valor-num">{{ item.puntuacion ?? 0 }}/5</span>
+            </div>
+
+            <div class="acciones-card">
+              <button type="button" class="btn-accion btn-ver" (click)="irDetalleLibro(item)">Ver</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </ng-container>
+  </section>
+
   <div class="lista-libros" *ngIf="!cargando && !error">
     <article class="card-libro-usuario" *ngFor="let item of librosUsuarioFiltrados; trackBy: trackByLibroUsuario">
       <img [src]="item.portada" [alt]="item.titulo" class="portada" />

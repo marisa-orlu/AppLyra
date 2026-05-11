@@ -106,6 +106,9 @@ public class LibroUsuarioController {
         libroUsuarioService.eliminarPorUsuarioYLibro(idUsuario, idLibro);
         return ResponseEntity.noContent().build();
     }
-
+    @GetMapping("/{id}/libros/top5-puntuacion")
+    public List<LibroUsuarioTop5Dto> top5Puntuacion(@PathVariable("id") Long idUsuario) {
+        return libroUsuarioService.top5ByUsuario(idUsuario);
+    }
 }
 

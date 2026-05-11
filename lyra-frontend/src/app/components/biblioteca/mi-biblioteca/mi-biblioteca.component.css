@@ -150,6 +150,47 @@
   color: #b21f3a;
 }
 
+.top5-panel {
+  margin: 0.2rem 1.4rem 0.9rem;
+  padding: 0.9rem;
+  border: 1px solid #d8dbe3;
+  border-radius: 12px;
+  background: #fbfcff;
+  box-shadow: 0 6px 18px rgba(30, 41, 59, 0.08);
+}
+
+.top5-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+.top5-header-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.top5-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #2b3240;
+}
+
+.top5-header p {
+  margin: 0;
+  color: #4b5568;
+  font-size: 0.88rem;
+}
+
+.btn-top5-toggle {
+  height: 34px;
+  padding: 0 0.75rem;
+  font-size: 0.85rem;
+}
+
 .lista-libros {
   padding: 0 1.4rem;
   display: grid;
