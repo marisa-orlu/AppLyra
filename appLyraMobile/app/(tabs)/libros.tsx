@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8e7f0',
-    paddingTop: Platform.select({ ios: 60, default: 24 }),
+    paddingTop: Platform.select({ ios: 84, default: 40 }),
     paddingHorizontal: 16,
   },
   headerCard: {

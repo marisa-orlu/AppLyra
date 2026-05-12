@@ -2,17 +2,17 @@ import { Image } from 'expo-image';
 import * as SecureStore from 'expo-secure-store';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  FlatList,
-  Modal,
-  Platform,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Modal,
+    Platform,
+    Pressable,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 import { API_URL, getBibliotecaUsuario, getLibroById, getStoredUserId, toPublicImageUrl, type BibliotecaItem } from '@/services/api';
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8e7f0',
-    paddingTop: Platform.select({ ios: 60, default: 24 }),
+    paddingTop: Platform.select({ ios: 84, default: 40 }),
     paddingHorizontal: 16,
   },
   headerCard: {

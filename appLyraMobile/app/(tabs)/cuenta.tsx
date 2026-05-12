@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { API_URL, getStoredUserId, getUsuarioById, toPublicImageUrl, type UsuarioDTO } from '@/services/api';
 
@@ -41,7 +41,7 @@ export default function CuentaScreen() {
   const [user, setUser] = useState<UsuarioDTO | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
 
-  const onLogout = useCallback(async () => {
+  const doLogout = useCallback(async () => {
     try {
       await Promise.all([
         SecureStore.deleteItemAsync('token'),
@@ -55,6 +55,18 @@ export default function CuentaScreen() {
       router.replace('/login' as any);
     }
   }, [router]);
+
+  const onLogout = useCallback(() => {
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Seguro que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Cerrar sesión', style: 'destructive', onPress: () => doLogout() },
+      ],
+      { cancelable: true }
+    );
+  }, [doLogout]);
 
   useEffect(() => {
     let mounted = true;
@@ -189,7 +201,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8e7f0',
-    paddingTop: Platform.select({ ios: 60, default: 24 }),
+    paddingTop: Platform.select({ ios: 84, default: 40 }),
     paddingHorizontal: 16,
   },
   headerCard: {

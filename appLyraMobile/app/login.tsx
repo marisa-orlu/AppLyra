@@ -46,7 +46,7 @@ export default function Login() {
   const onSubmit = async () => {
     setErrorMessage('');
     if (!email || !contrasena) {
-      setErrorMessage('Ambos campos son obligatorios');
+      setErrorMessage('Necesario rellenar los datos');
       return;
     }
 
@@ -204,6 +204,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
     textAlign: 'center',
+    width: '100%',
+    paddingHorizontal: 8,
+    flexShrink: 1,
   },
   btnPrimary: {
     width: '100%',
