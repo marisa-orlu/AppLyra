@@ -29,6 +29,7 @@ export default function HomeScreen() {
       <View style={styles.grid}>
         <Card title="Libros" onPress={() => router.push('/(tabs)/libros' as any)} />
         <Card title="Mi biblioteca" onPress={() => router.push('/(tabs)/biblioteca' as any)} />
+        <Card title="Cuenta" onPress={() => router.push('/(tabs)/cuenta' as any)} />
       </View>
     </View>
   );
