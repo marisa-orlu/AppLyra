@@ -1,19 +1,29 @@
 import { Image } from 'expo-image';
 import * as SecureStore from 'expo-secure-store';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    Platform,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  Platform,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
-import { getBibliotecaUsuario, getStoredUserId, toPublicImageUrl, type BibliotecaItem } from '@/services/api';
+import { API_URL, getBibliotecaUsuario, getLibroById, getStoredUserId, toPublicImageUrl, type BibliotecaItem } from '@/services/api';
+
+const API_ORIGIN = (() => {
+  try {
+    return new URL(API_URL).origin;
+  } catch {
+    return String(API_URL).replace(/\/$/, '');
+  }
+})();
 
 function toDateLabel(value: unknown): string {
   if (typeof value === 'number') {
@@ -106,6 +116,7 @@ function getLibroFromItem(item: BibliotecaItem): Record<string, unknown> {
     anyItem['detalleLibro'],
     anyItem['libroDetalle'],
     anyItem['libroInfo'],
+    anyItem['datosLibro'],
   ];
 
   for (const c of candidates) {
@@ -115,7 +126,32 @@ function getLibroFromItem(item: BibliotecaItem): Record<string, unknown> {
   return anyItem;
 }
 
-function CoverImage({ uri }: { uri: string }) {
+function getLibroIdFromBibliotecaItem(item: BibliotecaItem): string | number | null {
+  const anyItem = item as unknown as Record<string, unknown>;
+  const libro = getLibroFromItem(item);
+
+  const candidates: unknown[] = [
+    anyItem['idLibro'],
+    anyItem['libroId'],
+    anyItem['id_libro'],
+    anyItem['idLibroUsuario'],
+    (libro as any)?.id,
+    (libro as any)?.idLibro,
+    (libro as any)?.libroId,
+  ];
+
+  for (const c of candidates) {
+    if (typeof c === 'number' && Number.isFinite(c) && c > 0) return c;
+    if (typeof c === 'string') {
+      const n = Number(c);
+      if (Number.isFinite(n) && n > 0) return c;
+    }
+  }
+
+  return null;
+}
+
+function CoverImage({ uri, authToken }: { uri: string; authToken: string | null }) {
   const [failed, setFailed] = useState(false);
 
   if (!uri || failed) {
@@ -130,10 +166,17 @@ function CoverImage({ uri }: { uri: string }) {
 
   return (
     <Image
-      source={{ uri }}
+      source={
+        authToken && uri.startsWith(API_ORIGIN)
+          ? { uri, headers: { Authorization: `Bearer ${authToken}` } }
+          : { uri }
+      }
       style={styles.cover}
       contentFit="cover"
-      onError={() => setFailed(true)}
+      onError={(e) => {
+        console.warn('Error cargando portada (biblioteca):', uri, (e as any)?.error ?? '');
+        setFailed(true);
+      }}
     />
   );
 }
@@ -156,11 +199,49 @@ export default function BibliotecaScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const listRef = useRef<FlatList<BibliotecaItem>>(null);
+  const [showToTop, setShowToTop] = useState(false);
+
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
   const [fTitulo, setFTitulo] = useState('');
   const [fAutor, setFAutor] = useState('');
   const [fCategoria, setFCategoria] = useState('');
   const [fEstado, setFEstado] = useState('');
   const [fPuntuacion, setFPuntuacion] = useState('');
+
+  const [ratingPickerOpen, setRatingPickerOpen] = useState(false);
+
+  const ratingOptions = useMemo(() => {
+    const stars = (n: number) => Array.from({ length: n }).map(() => '★').join(' ');
+    return [
+      { value: '', label: 'Todas' },
+      { value: '1', label: `${stars(1)}  (1 estrella)` },
+      { value: '2', label: `${stars(2)}  (2 estrellas)` },
+      { value: '3', label: `${stars(3)}  (3 estrellas)` },
+      { value: '4', label: `${stars(4)}  (4 estrellas)` },
+      { value: '5', label: `${stars(5)}  (5 estrellas)` },
+    ];
+  }, []);
+
+  const selectedRatingLabel = useMemo(() => {
+    return ratingOptions.find((o) => o.value === fPuntuacion)?.label ?? 'Todas';
+  }, [fPuntuacion, ratingOptions]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const t = await SecureStore.getItemAsync('token');
+        if (mounted) setAuthToken(t ?? null);
+      } catch {
+        if (mounted) setAuthToken(null);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const load = useCallback(async () => {
     setError(null);
@@ -190,7 +271,30 @@ export default function BibliotecaScreen() {
     }
 
     const data = await getBibliotecaUsuario(userId);
-    setItems(Array.isArray(data) ? data : []);
+    const rawItems = Array.isArray(data) ? data : [];
+
+    // Si el backend no devuelve autor/género en el DTO de biblioteca,
+    const enriched = await Promise.all(
+      rawItems.map(async (it) => {
+        const libro = getLibroFromItem(it);
+        const autor = toDisplayText(pickFirst(libro, ['autor', 'autores', 'authors', 'author', 'autorDTO', 'autorDto', 'autoresDTO', 'autoresDto'])).trim();
+        const genero = toDisplayText(pickFirst(libro, ['genero', 'categoria', 'genre', 'category', 'generos', 'generosDTO', 'generosDto'])).trim();
+        if (autor && genero) return it;
+
+        const libroId = getLibroIdFromBibliotecaItem(it);
+        if (!libroId) return it;
+
+        try {
+          const full = await getLibroById(libroId);
+          const existingLibro = (it as any)?.libro && typeof (it as any).libro === 'object' ? (it as any).libro : {};
+          return { ...it, libro: { ...existingLibro, ...full } };
+        } catch {
+          return it;
+        }
+      })
+    );
+
+    setItems(enriched);
 
     if (Array.isArray(data) && data.length > 0) {
       // Útil para ver el shape real del DTO en el log
@@ -285,6 +389,16 @@ export default function BibliotecaScreen() {
     setFPuntuacion('');
   }, []);
 
+  const onScroll = useCallback((e: any) => {
+    const offsetY = e?.nativeEvent?.contentOffset?.y ?? 0;
+    const shouldShow = offsetY > 350;
+    setShowToTop((prev) => (prev === shouldShow ? prev : shouldShow));
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerCard}>
@@ -304,10 +418,13 @@ export default function BibliotecaScreen() {
         </View>
       ) : (
         <FlatList
+          ref={listRef}
           data={filteredItems}
           keyExtractor={(item, index) => String(item.id ?? item.idLibroUsuario ?? index)}
           contentContainerStyle={styles.listContent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
           ListHeaderComponent={
             <View style={styles.filtersCard}>
               <View style={styles.filtersRow}>
@@ -359,14 +476,16 @@ export default function BibliotecaScreen() {
               <View style={styles.filtersRow}>
                 <View style={styles.field}>
                   <Text style={styles.fieldLabel}>Puntuación</Text>
-                  <TextInput
-                    value={fPuntuacion}
-                    onChangeText={setFPuntuacion}
-                    placeholder="Todas"
-                    placeholderTextColor="#8c8c8c"
-                    keyboardType="decimal-pad"
-                    style={styles.input}
-                  />
+                  <TouchableOpacity
+                    style={styles.select}
+                    activeOpacity={0.85}
+                    onPress={() => setRatingPickerOpen(true)}
+                  >
+                    <Text style={[styles.selectText, !fPuntuacion ? styles.placeholderText : null]} numberOfLines={1}>
+                      {selectedRatingLabel}
+                    </Text>
+                    <Text style={styles.selectCaret}>▾</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.field} />
               </View>
@@ -390,8 +509,34 @@ export default function BibliotecaScreen() {
             const anyItem = item as unknown as Record<string, unknown>;
 
             const titulo = toDisplayOrDash(pickFirst(libro, ['titulo', 'nombre', 'title']) ?? anyItem['titulo']);
-            const autor = toDisplayOrDash(pickFirst(libro, ['autor', 'autores', 'authors', 'author']) ?? anyItem['autor']);
-            const genero = toDisplayOrDash(pickFirst(libro, ['genero', 'categoria', 'genre', 'category']) ?? anyItem['genero']);
+            const autor = toDisplayOrDash(
+              pickFirst(libro, [
+                'autor',
+                'autores',
+                'authors',
+                'author',
+                'autorDTO',
+                'autorDto',
+                'autoresDTO',
+                'autoresDto',
+                'listaAutores',
+                'nombreAutor',
+              ]) ?? anyItem['autor']
+            );
+            const genero = toDisplayOrDash(
+              pickFirst(libro, [
+                'genero',
+                'categoria',
+                'genre',
+                'category',
+                'generos',
+                'generosDTO',
+                'generosDto',
+                'listaGeneros',
+                'nombreGenero',
+                'nombreCategoria',
+              ]) ?? anyItem['genero']
+            );
 
             const estado = toEstadoLabel(item.estado);
             const fecha = toDateLabel(item.fecha_agregacion ?? (item as any)['fechaAgregacion'] ?? (anyItem as any)['fechaAgregacion']);
@@ -410,7 +555,7 @@ export default function BibliotecaScreen() {
               <View style={styles.card}>
                 <View style={styles.cardTop}>
                   <View style={styles.coverWrap}>
-                    <CoverImage uri={coverUri} />
+                    <CoverImage uri={coverUri} authToken={authToken} />
                   </View>
 
                   <View style={styles.meta}>
@@ -449,6 +594,41 @@ export default function BibliotecaScreen() {
           }}
         />
       )}
+
+      <Modal
+        visible={ratingPickerOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRatingPickerOpen(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setRatingPickerOpen(false)}>
+          <Pressable style={styles.modalCard} onPress={() => {}}>
+            <Text style={styles.modalTitle}>Filtrar por puntuación</Text>
+            {ratingOptions.map((opt) => {
+              const active = opt.value === fPuntuacion;
+              return (
+                <TouchableOpacity
+                  key={opt.value || 'all'}
+                  style={[styles.modalOption, active ? styles.modalOptionActive : null]}
+                  activeOpacity={0.85}
+                  onPress={() => {
+                    setFPuntuacion(opt.value);
+                    setRatingPickerOpen(false);
+                  }}
+                >
+                  <Text style={[styles.modalOptionText, active ? styles.modalOptionTextActive : null]}>{opt.label}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {showToTop ? (
+        <TouchableOpacity style={styles.toTopBtn} onPress={scrollToTop} activeOpacity={0.85}>
+          <Text style={styles.toTopBtnText}>↑</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 }
@@ -456,7 +636,7 @@ export default function BibliotecaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3d7e6',
+    backgroundColor: '#f8e7f0',
     paddingTop: Platform.select({ ios: 60, default: 24 }),
     paddingHorizontal: 16,
   },
@@ -509,6 +689,69 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     color: '#11181C',
+  },
+  placeholderText: {
+    color: '#8c8c8c',
+  },
+  select: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#c7b7d6',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  selectText: {
+    flex: 1,
+    color: '#11181C',
+    paddingRight: 8,
+  },
+  selectCaret: {
+    color: '#7a6a86',
+    fontWeight: '900',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    padding: 18,
+    justifyContent: 'center',
+  },
+  modalCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#c7b7d6',
+  },
+  modalTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#11181C',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalOption: {
+    borderWidth: 1,
+    borderColor: '#c7b7d6',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 8,
+    backgroundColor: '#ffffff',
+  },
+  modalOptionActive: {
+    backgroundColor: '#f8e7f0',
+  },
+  modalOptionText: {
+    color: '#11181C',
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  modalOptionTextActive: {
+    color: '#7a6a86',
   },
   filtersActions: {
     alignItems: 'flex-end',
@@ -605,5 +848,24 @@ const styles = StyleSheet.create({
   starsSuffix: {
     color: '#2d2d2d',
     fontSize: 12,
+  },
+  toTopBtn: {
+    position: 'absolute',
+    right: 18,
+    bottom: 18,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#e5b6ce',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#c7b7d6',
+  },
+  toTopBtnText: {
+    color: '#ffffff',
+    fontSize: 22,
+    fontWeight: '900',
+    lineHeight: 24,
   },
 });

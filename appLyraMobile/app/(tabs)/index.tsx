@@ -37,7 +37,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3d7e6',
+    backgroundColor: '#f8e7f0',
     paddingTop: Platform.select({ ios: 60, default: 24 }),
     paddingHorizontal: 16,
   },
@@ -46,8 +46,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   logo: {
-    width: 180,
-    height: 70,
+    width: '92%',
+    maxWidth: 360,
+    height: 130,
   },
   banner: {
     backgroundColor: '#e5b6ce',

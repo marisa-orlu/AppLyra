@@ -96,7 +96,7 @@ export default function Login() {
         await SecureStore.setItemAsync('role', String(role));
       }
 
-      ToastAndroid.show('Te has logeado bien', ToastAndroid.SHORT);
+      ToastAndroid.show('Inicio de sesión realizado', ToastAndroid.SHORT);
 
       // Navegar a pestañas
       router.replace('/(tabs)' as any);
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#f3d7e6',
+    backgroundColor: '#f8e7f0',
   },
   card: {
     width: '100%',
@@ -175,8 +175,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 260,
-    height: 100,
+    width: 320,
+    height: 125,
     marginBottom: 28,
   },
   title: {

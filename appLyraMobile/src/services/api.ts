@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 
 export const API_URL = 'http://172.30.50.59:8080';
 
+
 function toText(value: unknown): string {
   if (typeof value === 'string') return value;
   if (typeof value === 'number') return String(value);
@@ -16,19 +17,34 @@ function apiOrigin(): string {
   }
 }
 
-/**
- * Normaliza una ruta/URL de imagen del backend para que sea accesible desde el móvil.
- * Casos típicos:
- * - URL absoluta con localhost -> se reemplaza por el origin de API_URL
- * - Ruta relativa /uploads/... -> se prefija con API_URL
- * - Ruta tipo Windows C:\\...\\uploads\\... -> se convierte a /uploads/...
- * - Valor tipo uploads/archivo.jpg o solo archivo.jpg -> se asume bajo /uploads/
- */
+function encodePossiblyUnsafeUrl(input: string): string {
+  const raw = (input ?? '').trim();
+  if (!raw) return '';
+  try {
+    return new URL(raw).toString();
+  } catch {
+    // encodeURI arregla espacios y caracteres no permitidos sin romper los '/'
+    try {
+      return encodeURI(raw);
+    } catch {
+      return raw;
+    }
+  }
+}
+
 export function toPublicImageUrl(input: unknown): string {
   const raw = toText(input).trim();
   if (!raw) return '';
 
   const origin = apiOrigin();
+
+  // Casos típicos en tu back: el DTO viene como "portadas/archivo.jpg" pero el fichero
+  // realmente está en la carpeta "uploads".
+  // Reescribimos antes de procesar para evitar peticiones a rutas que no existen.
+  if (/^\/?portadas\//i.test(raw)) {
+    const rest = raw.replace(/^\/?portadas\//i, '');
+    return encodePossiblyUnsafeUrl(`${origin}/uploads/${rest.replace(/^\/+/, '')}`);
+  }
 
   // URL absoluta
   if (/^https?:\/\//i.test(raw)) {
@@ -36,18 +52,18 @@ export function toPublicImageUrl(input: unknown): string {
       const u = new URL(raw);
       const host = (u.hostname || '').toLowerCase();
       if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
-        return `${origin}${u.pathname}${u.search}`;
+        return encodePossiblyUnsafeUrl(`${origin}${u.pathname}${u.search}`);
       }
-      return u.toString();
+      return encodePossiblyUnsafeUrl(u.toString());
     } catch {
-      // si no parsea, se devuelve tal cual
-      return raw;
+      // si no parsea (p.ej. espacios), intentamos codificar
+      return encodePossiblyUnsafeUrl(raw);
     }
   }
 
   // Ruta relativa desde el root del backend
   if (raw.startsWith('/')) {
-    return `${origin}${raw}`;
+    return encodePossiblyUnsafeUrl(`${origin}${raw}`);
   }
 
   // Normaliza separadores y detecta subpath a partir de /uploads/
@@ -56,21 +72,29 @@ export function toPublicImageUrl(input: unknown): string {
   const idx = normalized.toLowerCase().lastIndexOf(uploadsMarker);
   if (idx >= 0) {
     const subPath = normalized.slice(idx);
-    return `${origin}${subPath.startsWith('/') ? '' : '/'}${subPath}`;
+    return encodePossiblyUnsafeUrl(`${origin}${subPath.startsWith('/') ? '' : '/'}${subPath}`);
   }
 
   // Empieza por uploads/... (sin / inicial)
   if (/^uploads\//i.test(normalized)) {
-    return `${origin}/${normalized}`;
+    return encodePossiblyUnsafeUrl(`${origin}/${normalized}`);
+  }
+
+  // Otras rutas relativas con subcarpetas (p.ej. "images/..", "portadas/..")
+  // Si tiene '/' y no parece una ruta de Windows, asumimos que es relativa al root del backend.
+  if (normalized.includes('/') && !/^[a-zA-Z]:\//.test(normalized)) {
+    return encodePossiblyUnsafeUrl(`${origin}/${normalized.replace(/^\/+/, '')}`);
   }
 
   // Parece un nombre de fichero, lo asumimos en /uploads/
-  if (/\.(png|jpe?g|webp|gif|bmp|avif)$/i.test(normalized)) {
-    return `${origin}/uploads/${normalized.replace(/^\/+/, '')}`;
+  // Nota: soporta .jfif y nombres con query/hash.
+  const normalizedNoQuery = normalized.split(/[?#]/, 1)[0];
+  if (/\.(png|jpe?g|jfif|webp|gif|bmp|avif)$/i.test(normalizedNoQuery)) {
+    return encodePossiblyUnsafeUrl(`${origin}/uploads/${normalized.replace(/^\/+/, '')}`);
   }
 
   // Último recurso: devolver tal cual
-  return raw;
+  return encodePossiblyUnsafeUrl(raw);
 }
 
 export type BibliotecaItem = Record<string, unknown> & {
@@ -93,6 +117,17 @@ export type LibroDTO = Record<string, unknown> & {
   imagen?: string;
   urlImagen?: string;
   cover?: string;
+};
+
+export type UsuarioDTO = Record<string, unknown> & {
+  id?: number;
+  nombre?: string;
+  email?: string;
+  biografia?: string;
+  fotoPerfil?: string;
+  fechaRegistro?: string;
+  fecha_registro?: string;
+  rol?: string;
 };
 
 export type PageResponse<T> = {
@@ -264,4 +299,17 @@ export async function getLibros(page = 0, size = 50): Promise<PageResponse<Libro
   });
 }
 
-export default { login, getBibliotecaUsuario, getLibros };
+export async function getLibroById(idLibro: string | number): Promise<LibroDTO> {
+  return await apiFetchJson<LibroDTO>(`/libros/${idLibro}`, {
+    method: 'GET',
+  });
+}
+
+
+export async function getUsuarioById(idUsuario: string | number): Promise<UsuarioDTO> {
+  return await apiFetchJson<UsuarioDTO>(`/usuarios/${idUsuario}`,
+    {
+      method: 'GET',
+    });
+}
+export default { login, getBibliotecaUsuario, getLibros, getLibroById, getUsuarioById };

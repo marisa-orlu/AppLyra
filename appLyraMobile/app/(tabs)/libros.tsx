@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import * as SecureStore from 'expo-secure-store';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,11 +13,35 @@ import {
   View,
 } from 'react-native';
 
-import { getLibros, toPublicImageUrl, type LibroDTO } from '@/services/api';
+import { API_URL, getLibros, toPublicImageUrl, type LibroDTO } from '@/services/api';
+
+const API_ORIGIN = (() => {
+  try {
+    return new URL(API_URL).origin;
+  } catch {
+    return String(API_URL).replace(/\/$/, '');
+  }
+})();
 
 function toText(value: unknown): string {
   if (typeof value === 'string') return value;
   if (typeof value === 'number') return String(value);
+  if (value && typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const candidate =
+      obj['url'] ??
+      obj['uri'] ??
+      obj['path'] ??
+      obj['filename'] ??
+      obj['name'] ??
+      obj['portada'] ??
+      obj['imagen'] ??
+      obj['urlImagen'] ??
+      obj['imageUrl'] ??
+      obj['cover'] ??
+      obj['src'];
+    return toText(candidate);
+  }
   return '';
 }
 
@@ -28,14 +53,49 @@ function pickCover(libro: LibroDTO): string {
     toText((libro as any).portadaUrl) ||
     toText((libro as any).imagenUrl) ||
     toText((libro as any).cover) ||
+    toText((libro as any).imageUrl) ||
     '';
   return toPublicImageUrl(raw);
 }
 
-function CoverImage({ uri }: { uri: string }) {
+function CoverImage({ uri, authToken }: { uri: string; authToken: string | null }) {
+  const [currentUri, setCurrentUri] = useState(uri);
+  const [attempt, setAttempt] = useState(0);
   const [failed, setFailed] = useState(false);
 
-  if (!uri || failed) {
+  useEffect(() => {
+    setCurrentUri(uri);
+    setAttempt(0);
+    setFailed(false);
+  }, [uri]);
+
+  const computeFallbackUri = useCallback((u: string, nextAttempt: number): string | null => {
+    if (!u) return null;
+    if (!u.startsWith(API_ORIGIN)) return null;
+
+    // Caso típico: backend devuelve /portadas/.. pero realmente sirve en /uploads/..
+    if (u.includes('/portadas/')) {
+      const file = u.split('/portadas/')[1];
+      if (!file) return null;
+      if (nextAttempt === 1) return `${API_ORIGIN}/uploads/${file}`;
+      if (nextAttempt === 2) return `${API_ORIGIN}/uploads/portadas/${file}`;
+    }
+
+    // Último intento: si no lleva /uploads/ pero es del backend, prueba a meterlo en /uploads/
+    if (nextAttempt === 1 && !u.includes('/uploads/')) {
+      try {
+        const parsed = new URL(u);
+        const file = parsed.pathname.split('/').filter(Boolean).pop();
+        if (file) return `${API_ORIGIN}/uploads/${file}`;
+      } catch {
+        return null;
+      }
+    }
+
+    return null;
+  }, []);
+
+  if (!currentUri || failed) {
     return (
       <Image
         source={require('@/assets/images/partial-react-logo.png')}
@@ -47,10 +107,26 @@ function CoverImage({ uri }: { uri: string }) {
 
   return (
     <Image
-      source={{ uri }}
+      source={
+        authToken && currentUri.startsWith(API_ORIGIN)
+          ? { uri: currentUri, headers: { Authorization: `Bearer ${authToken}` } }
+          : { uri: currentUri }
+      }
       style={styles.cover}
       contentFit="cover"
-      onError={() => setFailed(true)}
+      onError={(e) => {
+        const nextAttempt = attempt + 1;
+        const fallback = computeFallbackUri(currentUri, nextAttempt);
+        console.warn('Error cargando portada:', currentUri, (e as any)?.error ?? '');
+
+        if (fallback && fallback !== currentUri && nextAttempt <= 2) {
+          setAttempt(nextAttempt);
+          setCurrentUri(fallback);
+          return;
+        }
+
+        setFailed(true);
+      }}
     />
   );
 }
@@ -73,27 +149,63 @@ export default function LibrosScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const listRef = useRef<FlatList<LibroDTO>>(null);
+  const [showToTop, setShowToTop] = useState(false);
+
+  const PAGE_SIZE = 50;
+  const [pageIndex, setPageIndex] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
   const [fTitulo, setFTitulo] = useState('');
   const [fAutor, setFAutor] = useState('');
   const [fAnio, setFAnio] = useState('');
   const [fCategoria, setFCategoria] = useState('');
 
-  const load = useCallback(async () => {
-    setError(null);
-    const page = await getLibros(0, 50);
-    setItems(Array.isArray(page?.content) ? page.content : []);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const t = await SecureStore.getItemAsync('token');
+        if (mounted) setAuthToken(t ?? null);
+      } catch {
+        if (mounted) setAuthToken(null);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-    if (Array.isArray(page?.content) && page.content.length > 0) {
-      console.log('Libros ejemplo item:', page.content[0]);
+  const loadPage = useCallback(async (nextPageIndex: number, mode: 'replace' | 'append') => {
+    setError(null);
+    const page = await getLibros(nextPageIndex, PAGE_SIZE);
+    const content = Array.isArray(page?.content) ? page.content : [];
+
+    setItems((prev) => (mode === 'append' ? [...prev, ...content] : content));
+    setPageIndex(nextPageIndex);
+
+    const totalPages = typeof page?.totalPages === 'number' ? page.totalPages : null;
+    const nextHasMore = totalPages != null ? nextPageIndex + 1 < totalPages : content.length === PAGE_SIZE;
+    setHasMore(nextHasMore);
+
+    if (content.length > 0 && nextPageIndex === 0) {
+      console.log('Libros ejemplo item:', content[0]);
     }
   }, []);
+
+  const loadFirst = useCallback(async () => {
+    await loadPage(0, 'replace');
+  }, [loadPage]);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        await load();
+        await loadFirst();
       } catch (e: any) {
         if (!mounted) return;
         setError(e?.message ?? 'No se pudieron cargar los libros');
@@ -106,18 +218,42 @@ export default function LibrosScreen() {
     return () => {
       mounted = false;
     };
-  }, [load]);
+  }, [loadFirst]);
 
   const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-      await load();
+      await loadFirst();
     } catch (e: any) {
       setError(e?.message ?? 'No se pudo actualizar');
     } finally {
       setRefreshing(false);
     }
-  }, [load]);
+  }, [loadFirst]);
+
+  const onEndReached = useCallback(async () => {
+    if (loading || refreshing || loadingMore) return;
+    if (!hasMore) return;
+
+    try {
+      setLoadingMore(true);
+      await loadPage(pageIndex + 1, 'append');
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudieron cargar más libros');
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasMore, loadPage, loading, loadingMore, pageIndex, refreshing]);
+
+  const onScroll = useCallback((e: any) => {
+    const offsetY = e?.nativeEvent?.contentOffset?.y ?? 0;
+    const shouldShow = offsetY > 350;
+    setShowToTop((prev) => (prev === shouldShow ? prev : shouldShow));
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
   const emptyLabel = useMemo(() => {
     if (loading || error) return '';
@@ -169,6 +305,7 @@ export default function LibrosScreen() {
     <View style={styles.container}>
       <View style={styles.headerCard}>
         <Text style={styles.headerTitle}>Libros</Text>
+        <Text style={styles.headerSubtitle}>Libros de AppLyra</Text>
       </View>
 
       {loading ? (
@@ -183,12 +320,17 @@ export default function LibrosScreen() {
         </View>
       ) : (
         <FlatList
+          ref={listRef}
           data={filteredItems}
           numColumns={2}
           keyExtractor={(item, index) => String(item.id ?? index)}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.listContent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.35}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
           ListHeaderComponent={
             <View style={styles.filtersCard}>
               <View style={styles.filtersRow}>
@@ -252,6 +394,14 @@ export default function LibrosScreen() {
               </View>
             ) : null
           }
+          ListFooterComponent={
+            loadingMore ? (
+              <View style={styles.footerLoading}>
+                <ActivityIndicator />
+                <Text style={styles.footerLoadingText}>Cargando más…</Text>
+              </View>
+            ) : null
+          }
           renderItem={({ item }) => {
             const titulo = toText(item.titulo || (item as any).nombre);
             const autor = toText(item.autor || (item as any).autores);
@@ -261,7 +411,7 @@ export default function LibrosScreen() {
             return (
               <View style={styles.card}>
                 <View style={styles.coverWrap}>
-                  <CoverImage uri={coverUri} />
+                  <CoverImage uri={coverUri} authToken={authToken} />
                 </View>
 
                 <Text style={styles.title} numberOfLines={2}>
@@ -280,6 +430,12 @@ export default function LibrosScreen() {
           }}
         />
       )}
+
+      {showToTop ? (
+        <TouchableOpacity style={styles.toTopBtn} onPress={scrollToTop} activeOpacity={0.85}>
+          <Text style={styles.toTopBtnText}>↑</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 }
@@ -287,7 +443,7 @@ export default function LibrosScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3d7e6',
+    backgroundColor: '#f8e7f0',
     paddingTop: Platform.select({ ios: 60, default: 24 }),
     paddingHorizontal: 16,
   },
@@ -302,6 +458,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#ffffff',
+    textAlign: 'center',
+  },
+  
+  headerSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#ffffff',
+    opacity: 0.95,
     textAlign: 'center',
   },
   filtersCard: {
@@ -352,6 +516,15 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 24,
+  },
+  footerLoading: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+  },
+  footerLoadingText: {
+    marginTop: 10,
+    color: '#2d2d2d',
   },
   row: {
     justifyContent: 'space-between',
@@ -415,5 +588,24 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: '700',
     color: '#11181C',
+  },
+  toTopBtn: {
+    position: 'absolute',
+    right: 18,
+    bottom: 18,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#e5b6ce',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#c7b7d6',
+  },
+  toTopBtnText: {
+    color: '#ffffff',
+    fontSize: 22,
+    fontWeight: '900',
+    lineHeight: 24,
   },
 });
