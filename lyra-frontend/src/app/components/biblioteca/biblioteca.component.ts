@@ -21,6 +21,7 @@ export class BibliotecaComponent {
     { titulo: 'Usuarios', ruta: '/usuarios', adminOnly: true },
     { titulo: 'Explorar', ruta: '/explorar' },
     { titulo: 'Amigos', ruta: '/amigos' },
+    { titulo: 'Préstamos', ruta: '/prestamos' },
     { titulo: 'Mi biblioteca', ruta: '/mi-biblioteca' },
     { titulo: 'Cuenta', ruta: '/cuenta' }
   ];
