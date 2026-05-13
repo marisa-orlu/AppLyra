@@ -7,22 +7,22 @@
 
   <div class="prestamos-selector">
     <label>
-      <input type="radio" name="vista" value="presto" [(ngModel)]="vista" checked />
+      <input type="radio" name="vista" value="presto" [(ngModel)]="vista" (ngModelChange)="onVistaChange($event)" />
       <span>Libros que presto</span>
     </label>
 
     <label>
-      <input type="radio" name="vista" value="solicito" [(ngModel)]="vista" />
+      <input type="radio" name="vista" value="solicito" [(ngModel)]="vista" (ngModelChange)="onVistaChange($event)" />
       <span>Libros que solicito</span>
     </label>
 
     <label>
-      <input type="radio" name="vista" value="aceptados" [(ngModel)]="vista" />
+      <input type="radio" name="vista" value="aceptados" [(ngModel)]="vista" (ngModelChange)="onVistaChange($event)" />
       <span>Aceptados</span>
     </label>
     
     <label>
-      <input type="radio" name="vista" value="devueltos" [(ngModel)]="vista" />
+      <input type="radio" name="vista" value="devueltos" [(ngModel)]="vista" (ngModelChange)="onVistaChange($event)" />
       <span>Devueltos</span>
     </label>
   </div>
@@ -33,14 +33,20 @@
   <section *ngIf="vista === 'presto' && !cargando" class="prestamos-lista">
     <h2>Solicitudes pendientes</h2>
 
-    <p *ngIf="prestamosComoDuenioPendientes?.length === 0" class="estado">No tienes solicitudes pendientes.</p>
+    <p *ngIf="prestamosComoDuenioPendientes.length === 0" class="estado">No tienes solicitudes pendientes.</p>
 
     <article *ngFor="let p of prestamosComoDuenioPendientes" class="prestamo-card">
       <div class="card-media">
-        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+        <img
+          [src]="p.libro.portada || portadaDefault"
+          [alt]="tituloLibro(p)"
+          class="portada"
+          [title]="p.libro.portada || portadaDefault"
+          (error)="onPortadaError($event)"
+        />
       </div>
-      <h3>{{ p.libro?.titulo_libro }}</h3>
-      <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
+      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
+      <p><strong>Solicitante:</strong> {{ nombreSolicitante(p) }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
       <div class="prestamo-actions">
         <button class="btn-accept" (click)="debugAceptar(p)">Aceptar préstamo</button>
@@ -50,14 +56,20 @@
 
     <h2 style="margin-top:1.2rem">Libros prestados</h2>
 
-    <p *ngIf="prestamosComoDuenioAceptados?.length === 0" class="estado">No tienes libros prestados actualmente.</p>
+    <p *ngIf="prestamosComoDuenioAceptados.length === 0" class="estado">No tienes libros prestados actualmente.</p>
 
     <article *ngFor="let p of prestamosComoDuenioAceptados" class="prestamo-card">
       <div class="card-media">
-        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+        <img
+          [src]="p.libro.portada || portadaDefault"
+          [alt]="tituloLibro(p)"
+          class="portada"
+          [title]="p.libro.portada || portadaDefault"
+          (error)="onPortadaError($event)"
+        />
       </div>
-      <h3>{{ p.libro?.titulo_libro }}</h3>
-      <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
+      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
+      <p><strong>Solicitante:</strong> {{ nombreSolicitante(p) }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
       <div class="prestamo-actions">
         <button *ngIf="(p.estado || '').toUpperCase() === 'PENDIENTE_DEVOLUCION'" class="btn-confirm" (click)="confirmarRecepcion(p)">Libro recibido</button>
@@ -71,14 +83,20 @@
   <section *ngIf="vista === 'solicito' && !cargando" class="prestamos-lista">
     <h2>Libros que solicito</h2>
 
-    <p *ngIf="prestamosComoSolicitante?.length === 0" class="estado">No has solicitado préstamos.</p>
+    <p *ngIf="prestamosComoSolicitante.length === 0" class="estado">No has solicitado préstamos.</p>
 
     <article *ngFor="let p of prestamosComoSolicitante" class="prestamo-card">
       <div class="card-media">
-        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+        <img
+          [src]="p.libro.portada || portadaDefault"
+          [alt]="tituloLibro(p)"
+          class="portada"
+          [title]="p.libro.portada || portadaDefault"
+          (error)="onPortadaError($event)"
+        />
       </div>
-      <h3>{{ p.libro?.titulo_libro }}</h3>
-      <p><strong>Dueño:</strong> {{ p.usuario?.nombre }}</p>
+      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
+      <p><strong>Dueño:</strong> {{ nombreDuenio(p) }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
     </article>
 
@@ -89,13 +107,19 @@
     <h2>Préstamos aceptados</h2>
 
     <h3>Me han aceptado (yo solicité)</h3>
-    <p *ngIf="prestamosComoSolicitanteAceptados?.length === 0" class="estado">No tienes préstamos aceptados como solicitante.</p>
+    <p *ngIf="prestamosComoSolicitanteAceptados.length === 0" class="estado">No tienes préstamos aceptados como solicitante.</p>
     <article *ngFor="let p of prestamosComoSolicitanteAceptados" class="prestamo-card">
       <div class="card-media">
-        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+        <img
+          [src]="p.libro.portada || portadaDefault"
+          [alt]="tituloLibro(p)"
+          class="portada"
+          [title]="p.libro.portada || portadaDefault"
+          (error)="onPortadaError($event)"
+        />
       </div>
-      <h3>{{ p.libro?.titulo_libro }}</h3>
-      <p><strong>Dueño:</strong> {{ p.usuario?.nombre }}</p>
+      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
+      <p><strong>Dueño:</strong> {{ nombreDuenio(p) }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
       <div class="prestamo-actions">
         <button *ngIf="(p.estado || '').toUpperCase() === 'ACEPTADO'" class="btn-return" (click)="debugDevolver(p)">Devolver libro</button>
@@ -104,13 +128,19 @@
     </article>
 
     <h3 style="margin-top:1rem">Yo acepté</h3>
-    <p *ngIf="prestamosComoDuenioAceptados?.length === 0" class="estado">No tienes préstamos que hayas aceptado.</p>
+    <p *ngIf="prestamosComoDuenioAceptados.length === 0" class="estado">No tienes préstamos que hayas aceptado.</p>
     <article *ngFor="let p of prestamosComoDuenioAceptados" class="prestamo-card">
       <div class="card-media">
-        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+        <img
+          [src]="p.libro.portada || portadaDefault"
+          [alt]="tituloLibro(p)"
+          class="portada"
+          [title]="p.libro.portada || portadaDefault"
+          (error)="onPortadaError($event)"
+        />
       </div>
-      <h3>{{ p.libro?.titulo_libro }}</h3>
-      <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
+      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
+      <p><strong>Solicitante:</strong> {{ nombreSolicitante(p) }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
       <div class="prestamo-actions">
         <button *ngIf="(p.estado || '').toUpperCase() === 'PENDIENTE_DEVOLUCION'" class="btn-confirm" (click)="confirmarRecepcion(p)">Libro recibido</button>
@@ -123,27 +153,39 @@
     <h2>Devueltos</h2>
 
     <h3>Libros que he recibido (como dueño)</h3>
-    <p *ngIf="prestamosComoDuenioDevueltos?.length === 0" class="estado">No has registrado libros recibidos.</p>
+    <p *ngIf="prestamosComoDuenioDevueltos.length === 0" class="estado">No has registrado libros recibidos.</p>
     <article *ngFor="let p of prestamosComoDuenioDevueltos" class="prestamo-card">
       <div class="card-media">
-        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+        <img
+          [src]="p.libro.portada || portadaDefault"
+          [alt]="tituloLibro(p)"
+          class="portada"
+          [title]="p.libro.portada || portadaDefault"
+          (error)="onPortadaError($event)"
+        />
       </div>
-      <h3>{{ p.libro?.titulo_libro }}</h3>
-      <p><strong>Solicitante:</strong> {{ p.usuario?.nombre }}</p>
+      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
+      <p><strong>Solicitante:</strong> {{ nombreSolicitante(p) }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
-      <p><strong>Fecha final:</strong> {{ formatearFecha(p.fecha_fin) }}</p>
+      <p><strong>Fecha final:</strong> {{ formatearFecha(obtenerFechaFin(p)) }}</p>
     </article>
 
     <h3 style="margin-top:1rem">Mis libros devueltos (como solicitante)</h3>
-    <p *ngIf="prestamosComoSolicitanteDevueltos?.length === 0" class="estado">No tienes devoluciones registradas.</p>
+    <p *ngIf="prestamosComoSolicitanteDevueltos.length === 0" class="estado">No tienes devoluciones registradas.</p>
     <article *ngFor="let p of prestamosComoSolicitanteDevueltos" class="prestamo-card">
       <div class="card-media">
-        <img [src]="p.libro?.portada || portadaDefault" alt="Portada" />
+        <img
+          [src]="p.libro.portada || portadaDefault"
+          [alt]="tituloLibro(p)"
+          class="portada"
+          [title]="p.libro.portada || portadaDefault"
+          (error)="onPortadaError($event)"
+        />
       </div>
-      <h3>{{ p.libro?.titulo_libro }}</h3>
-      <p><strong>Dueño:</strong> {{ p.usuario?.nombre }}</p>
+      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
+      <p><strong>Dueño:</strong> {{ nombreDuenio(p) }}</p>
       <p><strong>Estado:</strong> {{ p.estado }}</p>
-      <p><strong>Fecha final:</strong> {{ formatearFecha(p.fecha_fin) }}</p>
+      <p><strong>Fecha final:</strong> {{ formatearFecha(obtenerFechaFin(p)) }}</p>
     </article>
   </section>
 

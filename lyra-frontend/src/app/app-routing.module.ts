@@ -66,8 +66,34 @@ const routes: Routes = [
   },
   {
     path: 'prestamos',
-    component: PrestamosComponent,
-    canActivate: [AuthGuard]
+    redirectTo: 'prestamos/prestados',
+    pathMatch: 'full'
+  },
+  {
+    path: 'prestamos',
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'prestados',
+        component: PrestamosComponent,
+        data: { vista: 'presto' }
+      },
+      {
+        path: 'solicitados',
+        component: PrestamosComponent,
+        data: { vista: 'solicito' }
+      },
+      {
+        path: 'aceptados',
+        component: PrestamosComponent,
+        data: { vista: 'aceptados' }
+      },
+      {
+        path: 'devueltos',
+        component: PrestamosComponent,
+        data: { vista: 'devueltos' }
+      }
+    ]
   },
   {
     path: 'mi-biblioteca',
