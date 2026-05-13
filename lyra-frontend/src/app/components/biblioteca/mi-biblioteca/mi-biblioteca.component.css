@@ -34,6 +34,25 @@
   padding: 1rem 1.4rem 0.35rem;
 }
 
+:is(.icono-filtro, .btn-limpiar, .btn-header, .btn-accion, .btn-cerrar, .btn-mas) {
+  transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease, color 0.14s ease, box-shadow 0.14s ease;
+}
+
+:is(.icono-filtro, .btn-limpiar, .btn-header, .btn-accion, .btn-cerrar, .btn-mas):not(:disabled):hover {
+  box-shadow: 0 6px 18px rgba(30, 41, 59, 0.08);
+  transform: translateY(-1px);
+}
+
+:is(.icono-filtro, .btn-limpiar, .btn-header, .btn-accion, .btn-cerrar, .btn-mas):not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+:is(.icono-filtro, .btn-limpiar, .btn-header, .btn-accion, .btn-cerrar, .btn-mas):focus-visible {
+  outline: 2px solid #e39bf5;
+  outline-offset: 2px;
+}
+
 .icono-filtro {
   display: inline-flex;
   align-items: center;
@@ -46,6 +65,10 @@
   color: #87439d;
   font-size: 1.05rem;
   cursor: pointer;
+}
+
+.icono-filtro:hover {
+  background: #f8f9fc;
 }
 
 .icono-filtro.activo {
@@ -111,7 +134,13 @@
   background: #ffffff;
   color: #334155;
   cursor: pointer;
+  font-weight: 600;
 }
+
+.btn-limpiar:not(:disabled):hover {
+  background: #f8f9fc;
+}
+
 
 .btn-limpiar:disabled {
   opacity: 0.6;
@@ -127,10 +156,29 @@
   padding: 0 0.9rem;
   font-size: 0.9rem;
   cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-header:not(:disabled):hover {
+  background: #f8f9fc;
 }
 
 .btn-anadir {
   border-color: #b8c7ef;
+}
+
+.btn-header.btn-anadir {
+  border-color: transparent;
+  background: linear-gradient(90deg, #c7b6d8 0%, #e5b6ce 100%);
+  color: #fff;
+}
+
+.btn-header.btn-anadir:not(:disabled):hover {
+  background: linear-gradient(90deg, #c7b6d8 0%, #e5b6ce 100%);
+  box-shadow: 0 8px 20px rgba(97, 63, 125, 0.24);
 }
 
 .btn-carpeta {
@@ -151,12 +199,18 @@
 }
 
 .top5-panel {
-  margin: 0.2rem 1.4rem 0.9rem;
+  width: min(980px, 100%);
+  margin: 0.2rem auto 0.9rem;
   padding: 0.9rem;
   border: 1px solid #d8dbe3;
   border-radius: 12px;
   background: #fbfcff;
   box-shadow: 0 6px 18px rgba(30, 41, 59, 0.08);
+  box-sizing: border-box;
+}
+
+.top5-panel .lista-libros {
+  padding: 0;
 }
 
 .top5-header {
@@ -282,21 +336,56 @@
 }
 
 .btn-accion {
-  padding: 0.2rem 0.35rem;
-  font-size: 0.68rem;
-  min-height: 30px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+  min-height: 32px;
   border: 1px solid currentColor;
-  border-radius: 4px;
-  background: transparent;
+  border-radius: 10px;
+  background: #ffffff;
   line-height: 1.1;
   cursor: pointer;
   white-space: normal;
   overflow-wrap: anywhere;
   flex: 1 1 calc(50% - 0.3rem);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-accion:not(:disabled):hover {
+  background: #f8f9fc;
+}
+
+.btn-ver {
+  border-color: #e39bf5;
+  background: #eaf0ff;
+  color: #aa2bd8;
+}
+
+.btn-ver:not(:disabled):hover {
+  background: #eaf0ff;
+}
+
+.btn-editar {
+  border-color: #e39bf5;
+  background: #eaf0ff;
+  color: #aa2bd8;
+}
+
+.btn-editar:not(:disabled):hover {
+  background: #fbfcff;
 }
 
 .btn-borrar {
   flex-basis: 100%;
+  border-color: #b21f3a;
+  background: #ffffff;
+  color: #b21f3a;
+}
+
+.btn-borrar:not(:disabled):hover {
+  background: #f8f9fc;
 }
 
 
@@ -461,6 +550,10 @@
   cursor: pointer;
 }
 
+.btn-cerrar:hover {
+  background: #ffffff;
+}
+
 .filtros-catalogo {
   display: flex;
   flex-wrap: wrap;
@@ -511,6 +604,10 @@
   font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
+}
+
+.btn-mas:not(:disabled):hover {
+  background: #eaf0ff;
 }
 
 .btn-mas.btn-anadido {

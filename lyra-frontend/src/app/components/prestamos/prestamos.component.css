@@ -88,6 +88,19 @@
   color: #2d2240;
 }
 
+.titulo-libro {
+  margin: 0 0 0.4rem;
+  color: #2d2240;
+  font-size: 1.05rem;
+}
+
+.portada {
+  display: block;
+  width: 72px;
+  height: 96px;
+  object-fit: cover;
+}
+
 .estado {
   text-align: center;
   color: #6a5a7a;

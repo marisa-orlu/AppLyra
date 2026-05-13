@@ -1,44 +1,52 @@
 <aside class="menu-lateral" [class.colapsado]="colapsado">
   <div class="menu-header">
     <div class="menu-logo">
-      <img
-        *ngIf="!colapsado; else logoColapsado"
-        src="assets/logo/logo-app-lyra.png"
-        alt="Logo App Lyra"
-        class="logo-img"
-      />
+      <img *ngIf="!colapsado; else logoColapsado" src="assets/logo/logo-app-lyra.png" alt="Logo App Lyra"
+        class="logo-img" />
 
       <ng-template #logoColapsado>
-        <img
-          src="assets/logo/Logo App Lyra_Mesa de trabajo 1 copia 4.png"
-          alt="Logo App Lyra compacto"
-          class="logo-img logo-img-colapsado"
-        />
+        <img src="assets/logo/Logo App Lyra_Mesa de trabajo 1 copia 4.png" alt="Logo App Lyra compacto"
+          class="logo-img logo-img-colapsado" />
       </ng-template>
     </div>
 
-    <button
-      type="button"
-      class="btn-toggle"
-      (click)="toggleSidebar()"
+    <button type="button" class="btn-toggle" (click)="toggleSidebar()"
       [attr.aria-label]="colapsado ? 'Expandir menu lateral' : 'Colapsar menu lateral'"
-      [title]="colapsado ? 'Expandir menu' : 'Colapsar menu'"
-    >
+      [title]="colapsado ? 'Expandir menu' : 'Colapsar menu'">
       <span class="flecha" [class.derecha]="colapsado" aria-hidden="true"></span>
     </button>
   </div>
 
   <nav class="menu-nav" aria-label="Navegacion principal">
     <ng-container *ngFor="let item of menuItems">
-      <a
-        [routerLink]="item.route"
-        routerLinkActive="activo"
-        class="menu-item"
-        [attr.aria-label]="colapsado ? item.label : null"
-      >
-        <i class="menu-icono" [ngClass]="item.iconClass" aria-hidden="true"></i>
-        <span class="menu-texto">{{ item.label }}</span>
-      </a>
+      <ng-container *ngIf="item.children?.length; else itemSimple">
+        <div class="menu-grupo">
+          <button type="button" class="menu-item" [class.activo]="isGrupoActivo(item)" (click)="toggleSubmenu(item)"
+            [attr.aria-label]="colapsado ? item.label : null" [attr.aria-expanded]="isSubmenuAbierto(item)"
+            [attr.aria-controls]="submenuId(item)">
+            <i class="menu-icono" [ngClass]="item.iconClass" aria-hidden="true"></i>
+            <span class="menu-texto">{{ item.label }}</span>
+          </button>
+
+          <div class="submenu" [class.abierto]="isSubmenuAbierto(item) && !colapsado" *ngIf="!colapsado"
+            [id]="submenuId(item)" [attr.aria-label]="'Submenu de ' + item.label">
+
+            <a *ngFor="let child of item.children" [routerLink]="child.route" routerLinkActive="activo"
+              class="menu-item submenu-item">
+              <span class="submenu-punto" aria-hidden="true"></span>
+              <span class="menu-texto">{{ child.label }}</span>
+            </a>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #itemSimple>
+        <a [routerLink]="item.route" routerLinkActive="activo" class="menu-item"
+          [attr.aria-label]="colapsado ? item.label : null">
+          <i class="menu-icono" [ngClass]="item.iconClass" aria-hidden="true"></i>
+          <span class="menu-texto">{{ item.label }}</span>
+        </a>
+      </ng-template>
     </ng-container>
   </nav>
 
