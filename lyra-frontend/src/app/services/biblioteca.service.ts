@@ -67,6 +67,12 @@ export class BibliotecaService {
     });
   }
 
+  obtenerTop5Puntuacion(idUsuario: number): Observable<LibroUsuarioDto[]> {
+    return this.http.get<LibroUsuarioDto[]>(`${this.apiUrl}/${idUsuario}/libros/top5-puntuacion`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   eliminarDeBiblioteca(idLibroUsuario: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${idLibroUsuario}`, {
       headers: this.getAuthHeaders()
