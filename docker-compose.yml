@@ -1,0 +1,30 @@
+services:
+
+  backend:
+    build:
+      context: ./lyra-backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./lyra-backend/uploads:/app/uploads
+
+    container_name: lyra-backend
+
+    restart: always
+
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./lyra-frontend
+      dockerfile: Dockerfile
+
+    container_name: lyra-frontend
+
+    restart: always
+
+    ports:
+      - "4200:80"
+
+    depends_on:
+      - backend

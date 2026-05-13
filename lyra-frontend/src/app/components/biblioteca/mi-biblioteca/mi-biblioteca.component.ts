@@ -548,7 +548,8 @@ export class MiBibliotecaComponent implements OnInit {
     this.bibliotecaService.obtenerTop5Puntuacion(idUsuario).subscribe({
       next: (data: LibroUsuarioDto[]) => {
         const respuesta = Array.isArray(data) ? data : [];
-        this.top5Puntuacion = respuesta.map(item => this.mapearLibroUsuario(item));
+        const mapeados = respuesta.map(item => this.mapearLibroUsuario(item));
+        this.top5Puntuacion = mapeados.filter(item => this.obtenerEstrellasSeleccionadas(item) > 0);
         this.top5Puntuacion.forEach(item => this.cargarPortadaSegura(item, this.objectUrlsTop5));
         this.cargandoTop5 = false;
       },

@@ -199,8 +199,8 @@
 }
 
 .top5-panel {
-  width: min(980px, 100%);
-  margin: 0.2rem auto 0.9rem;
+  width: 100%;
+  margin: 0.2rem 0 0.9rem;
   padding: 0.9rem;
   border: 1px solid #d8dbe3;
   border-radius: 12px;
@@ -211,6 +211,7 @@
 
 .top5-panel .lista-libros {
   padding: 0;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 
 .top5-header {
