@@ -4,6 +4,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +21,7 @@ import { CuentaComponent } from './components/cuenta/cuenta.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { AmigosComponent } from './components/amigos/amigos.component';
 import { PrestamosComponent } from './components/prestamos/prestamos.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 
 
 @NgModule({
@@ -33,7 +36,8 @@ import { PrestamosComponent } from './components/prestamos/prestamos.component';
     MiBibliotecaComponent,
     CuentaComponent,
     UsuariosComponent,
-    AmigosComponent
+    AmigosComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -43,6 +47,8 @@ import { PrestamosComponent } from './components/prestamos/prestamos.component';
     HttpClientModule,
     FormsModule,
     MatSnackBarModule,
+    MatDialogModule,
+    MatButtonModule,
     AuthModule
   ],
   providers: [],

@@ -1,0 +1,17 @@
+<div class="lyra-confirm-titlebar">
+  <h2 mat-dialog-title class="lyra-confirm-title">{{ data.title }}</h2>
+</div>
+
+<div mat-dialog-content class="lyra-confirm-content">
+  <p class="mensaje">{{ data.message }}</p>
+</div>
+
+<div mat-dialog-actions class="lyra-confirm-actions" align="end">
+  <button type="button" mat-button class="lyra-confirm-btn lyra-confirm-btn-cancel" (click)="cancelar()">
+    {{ data.cancelText || 'Cancelar' }}
+  </button>
+
+  <button type="button" mat-flat-button class="lyra-confirm-btn lyra-confirm-btn-ok" (click)="confirmar()">
+    {{ data.confirmText || 'Aceptar' }}
+  </button>
+</div>

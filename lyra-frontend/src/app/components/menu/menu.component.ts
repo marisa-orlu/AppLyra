@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 type MenuChildItem = {
   label: string;
@@ -56,7 +58,8 @@ export class MenuComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.menuItemsBase.forEach(item => {
       if (item.children?.length && this.isGrupoActivo(item)) {
@@ -97,15 +100,30 @@ export class MenuComponent {
   }
 
   cerrarSesion(): void {
-    this.authService.logout();
-    localStorage.removeItem('rol');
-
-    this.snackBar.open('Sesión cerrada correctamente', 'Cerrar', {
-      duration: 3000,
-      verticalPosition: 'bottom',
-      horizontalPosition: 'center'
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '360px',
+      panelClass: 'lyra-confirm-dialog',
+      data: {
+        title: 'Cerrar sesión',
+        message: '¿Deseas cerrar sesión?',
+        confirmText: 'Cerrar sesión',
+        cancelText: 'Cancelar'
+      }
     });
 
-    this.router.navigate(['/login']);
+    ref.afterClosed().subscribe(confirmado => {
+      if (!confirmado) return;
+
+      this.authService.logout();
+      localStorage.removeItem('rol');
+
+      this.snackBar.open('Sesión cerrada correctamente', 'Cerrar', {
+        duration: 3000,
+        verticalPosition: 'bottom',
+        horizontalPosition: 'center'
+      });
+
+      this.router.navigate(['/login']);
+    });
   }
 }
