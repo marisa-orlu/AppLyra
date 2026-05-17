@@ -211,7 +211,29 @@
 
 .top5-panel .lista-libros {
   padding: 0;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 180px));
+  justify-content: start;
+  gap: 0.6rem;
+}
+
+.top5-panel .card-libro-usuario {
+  max-width: 180px;
+  padding: 0.45rem;
+  min-height: unset;
+}
+
+.top5-panel .portada {
+  aspect-ratio: 2 / 3;
+  margin-bottom: 0.35rem;
+}
+
+.top5-panel .contenido {
+  font-size: 0.74rem;
+}
+
+.top5-panel .contenido h3 {
+  font-size: 0.82rem;
+  min-height: 1.6em;
 }
 
 .top5-header {

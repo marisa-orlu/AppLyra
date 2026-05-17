@@ -5,3 +5,10 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Dialog de confirmación con look Lyra */
+.lyra-confirm-dialog .mdc-dialog__surface {
+	border-radius: 14px;
+	overflow: hidden;
+	border: 1px solid #d8dbe3;
+}
