@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://imgur.com/YWSODac" style="max-width: 400px; width: 100%;">
+<img src="https://i.imgur.com/YWSODac.png" style="max-width: 400px; width: 100%;">
 
 # App Lyra 📚  
 ### Aplicación social de gestión de biblioteca personal
