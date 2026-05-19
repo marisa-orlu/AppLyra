@@ -27,7 +27,7 @@
                 <input
                     type="text"
                     [value]="filtroTitulo"
-                    (input)="filtroTitulo = ($any($event.target)).value"
+                    (input)="onFiltroTituloInput(($any($event.target)).value)"
                     placeholder="Buscar por titulo"
                 />
             </label>
@@ -37,27 +37,27 @@
                 <input
                     type="text"
                     [value]="filtroAutor"
-                    (input)="filtroAutor = ($any($event.target)).value"
+                    (input)="onFiltroAutorInput(($any($event.target)).value)"
                     placeholder="Buscar por autor"
                 />
             </label>
 
             <label class="campo-filtro">
-                <span>Anio de publicacion</span>
+                <span>Año de publicación</span>
                 <input
                     type="number"
                     min="0"
                     [value]="filtroAnio"
-                    (input)="filtroAnio = ($any($event.target)).value"
+                    (input)="onFiltroAnioInput(($any($event.target)).value)"
                     placeholder="Ej: 2024"
                 />
             </label>
 
             <label class="campo-filtro">
-                <span>Categoria</span>
+                <span>Categoría</span>
                 <select
                     [value]="filtroCategoria"
-                    (change)="filtroCategoria = ($any($event.target)).value"
+                    (change)="onFiltroCategoriaChange(($any($event.target)).value)"
                 >
                     <option value="">Todas</option>
                     <option *ngFor="let categoria of categoriasDisponibles" [value]="categoria">
@@ -78,7 +78,7 @@
     <p *ngIf="error" class="estado estado-error">{{ error }}</p>
 
     <div class="grid-libros" *ngIf="!cargando && !error">
-        <article class="card-libro" *ngFor="let libro of librosFiltrados; trackBy: trackByLibro">
+        <article class="card-libro" *ngFor="let libro of librosMostrados; trackBy: trackByLibro">
             <img
                 [src]="libro.portada || portadaDefault"
                 [alt]="libro.titulo"
@@ -125,25 +125,25 @@
         <p class="estado" *ngIf="libros.length > 0 && librosFiltrados.length === 0">No hay resultados con esos filtros.</p>
     </div>
 
-    <div class="paginacion" *ngIf="!cargando && !error && totalPaginas > 0">
+    <div class="paginacion" *ngIf="!cargando && !error && totalPaginasVista > 0">
         <button
             type="button"
             class="btn-pagina"
             (click)="irPaginaAnterior()"
-            [disabled]="paginaActual === 0"
+            [disabled]="paginaVista === 0"
         >
             Anterior
         </button>
 
         <p class="paginacion-info">
-            Pagina {{ paginaActual + 1 }} de {{ totalPaginas }} · {{ totalElementos }} libros
+            Pagina {{ paginaVista + 1 }} de {{ totalPaginasVista }} · {{ totalElementosVista }} libros
         </p>
 
         <button
             type="button"
             class="btn-pagina"
             (click)="irPaginaSiguiente()"
-            [disabled]="paginaActual >= totalPaginas - 1"
+            [disabled]="paginaVista >= totalPaginasVista - 1"
         >
             Siguiente
         </button>

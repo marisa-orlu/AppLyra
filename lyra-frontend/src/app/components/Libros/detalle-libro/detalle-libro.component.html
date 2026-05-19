@@ -19,19 +19,19 @@
 
     <div class="detalle-info">
       <p><strong>Autor:</strong> {{ libro.autor }}</p>
-      <p><strong>Categoria:</strong> {{ libro.genero || 'Sin genero' }}</p>
+      <p><strong>Categoría:</strong> {{ libro.genero || 'Sin genero' }}</p>
       <p><strong>Año:</strong> {{ libro.anio_publicacion || 'Sin dato' }}</p>
 
       <div class="info-biblioteca" *ngIf="desdeBiblioteca">
         <h3>Datos en mi biblioteca</h3>
         <p><strong>Estado:</strong> {{ estadoBiblioteca || 'Sin estado' }}</p>
-        <p><strong>Fecha de agregacion:</strong> {{ fechaAgregacionBiblioteca || 'Sin fecha' }}</p>
-        <p><strong>Prestamo:</strong> {{ prestadoBiblioteca === null ? 'Sin dato' : (prestadoBiblioteca ? 'Si' : 'No') }}</p>
-        <p><strong>Puntuacion:</strong> {{ puntuacionBiblioteca ?? 'Sin puntuacion' }}</p>
+        <p><strong>Fecha de agregación:</strong> {{ fechaAgregacionBiblioteca || 'Sin fecha' }}</p>
+        <p><strong>Préstamo:</strong> {{ prestadoBiblioteca === null ? 'Sin dato' : (prestadoBiblioteca ? 'Si' : 'No') }}</p>
+        <p><strong>Puntuación:</strong> {{ puntuacionBiblioteca ?? 'Sin puntuacion' }}</p>
       </div>
 
       <div class="valoracion" aria-label="Valoracion del libro">
-        <strong>Valoracion:</strong>
+        <strong>Valoración:</strong>
         <i class="bi bi-star"></i>
         <i class="bi bi-star"></i>
         <i class="bi bi-star"></i>

@@ -45,8 +45,7 @@ export class MenuComponent {
       children: [
         { label: 'Libros prestados', route: '/prestamos/prestados', disabled: false },
         { label: 'Libros solicitados', route: '/prestamos/solicitados', disabled: false },
-        { label: 'Libros aceptados', route: '/prestamos/aceptados', disabled: false },
-        { label: 'Libros devueltos', route: '/prestamos/devueltos', disabled: false }
+        { label: 'Libros aceptados', route: '/prestamos/aceptados', disabled: false }
       ]
     },
     { label: 'Mi biblioteca', route: '/mi-biblioteca', iconClass: 'bi bi-bookmarks-fill', disabled: false },

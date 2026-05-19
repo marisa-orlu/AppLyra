@@ -101,8 +101,8 @@
   <section class="top5-panel" *ngIf="!cargando && !error" aria-label="Top 5 por puntuacion">
     <header class="top5-header">
       <div class="top5-header-texto">
-        <h3>Top 5 por puntuacion</h3>
-        <p>Los libros mejor puntuados de tu biblioteca.</p>
+        <h3>Top 5 por puntuación</h3>
+        <p>Los libros mejor puntuados de tu biblioteca</p>
       </div>
 
       <button
@@ -160,12 +160,12 @@
       <div class="contenido">
         <h3>{{ item.titulo }}</h3>
         <p><strong>Autor:</strong> {{ item.autor }}</p>
-        <p><strong>Genero:</strong> {{ item.genero }}</p>
+        <p><strong>Género:</strong> {{ item.genero }}</p>
         <p><strong>Estado:</strong> {{ item.estado }}</p>
-        <p><strong>Fecha de agregacion:</strong> {{ item.fechaAgregacion }}</p>
-        <p><strong>Prestamo:</strong> {{ item.isPrestamo ? 'Si' : 'No' }}</p>
+        <p><strong>Fecha de agregación:</strong> {{ item.fechaAgregacion }}</p>
+        <p><strong>Préstamo:</strong> {{ item.isPrestamo ? 'Si' : 'No' }}</p>
         <div class="valoracion-editable">
-          <strong>Puntuacion:</strong>
+          <strong>Puntuación:</strong>
           <div class="estrellas" aria-label="Valoracion actual">
             <span
               *ngFor="let estrella of estrellasDisponibles"
@@ -210,7 +210,7 @@
   >
     <div class="modal-catalogo" (click)="$event.stopPropagation()">
       <header class="modal-catalogo-header">
-        <h2 id="titulo-popup-anadir">Anadir libro a mi biblioteca</h2>
+        <h2 id="titulo-popup-anadir">Añadir libro a mi biblioteca</h2>
         <button type="button" class="btn-cerrar" (click)="cerrarPopupAnadirLibro()">X</button>
       </header>
 
@@ -231,7 +231,7 @@
         />
       </div>
 
-      <p *ngIf="cargandoCatalogo" class="estado">Cargando catalogo...</p>
+      <p *ngIf="cargandoCatalogo" class="estado">Cargando catálogo...</p>
 
       <div class="tabla-contenedor" *ngIf="!cargandoCatalogo">
         <table class="tabla-catalogo">
@@ -311,11 +311,11 @@
             (change)="prestamoEdicion = ($any($event.target)).checked"
             [disabled]="guardandoEdicion"
           />
-          <span>Prestamo activo</span>
+          <span>Préstamo activo</span>
         </label>
 
         <div class="campo-edicion">
-          <span>Puntuacion</span>
+          <span>Puntuación</span>
           <div class="estrellas" aria-label="Editar puntuacion">
             <button
               type="button"

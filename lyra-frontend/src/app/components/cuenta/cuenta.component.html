@@ -23,7 +23,7 @@
     <div class="datos-cuenta">
       <p><strong>Email:</strong> {{ u.email }}</p>
       <p><strong>Registrado:</strong> {{ fechaRegistroFormateada }}</p>
-      <p *ngIf="u.biografia"><strong>Biografia</strong> {{ recortarBiografia(u.biografia, 30) }}</p>
+      <p *ngIf="u.biografia"><strong>Biografía</strong> {{ recortarBiografia(u.biografia, 30) }}</p>
     </div>
 
     <div class="acciones-cuenta">
@@ -65,7 +65,7 @@
       </label>
 
       <label class="campo-form">
-        <span>Biografia</span>
+        <span>Biografía</span>
         <textarea
           name="biografia"
           [(ngModel)]="formEdicion.biografia"

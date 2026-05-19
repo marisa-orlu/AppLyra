@@ -87,11 +87,6 @@ const routes: Routes = [
         path: 'aceptados',
         component: PrestamosComponent,
         data: { vista: 'aceptados' }
-      },
-      {
-        path: 'devueltos',
-        component: PrestamosComponent,
-        data: { vista: 'devueltos' }
       }
     ]
   },

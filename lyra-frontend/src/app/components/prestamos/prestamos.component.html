@@ -20,11 +20,6 @@
       <input type="radio" name="vista" value="aceptados" [(ngModel)]="vista" (ngModelChange)="onVistaChange($event)" />
       <span>Aceptados</span>
     </label>
-    
-    <label>
-      <input type="radio" name="vista" value="devueltos" [(ngModel)]="vista" (ngModelChange)="onVistaChange($event)" />
-      <span>Devueltos</span>
-    </label>
   </div>
 
   <p *ngIf="cargando" class="estado">Cargando préstamos...</p>
@@ -146,46 +141,6 @@
         <button *ngIf="(p.estado || '').toUpperCase() === 'PENDIENTE_DEVOLUCION'" class="btn-confirm" (click)="confirmarRecepcion(p)">Libro recibido</button>
         <span *ngIf="(p.estado || '').toUpperCase() === 'ACEPTADO'" class="estado">En préstamo</span>
       </div>
-    </article>
-  </section>
-
-  <section *ngIf="vista === 'devueltos' && !cargando" class="prestamos-lista">
-    <h2>Devueltos</h2>
-
-    <h3>Libros que he recibido (como dueño)</h3>
-    <p *ngIf="prestamosComoDuenioDevueltos.length === 0" class="estado">No has registrado libros recibidos.</p>
-    <article *ngFor="let p of prestamosComoDuenioDevueltos" class="prestamo-card">
-      <div class="card-media">
-        <img
-          [src]="p.libro.portada || portadaDefault"
-          [alt]="tituloLibro(p)"
-          class="portada"
-          [title]="p.libro.portada || portadaDefault"
-          (error)="onPortadaError($event)"
-        />
-      </div>
-      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
-      <p><strong>Solicitante:</strong> {{ nombreSolicitante(p) }}</p>
-      <p><strong>Estado:</strong> {{ p.estado }}</p>
-      <p><strong>Fecha final:</strong> {{ formatearFecha(obtenerFechaFin(p)) }}</p>
-    </article>
-
-    <h3 style="margin-top:1rem">Mis libros devueltos (como solicitante)</h3>
-    <p *ngIf="prestamosComoSolicitanteDevueltos.length === 0" class="estado">No tienes devoluciones registradas.</p>
-    <article *ngFor="let p of prestamosComoSolicitanteDevueltos" class="prestamo-card">
-      <div class="card-media">
-        <img
-          [src]="p.libro.portada || portadaDefault"
-          [alt]="tituloLibro(p)"
-          class="portada"
-          [title]="p.libro.portada || portadaDefault"
-          (error)="onPortadaError($event)"
-        />
-      </div>
-      <p class="titulo-libro"><strong>Título del libro:</strong> {{ tituloLibro(p) }}</p>
-      <p><strong>Dueño:</strong> {{ nombreDuenio(p) }}</p>
-      <p><strong>Estado:</strong> {{ p.estado }}</p>
-      <p><strong>Fecha final:</strong> {{ formatearFecha(obtenerFechaFin(p)) }}</p>
     </article>
   </section>
 

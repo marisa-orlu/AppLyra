@@ -24,7 +24,7 @@ export class PrestamosComponent implements OnInit {
 
   prestamosComoDuenio: PrestamoUsuarioLibro[] = [];
   prestamosComoSolicitante: PrestamoUsuarioLibro[] = [];
-  vista: 'presto' | 'solicito' | 'aceptados' | 'devueltos' = 'presto';
+  vista: 'presto' | 'solicito' | 'aceptados' = 'presto';
   readonly portadaDefault = 'assets/portadas/quijote.jpg';
   private objectUrls: string[] = [];
   private routeSub?: Subscription;
@@ -49,7 +49,7 @@ export class PrestamosComponent implements OnInit {
   ngOnInit(): void {
     this.routeSub = this.route.data.subscribe(data => {
       const vista = data?.['vista'] as any;
-      if (vista === 'presto' || vista === 'solicito' || vista === 'aceptados' || vista === 'devueltos') {
+      if (vista === 'presto' || vista === 'solicito' || vista === 'aceptados') {
         this.vista = vista;
       }
     });
@@ -57,14 +57,14 @@ export class PrestamosComponent implements OnInit {
     this.cargarPrestamos();
   }
 
-  onVistaChange(nuevaVista: 'presto' | 'solicito' | 'aceptados' | 'devueltos'): void {
+  onVistaChange(nuevaVista: 'presto' | 'solicito' | 'aceptados'): void {
     const segmento = this.segmentoParaVista(nuevaVista);
     if (!segmento) return;
     if (this.router.url.endsWith('/' + segmento)) return;
     this.router.navigate(['/prestamos', segmento]);
   }
 
-  private segmentoParaVista(vista: 'presto' | 'solicito' | 'aceptados' | 'devueltos'): string {
+  private segmentoParaVista(vista: 'presto' | 'solicito' | 'aceptados'): string {
     switch (vista) {
       case 'presto':
         return 'prestados';
@@ -72,8 +72,6 @@ export class PrestamosComponent implements OnInit {
         return 'solicitados';
       case 'aceptados':
         return 'aceptados';
-      case 'devueltos':
-        return 'devueltos';
       default:
         return 'prestados';
     }
@@ -393,14 +391,6 @@ export class PrestamosComponent implements OnInit {
 
   get prestamosComoSolicitanteAceptados(): PrestamoUsuarioLibro[] {
     return this.prestamosComoSolicitante.filter(p => (p.estado || '').toUpperCase() === 'ACEPTADO');
-  }
-
-  get prestamosComoDuenioDevueltos(): PrestamoUsuarioLibro[] {
-    return this.prestamosComoDuenio.filter(p => (p.estado || '').toUpperCase() === 'DEVUELTO');
-  }
-
-  get prestamosComoSolicitanteDevueltos(): PrestamoUsuarioLibro[] {
-    return this.prestamosComoSolicitante.filter(p => (p.estado || '').toUpperCase() === 'DEVUELTO');
   }
 
   confirmarRecepcion(itemOrId: any): void {
