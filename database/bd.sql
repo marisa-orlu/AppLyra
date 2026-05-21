@@ -26,7 +26,8 @@ CREATE TABLE Libro (
     genero VARCHAR(100),
     anio_publicacion INT,
     sinopsis TEXT,
-    portada VARCHAR(255)
+    portada VARCHAR(255),
+    UNIQUE (titulo_libro, autor)
 );
 
 

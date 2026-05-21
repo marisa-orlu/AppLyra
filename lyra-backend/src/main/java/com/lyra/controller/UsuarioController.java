@@ -15,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class UsuarioController {
     // Registrar usuario
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<UsuarioDTO> registrar(
-            @RequestPart("data") UsuarioRegistroDTO dto,
+            @Valid @RequestPart("data") UsuarioRegistroDTO dto,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) {
         return ResponseEntity

@@ -12,7 +12,15 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "libro")
+@Table(
+    name = "libro",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_libro_titulo_autor",
+            columnNames = {"titulo_libro", "autor"}
+        )
+    }
+)
 @Getter
 @Setter
 @ToString

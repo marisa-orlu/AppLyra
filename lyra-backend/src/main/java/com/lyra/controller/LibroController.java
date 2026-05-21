@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.validation.Valid;
 
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class LibroController {
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<LibroDTO> crear(
-            @RequestPart("data") LibroCrearDTO dto,
+            @Valid @RequestPart("data") LibroCrearDTO dto,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal Usuario usuarioAutenticado
     ) {

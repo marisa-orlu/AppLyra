@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
@@ -77,9 +78,9 @@ export class GestionLibrosComponent implements OnDestroy {
             this.router.navigate(['/libros']);
           }, 700);
         },
-        error: () => {
+        error: (err: HttpErrorResponse) => {
           this.guardando = false;
-          this.error = 'No se pudo actualizar el libro. Revisa los datos e intentalo de nuevo.';
+          this.error = this.obtenerMensajeError(err) || 'No se pudo actualizar el libro. Revisa los datos e intentalo de nuevo.';
         }
       });
       return;
@@ -94,11 +95,17 @@ export class GestionLibrosComponent implements OnDestroy {
           this.router.navigate(['/libros']);
         }, 700);
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.guardando = false;
-        this.error = 'No se pudo crear el libro. Revisa los datos e intentalo de nuevo.';
+        this.error = this.obtenerMensajeError(err) || 'No se pudo crear el libro. Revisa los datos e intentalo de nuevo.';
       }
     });
+  }
+
+  private obtenerMensajeError(err: HttpErrorResponse): string {
+    const detalles: Record<string, string> | undefined = err.error?.detalles;
+    const primerDetalle = detalles ? Object.values(detalles)[0] : '';
+    return (err.error?.mensaje || err.error?.message || err.error?.error || primerDetalle || '').toString();
   }
 
   private cargarLibro(id: number): void {

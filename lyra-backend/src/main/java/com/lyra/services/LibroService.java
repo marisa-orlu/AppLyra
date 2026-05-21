@@ -2,6 +2,7 @@ package com.lyra.services;
 
 import com.lyra.DTOs.LibroDTOs.LibroCrearDTO;
 import com.lyra.DTOs.LibroDTOs.LibroDTO;
+import com.lyra.exception.LibroYaExisteException;
 import com.lyra.exception.OperacionNoPermitidaException;
 import com.lyra.exception.RecursoNoEncontradoException;
 import com.lyra.model.FileMetadata;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.lyra.services.StorageService;
 
 import java.util.List;
 
@@ -28,11 +28,19 @@ public class LibroService {
 
     // Crear libro
     public Libro crearLibro(LibroCrearDTO dto, MultipartFile file, Usuario usuarioAutenticado) {
+        String tituloNormalizado = dto.titulo() == null ? "" : dto.titulo().trim();
+        String autorNormalizado = dto.autor() == null ? "" : dto.autor().trim();
+
+        if (!tituloNormalizado.isBlank() && !autorNormalizado.isBlank()
+            && libroRepository.existsByTituloYAutorIgnoreCase(tituloNormalizado, autorNormalizado)) {
+            throw new LibroYaExisteException("Ya existe un libro con ese título y autor");
+        }
+
         FileMetadata fileMetadata = (file != null && !file.isEmpty()) ? storageService.store(file) : null;
 
         Libro libro = Libro.builder()
-                .titulo_libro(dto.titulo())
-                .autor(dto.autor())
+            .titulo_libro(tituloNormalizado)
+            .autor(autorNormalizado)
                 .genero(dto.genero())
                 .anio_publicacion(dto.anio_publicacion())
                 .sinopsis(dto.sinopsis())

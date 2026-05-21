@@ -74,7 +74,9 @@ export class RegisterComponent {
       },
       error: (err: HttpErrorResponse) => {
         this.cargando = false;
-        const backendMessage = err.error?.message || err.error?.error;
+        const detalles: Record<string, string> | undefined = err.error?.detalles;
+        const primerDetalle = detalles ? Object.values(detalles)[0] : undefined;
+        const backendMessage = err.error?.mensaje || err.error?.message || err.error?.error || primerDetalle;
         this.errorMessage = backendMessage || 'No se pudo registrar el usuario.';
       }
     });

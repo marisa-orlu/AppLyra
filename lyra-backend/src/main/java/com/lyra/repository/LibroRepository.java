@@ -9,8 +9,11 @@ import java.util.List;
 
 public interface LibroRepository extends JpaRepository<Libro, Long> {
     //Busca libros cuyo título contenga la cadena indicada, ignorando mayúsculas y minúsculas
-    @Query("SELECT l FROM Libro l WHERE l.titulo_libro = :titulo")
-    List<Libro> findByTituloLibroContainingIgnoreCase(String titulo);
+    @Query("SELECT l FROM Libro l WHERE LOWER(l.titulo_libro) LIKE LOWER(CONCAT('%', :titulo, '%'))")
+    List<Libro> findByTituloLibroContainingIgnoreCase(@Param("titulo") String titulo);
+
+    @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM Libro l WHERE LOWER(l.titulo_libro) = LOWER(:titulo) AND LOWER(l.autor) = LOWER(:autor)")
+    boolean existsByTituloYAutorIgnoreCase(@Param("titulo") String titulo, @Param("autor") String autor);
 
     // Busca libros cuyo autor contenga la cadena indicada, ignorando mayúsculas y minúsculas
     List<Libro> findByAutorContainingIgnoreCase(String autor);
